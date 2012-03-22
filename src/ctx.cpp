@@ -83,11 +83,11 @@ xs::ctx_t::~ctx_t ()
 
 int xs::ctx_t::terminate ()
 {
+    slot_sync.lock ();
     if (!starting) {
 
         //  Check whether termination was already underway, but interrupted and now
         //  restarted.
-        slot_sync.lock ();
         bool restarted = terminating;
         terminating = true;
         slot_sync.unlock ();
@@ -115,8 +115,8 @@ int xs::ctx_t::terminate ()
         xs_assert (cmd.type == command_t::done);
         slot_sync.lock ();
         xs_assert (sockets.empty ());
-        slot_sync.unlock ();
     }
+    slot_sync.unlock ();
 
     //  Deallocate the resources.
     delete this;
@@ -154,6 +154,7 @@ int xs::ctx_t::setctxopt (int option_, const void *optval_, size_t optvallen_)
 
 xs::socket_base_t *xs::ctx_t::create_socket (int type_)
 {
+    slot_sync.lock ();
     if (unlikely (starting)) {
 
         starting = false;
@@ -193,8 +194,6 @@ xs::socket_base_t *xs::ctx_t::create_socket (int type_)
             slots [i] = NULL;
         }
     }
-
-    slot_sync.lock ();
 
     //  Once xs_term() was called, we can't create new sockets.
     if (terminating) {
