@@ -245,11 +245,22 @@ int xs::signaler_t::make_fdpair (fd_t *r_, fd_t *w_)
     //  implement IOCP polling mechanism that allows to poll on both sockets
     //  and in-process synchronisation objects.
 
+    //  Make the following critical section accessible to everyone.
+    SECURITY_ATTRIBUTES sa = {0};
+    sa.nLength = sizeof (sa);
+    sa.bInheritHandle = FALSE;
+    SECURITY_DESCRIPTOR sd;
+    BOOL ok = InitializeSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION);
+    win_assert (ok);
+    ok = SetSecurityDescriptorDacl(&sd, TRUE, (PACL) NULL, FALSE);
+    win_assert (ok);
+    sa.lpSecurityDescriptor = &sd;
+
     //  This function has to be in a system-wide critical section so that
     //  two instances of the library don't accidentally create signaler
     //  crossing the process boundary.
     //  We'll use named event object to implement the critical section.
-    HANDLE sync = CreateEvent (NULL, FALSE, TRUE, "xs-signaler-port-sync");
+    HANDLE sync = CreateEvent (&sa, FALSE, TRUE, "xs-signaler-port-sync");
     win_assert (sync != NULL);
 
     //  Enter the critical section.
