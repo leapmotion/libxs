@@ -28,7 +28,7 @@ build and install the library, ensure your system has a C++ compiler
 installed, and proceed with the following steps:
 
 1. Run `./configure`, then `make` to build the library.
-2. Optionally, run `make test` to run the built in test suite.
+2. Optionally, run `make check` to run the built in test suite.
 3. Run `make install` as root.
 4. On Linux or other platforms which use ld.so for dynamic linking, run
    `ldconfig` or equivalent as root to update your systems shared library
@@ -53,7 +53,7 @@ For further details refer to the `doc/xs_zmq.html` or the 'xs_zmq(7)'
 manual page included with this distribution.
 
 NOTE: Enabling this option will *overwrite* any existing installation of
-`libzmq` on your system. 
+`libzmq` on your system.
 
 
 Reporting Bugs
