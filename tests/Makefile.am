@@ -20,7 +20,8 @@ noinst_PROGRAMS = pair_inproc \
                   timeo \
                   max_sockets \
                   emptyctx \
-                  polltimeo
+                  polltimeo \
+                  wireformat
 
 pair_inproc_SOURCES = pair_inproc.cpp testutil.hpp
 pair_tcp_SOURCES = pair_tcp.cpp testutil.hpp
@@ -40,5 +41,6 @@ timeo_SOURCES = timeo.cpp testutil.hpp
 max_sockets_SOURCES = max_sockets.cpp
 emptyctx_SOURCES = emptyctx.cpp
 polltimeo_SOURCES = polltimeo.cpp testutil.hpp
+wireformat_SOURCES = wireformat.cpp
 
 TESTS = $(noinst_PROGRAMS)
