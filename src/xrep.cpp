@@ -217,23 +217,25 @@ int xs::xrep_t::xrecv (msg_t *msg_, int flags_)
         //  Empty identity means we can preserve the auto-generated identity.
         if (msg_->size () != 0) {
 
+            //  Check whether this is a duplicate identity. If so, drop the
+            //  corresponding connection.
+            blob_t identity ((unsigned char*) msg_->data (), msg_->size ());
+            if (outpipes.find (identity) != outpipes.end ()) {
+                pipe->terminate (false);
+                continue;
+            }
+
             //  Actual change of the identity.
             bool changed = false;
             outpipes_t::iterator it = outpipes.begin ();
             while (it != outpipes.end ()) {
                 if (it->second.pipe == pipe) {
-                    blob_t identity ((unsigned char*) msg_->data (),
-                        msg_->size ());
                     pipe->set_identity (identity);
                     outpipes.erase (it);
                     outpipe_t outpipe = {pipe, true};
-                    if (!outpipes.insert (outpipes_t::value_type (identity,
-                        outpipe)).second) {
-
-                        //  Duplicate identity.
-                        //  TODO: Drop the new connection.
-                        xs_assert (false);
-                    }
+                    bool ok = outpipes.insert (outpipes_t::value_type (identity,
+                          outpipe)).second;
+                    xs_assert (ok);
                     changed = true;
                     break;
                 }
