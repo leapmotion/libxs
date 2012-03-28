@@ -60,7 +60,7 @@ xs::fd_t xs::open_socket (int domain_, int type_, int protocol_)
     return s;
 }
 
-void xs::tune_tcp_socket (fd_t s_)
+void xs::tune_tcp_socket (fd_t s_, bool keepalive_)
 {
     //  Disable Nagle's algorithm. We are doing data batching on Crossroads
     //  level, so using Nagle wouldn't improve throughput in anyway, but it
@@ -81,6 +81,17 @@ void xs::tune_tcp_socket (fd_t s_)
         sizeof (int));
     errno_assert (rc != SOCKET_ERROR);
 #endif
+
+    if (keepalive_) { 
+        int keepalive = 1;
+        int rc = setsockopt (s_, SOL_SOCKET, SO_KEEPALIVE, (char*) &keepalive,
+            sizeof (int));
+#ifdef XS_HAVE_WINDOWS
+        wsa_assert (rc != SOCKET_ERROR);
+#else
+        errno_assert (rc == 0);
+#endif
+    }
 }
 
 void xs::unblock_socket (fd_t s_)

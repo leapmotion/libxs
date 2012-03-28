@@ -390,6 +390,19 @@ Option value unit:: N/A (flags)
 Default value:: N/A
 Applicable socket types:: all
 
+XS_KEEPALIVE: Use TCP keepalives
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When set to `1` TCP keepalives are enabled. This option can be used to prevent
+the infrastructure (VPNs and similar) to terminate connections with no activity.
+The keepalive period as such is normally a global OS setting.
+
+[horizontal]
+Option value type:: int
+Option value unit:: boolean
+Default value:: 0 (false)
+Applicable socket types:: all, when using TCP transports.
+
 
 RETURN VALUE
 ------------

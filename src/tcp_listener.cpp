@@ -86,7 +86,7 @@ void xs::tcp_listener_t::in_event (fd_t fd_)
     if (fd == retired_fd)
         return;
 
-    tune_tcp_socket (fd);
+    tune_tcp_socket (fd, options.keepalive ? true : false);
 
     //  Create the engine object for this connection.
     stream_engine_t *engine = new (std::nothrow) stream_engine_t (fd, options);

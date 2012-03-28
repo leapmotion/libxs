@@ -198,6 +198,7 @@ XS_EXPORT int xs_setctxopt (void *context, int option, const void *optval,
 #define XS_RCVTIMEO 27
 #define XS_SNDTIMEO 28
 #define XS_IPV4ONLY 31
+#define XS_KEEPALIVE 32
 
 /*  Message options                                                           */
 #define XS_MORE 1
