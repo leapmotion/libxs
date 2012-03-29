@@ -57,7 +57,7 @@ extern "C" {
 /*  Version macros for compile-time API version detection                     */
 #define XS_VERSION_MAJOR 1
 #define XS_VERSION_MINOR 0
-#define XS_VERSION_PATCH 0
+#define XS_VERSION_PATCH 1
 
 #define XS_MAKE_VERSION(major, minor, patch) \
     ((major) * 10000 + (minor) * 100 + (patch))
