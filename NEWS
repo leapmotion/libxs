@@ -6,27 +6,55 @@ I/O. For a detailed list of changes please refer to Git history, or the
 ChangeLog file included with your distribution of Crossroads.
 
 
+Release 1.0.1 (29 March 2012)
+-----------------------------
+
+This is a bug fix release, with the only new addition being the XS_KEEPALIVE
+socket option for enabling TCP keepalives.
+
+New features::
+* XS_KEEPALIVE options added
+
+Bugfixes::
+* Fix race condition in find_endpoint
+* Small ommision in session creation mechanism
+* Reconnect test fixed
+* OpenVMS tests fixed
+* Send identities on reconnect
+* Make REQ session state machine aware of reconnections
+* Error handling during connect
+* Ignore distorted timeouts on Windows in debug mode
+* Add long comment about security problem on Windows platform
+* Signaler's global event is now accessible by everyone
+* Handle duplicate identities decently
+* wireformat test added
+* Fixed issue LIBZMQ-345 - race condition in ctx.socket/term allows segfault
+* Add missing <sys/types.h> header.
+* Use strncpy() instead of strcpy().
+* Documentation updates.
+
+
 Release 1.0.0 (15 March 2012)
 -----------------------------
 
 Initial release.  Changes listed here are as compared to libzmq release
 3.1.
 
-New features:
+New features::
 
 * The io_threads argument has been removed from xs_init(), and the default
   number of I/O threads per context is now 1.
 * Context options added - see xs_setctxopt(3):
-  * The XS_IO_THREADS context option allows the user to specify the size of
+  - The XS_IO_THREADS context option allows the user to specify the size of
     the worker thread pool.
-  * The XS_MAX_SOCKETS context option allows the user to specify the
+  - The XS_MAX_SOCKETS context option allows the user to specify the
     maximum number of sockets that can exist in parallel within a context.
 * Allow setting the source address for TCP connections - see xs_tcp(7).
 * ZeroMQ drop-in compatibility mode, enabled by the --enable-libzmq option
   to configure. This is a binary compatible emulation of the ZeroMQ 2.1.11
   API, for details see zmq(7).
 
-Bugfixes:
+Bugfixes::
 
 * Fix pgm_receiver.cpp: zmq_assert (pending_bytes == 0). (LIBZMQ-205)
 * Fix assertion in pgm_sender_t::plug(). (LIBZMQ-303)
@@ -39,18 +67,18 @@ Bugfixes:
 * Removal of pipe from dist_t fixed.
 * Only use AI_V4MAPPED if defined, and don't use it on FreeBSD.
 
-Optimisation:
+Optimisation::
 
 * Several optimisations to reduce the memory size of PUB/SUB subscription
   map.
 * Avoid one extra call to poll() when there are no more data to send.
 
-Build:
+Build::
 
 * MSVC build updated to use MSVC2010 instead of MSVC2008.
 * configure prints out a summary of XS configuration.
 
-Self tests:
+Self tests::
 
 * Many more tests have been added, see the tests/ subdirectory.
 * The self tests can now be run from a MSVC build, see the "tests" project.

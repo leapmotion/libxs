@@ -158,7 +158,7 @@ XS_EXPORT int xs_setctxopt (void *context, int option, const void *optval,
 /*  Crossroads socket definition.                                             */
 /******************************************************************************/
 
-/*  Socket types.                                                             */ 
+/*  Socket types.                                                             */
 #define XS_PAIR 0
 #define XS_PUB 1
 #define XS_SUB 2
@@ -171,6 +171,7 @@ XS_EXPORT int xs_setctxopt (void *context, int option, const void *optval,
 #define XS_XPUB 9
 #define XS_XSUB 10
 
+/*  Legacy socket type aliases.                                               */
 #define XS_ROUTER XS_XREP
 #define XS_DEALER XS_XREQ
 

@@ -59,15 +59,33 @@ NOTE: Enabling this option will *overwrite* any existing installation of
 Reporting Bugs
 --------------
 
-To report a bug, sign up to the Crossroads I/O development discussion group
-at <http://groups.crossroads.io> and post a topic or send an email
-describing your problem.
+To report a bug, send an email describing your problem to the Crossroads
+mailing list. To make sure your bug report won't be missed, you can file a
+report in the bug tracker at <https://github.com/crossroads-io/libxs/issues>.
 
-Prefix the subject of your post with `[BUG]` to catch the developers
-attention.
+To help Crossroads developers to fix the bug, please try to provide a minimal
+test program, ideally written in C, that reproduces the problem you are
+reporting.
 
-To ensure that your report is dealt with promptly, please attach a minimal
-test case reproducing the bug, ideally written in C.
+NOTE: The bug tracker exists primarily to track bugs and pertinent data (test
+cases, crash logs, etc.). You should not use it for _discussion_. In the bug
+tracker your audience will be very limited. Mailing list serves the purpose of
+discussing bugs much better.
+
+
+Contributing to the Project
+---------------------------
+
+Before contributing to the project make sure you understand the legal
+implications of doing so. These are outlined on the Crossroads I/O website at
+<http://www.crossroads.io/dev:legal>.
+
+To submit your contribution, send it as a patch (using git format-patch, diff,
+or similar) to the mailing list. Make sure to use your real name, and prefix
+the subject of your post with `[PATCH]`.
+
+All contributions will be reviewed and, if they pass review, accepted. For more
+details refer to the website at <http://www.crossroads.io/dev:code-review>.
 
 
 Resources
@@ -81,7 +99,8 @@ mailing list. Vist <http://groups.crossroads.io/> to join or view archives
 of previous discussion.
 
 Extensive documentation is provided with the distribution. Refer to
-doc/xs.html, or "man xs" after you have installed libxs on your system.
+`doc/xs.html`, or the 'xs(7)' manual page after you have installed libxs on
+your system.
 
 Further resources, language bindings, tutorials, and more can be found on
 the Crossroads website at <http://www.crossroads.io/>.

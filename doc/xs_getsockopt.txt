@@ -121,7 +121,7 @@ XS_IDENTITY: Set socket identity
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The 'XS_IDENTITY' option shall retrieve the identity of the specified 'socket'.
 Socket identity is used only by request/reply pattern. Namely, it can be used
-in tandem with ROUTER socket to route messages to the peer with specific
+in tandem with a 'XS_XREP' socket to route messages to the peer with specific
 identity.
 
 Identity should be at least one byte and at most 255 bytes long. Identities
@@ -338,7 +338,7 @@ hosts.
 Option value type:: int
 Option value unit:: boolean
 Default value:: 1 (true)
-Applicable socket types:: all, when using TCP transports.
+Applicable socket types:: all, when using TCP transport.
 
 
 XS_FD: Retrieve file descriptor associated with the socket
@@ -390,18 +390,18 @@ Option value unit:: N/A (flags)
 Default value:: N/A
 Applicable socket types:: all
 
-XS_KEEPALIVE: Use TCP keepalives
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When set to `1` TCP keepalives are enabled. This option can be used to prevent
-the infrastructure (VPNs and similar) to terminate connections with no activity.
-The keepalive period as such is normally a global OS setting.
+XS_KEEPALIVE: Enable transport keepalives
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When set to `1`, this option enables use of protocol keepalives on the
+'socket', if supported by the underlying transport protocol.
 
 [horizontal]
 Option value type:: int
 Option value unit:: boolean
 Default value:: 0 (false)
-Applicable socket types:: all, when using TCP transports.
+Applicable socket types:: all, when using TCP transport.
 
 
 RETURN VALUE
