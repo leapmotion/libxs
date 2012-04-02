@@ -92,6 +92,9 @@ namespace xs
         //  If 1, keepalives are to be sent periodically.
         int keepalive;
 
+        //  Version of wire protocol to use.
+        int protocol;
+
         //  If true, session reads all the pending messages from the pipe and
         //  sends them to the network when socket is closed.
         bool delay_on_close;

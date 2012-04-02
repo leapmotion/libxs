@@ -52,7 +52,11 @@ void xs::xsub_t::xattach_pipe (pipe_t *pipe_, bool icanhasall_)
 {
     xs_assert (pipe_);
     fq.attach (pipe_);
-    dist.attach (pipe_);
+
+    //  Pipes with 0MQ/2.1-style protocol are not eligible for accepting
+    //  subscriptions.
+    if (pipe_->get_protocol () != 1)
+        dist.attach (pipe_);
 
     //  Send all the cached subscriptions to the new upstream peer.
     subscriptions.apply (send_subscription, pipe_);
@@ -72,14 +76,18 @@ void xs::xsub_t::xwrite_activated (pipe_t *pipe_)
 void xs::xsub_t::xterminated (pipe_t *pipe_)
 {
     fq.terminated (pipe_);
-    dist.terminated (pipe_);
+    if (pipe_->get_protocol () != 1)
+        dist.terminated (pipe_);
 }
 
 void xs::xsub_t::xhiccuped (pipe_t *pipe_)
 {
-    //  Send all the cached subscriptions to the hiccuped pipe.
-    subscriptions.apply (send_subscription, pipe_);
-    pipe_->flush ();
+    if (pipe_->get_protocol () != 1) {
+
+        //  Send all the cached subscriptions to the hiccuped pipe.
+        subscriptions.apply (send_subscription, pipe_);
+        pipe_->flush ();
+    }
 }
 
 int xs::xsub_t::xsend (msg_t *msg_, int flags_)

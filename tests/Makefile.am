@@ -21,7 +21,8 @@ noinst_PROGRAMS = pair_inproc \
                   max_sockets \
                   emptyctx \
                   polltimeo \
-                  wireformat
+                  wireformat \
+                  libzmq21
 
 pair_inproc_SOURCES = pair_inproc.cpp testutil.hpp
 pair_tcp_SOURCES = pair_tcp.cpp testutil.hpp
@@ -42,5 +43,6 @@ max_sockets_SOURCES = max_sockets.cpp
 emptyctx_SOURCES = emptyctx.cpp
 polltimeo_SOURCES = polltimeo.cpp testutil.hpp
 wireformat_SOURCES = wireformat.cpp
+libzmq21_SOURCES = libzmq21.cpp
 
 TESTS = $(noinst_PROGRAMS)

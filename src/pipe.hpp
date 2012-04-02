@@ -44,7 +44,7 @@ namespace xs
     //  pipe receives all the pending messages before terminating, otherwise it
     //  terminates straight away.
     int pipepair (xs::object_t *parents_ [2], xs::pipe_t* pipes_ [2],
-        int hwms_ [2], bool delays_ [2]);
+        int hwms_ [2], bool delays_ [2], int protocol_);
 
     struct i_pipe_events
     {
@@ -68,7 +68,8 @@ namespace xs
     {
         //  This allows pipepair to create pipe objects.
         friend int pipepair (xs::object_t *parents_ [2],
-            xs::pipe_t* pipes_ [2], int hwms_ [2], bool delays_ [2]);
+            xs::pipe_t* pipes_ [2], int hwms_ [2], bool delays_ [2],
+            int protocol_);
 
     public:
 
@@ -110,6 +111,9 @@ namespace xs
         //  before actual shutdown.
         void terminate (bool delay_);
 
+        //  Returns the ID of the protocol associated with the pipe.
+        int get_protocol ();
+
     private:
 
         //  Type of the underlying lock-free pipe.
@@ -128,7 +132,7 @@ namespace xs
         //  Constructor is private. Pipe can only be created using
         //  pipepair function.
         pipe_t (object_t *parent_, upipe_t *inpipe_, upipe_t *outpipe_,
-            int inhwm_, int outhwm_, bool delay_);
+            int inhwm_, int outhwm_, bool delay_, int protocol_);
 
         //  Pipepair uses this function to let us know about
         //  the peer pipe object.
@@ -187,6 +191,10 @@ namespace xs
         //  terminating. If false, we terminate immediately when the peer
         //  asks us to.
         bool delay;
+
+        //  ID of the protocol to use. This value is not used by the pipe
+        //  itself, rather it's used by the users of the pipe.
+        int protocol;
 
         //  Identity of the writer. Used uniquely by the reader side.
         blob_t identity;

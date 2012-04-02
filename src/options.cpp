@@ -46,6 +46,7 @@ xs::options_t::options_t () :
     sndtimeo (-1),
     ipv4only (1),
     keepalive (0),
+    protocol (0),
     delay_on_close (true),
     delay_on_disconnect (true),
     filter (false),
@@ -232,6 +233,21 @@ int xs::options_t::setsockopt (int option_, const void *optval_,
             return 0;
         }
 
+    case XS_PROTOCOL:
+        {
+            if (optvallen_ != sizeof (int)) {
+                errno = EINVAL;
+                return -1;
+            }
+            int val = *((int*) optval_);
+            if (val < 0) {
+                errno = EINVAL;
+                return -1;
+            }
+            protocol = val;
+            return 0;
+        }
+
     }
 
     errno = EINVAL;
@@ -410,6 +426,15 @@ int xs::options_t::getsockopt (int option_, void *optval_, size_t *optvallen_)
             return -1;
         }
         *((int*) optval_) = keepalive;
+        *optvallen_ = sizeof (int);
+        return 0;
+
+    case XS_PROTOCOL:
+        if (*optvallen_ < sizeof (int)) {
+            errno = EINVAL;
+            return -1;
+        }
+        *((int*) optval_) = protocol;
         *optvallen_ = sizeof (int);
         return 0;
 
