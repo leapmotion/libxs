@@ -721,6 +721,13 @@ dnl # Choose polling system                                                     
 dnl ################################################################################
 AC_DEFUN([LIBXS_CHECK_POLLER], [{
 
+    # Templates to be picked up by autoheader
+    AH_TEMPLATE([XS_HAVE_KQUEUE], [Defined to 1 if your system has kqueue()])
+    AH_TEMPLATE([XS_HAVE_EPOLL], [Defined to 1 if your system has epoll()])
+    AH_TEMPLATE([XS_HAVE_DEVPOLL], [Defined to 1 if your system has /dev/poll])
+    AH_TEMPLATE([XS_HAVE_POLL], [Defined to 1 if your system has poll()])
+    AH_TEMPLATE([XS_HAVE_SELECT], [Defined to 1 if your system has select()])
+
     # Allow user to disable doc build
     AC_ARG_WITH([poller], [AS_HELP_STRING([--with-poller],
                 [choose polling system manually. valid values are kqueue, epoll, devpoll, poll or select [default=autodetect]])])
@@ -767,9 +774,14 @@ AC_DEFUN([LIBXS_CHECK_POLLER], [{
       ;;
     esac
 
-    libxs_cv_poller_flag=`echo "XS_HAVE_${libxs_cv_poller}" | tr a-z A-Z`
+    AS_IF([test "x${libxs_cv_poller}" != "x"], [
+        AC_MSG_RESULT([using $libxs_cv_poller])
+        $1
+    ], [
+        AC_MSG_RESULT([no suitable polling system found])
+        $2
+    ])
 
-    AS_IF([test "x${libxs_cv_poller}" != "x"],
-          [AC_MSG_RESULT([using $libxs_cv_poller]) ; $1], [AC_MSG_RESULT(no suitable polling system found) ; $2])
+    AC_DEFINE_UNQUOTED(AS_TR_CPP(xs_have_${libxs_cv_poller}))
 }])
 

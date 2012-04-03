@@ -231,7 +231,7 @@ AS_CASE(["${host_cpu}"],
 LIBXS_CHECK_DOC_BUILD
 
 # Check polling system
-LIBXS_CHECK_POLLER([CPPFLAGS="${CPPFLAGS} -D${libxs_cv_poller_flag}"],
+LIBXS_CHECK_POLLER([],
     [AC_MSG_ERROR([Unable to continue without polling system])])
 
 # Checks for header files.
