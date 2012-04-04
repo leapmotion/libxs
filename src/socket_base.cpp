@@ -422,6 +422,7 @@ int xs::socket_base_t::connect (const char *addr_)
             id.set_flags (msg_t::identity);
             bool written = ppair [0]->write (&id);
             xs_assert (written);
+            pipes [0]->flush ();
         }
 
         //  Attach remote end of the pipe to the peer socket. Note that peer's
