@@ -191,7 +191,7 @@ void xs::pipe_t::rollback ()
 void xs::pipe_t::flush ()
 {
     //  If terminate() was already called do nothing.
-    if (state == terminated && state == double_terminated)
+    if (state == terminated || state == double_terminated)
         return;
 
     //  The peer does not exist anymore at this point.
