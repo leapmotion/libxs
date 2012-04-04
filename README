@@ -1,8 +1,8 @@
 Welcome
--------
+=======
 
 Crossroads I/O ("libxs") is a library for building scalable and high
-performance distributed applications. It fits between classic BSD sockets,
+performance distributed applications.  It fits between classic BSD sockets,
 JMS/AMQP-style message queues, and enterprise message-oriented middleware.
 
 Crossroads I/O extends the standard socket interfaces with features
@@ -11,7 +11,7 @@ providing an abstraction of asynchronous message queues, multiple messaging
 patterns, message filtering (subscriptions), seamless access to multiple
 transport protocols, and more.
 
-Crossroads I/O provides a native C API for applications. Support for many
+Crossroads I/O provides a native C API for applications.  Support for many
 more languages is provided by the community through language bindings which
 can be found at the Crossroads website.
 
@@ -20,18 +20,18 @@ Building and Installation
 -------------------------
 
 The following instructions apply to building libxs from an official release
-downloaded from the Crossroads I/O website. For building directly from Git,
+downloaded from the Crossroads I/O website.  For building directly from Git,
 refer to the `INSTALL` file included with the libxs distribution.
 
-On POSIX platforms, libxs uses the standard autotools build system. To
+On POSIX platforms, libxs uses the standard autotools build system.  To
 build and install the library, ensure your system has a C++ compiler
 installed, and proceed with the following steps:
 
 1. Run `./configure`, then `make` to build the library.
 2. Optionally, run `make check` to run the built in test suite.
 3. Run `make install` as root.
-4. On Linux or other platforms which use ld.so for dynamic linking, run
-   `ldconfig` or equivalent as root to update your systems shared library
+4. On Linux or other platforms which use `ld.so` for dynamic linking, run
+   `ldconfig` or equivalent as root to update your system's shared library
    cache.
 
 On Windows, solution files for Visual C++ 2010 are provided in the
@@ -49,7 +49,7 @@ language bindings and applications. To enable 'libzmq' compatibility, you
 must build your copy of libxs with the `--enable-libzmq` option to
 configure, or on Windows by building the appropriate solution file.
 
-For further details refer to the `doc/xs_zmq.html` or the 'xs_zmq(7)'
+For further details refer to the `doc/xs_zmq.html` or the `xs_zmq(7)`
 manual page included with this distribution.
 
 NOTE: Enabling this option will *overwrite* any existing installation of
@@ -60,16 +60,16 @@ Reporting Bugs
 --------------
 
 To report a bug, send an email describing your problem to the Crossroads
-mailing list. To make sure your bug report won't be missed, you can file a
-report in the bug tracker at <https://github.com/crossroads-io/libxs/issues>.
+mailing list.  To make sure your bug report won't be missed, you can file a
+report in the [bug tracker][1].
 
 To help Crossroads developers to fix the bug, please try to provide a minimal
 test program, ideally written in C, that reproduces the problem you are
 reporting.
 
 NOTE: The bug tracker exists primarily to track bugs and pertinent data (test
-cases, crash logs, etc.). You should not use it for _discussion_. In the bug
-tracker your audience will be very limited. Mailing list serves the purpose of
+cases, crash logs, etc.).  You should not use it for _discussion_.  In the bug
+tracker your audience will be very limited.  Mailing list serves the purpose of
 discussing bugs much better.
 
 
@@ -77,42 +77,49 @@ Contributing to the Project
 ---------------------------
 
 Before contributing to the project make sure you understand the legal
-implications of doing so. These are outlined on the Crossroads I/O website at
-<http://www.crossroads.io/dev:legal>.
+implications of doing so.  These are outlined on the [Crossroads I/O website][2].
 
-To submit your contribution, send it as a patch (using git format-patch, diff,
-or similar) to the mailing list. Make sure to use your real name, and prefix
+To submit your contribution, send it as a patch (using `git format-patch`, `diff`,
+or similar) to the mailing list.  Make sure to use your real name, and prefix
 the subject of your post with `[PATCH]`.
 
-All contributions will be reviewed and, if they pass review, accepted. For more
-details refer to the website at <http://www.crossroads.io/dev:code-review>.
+All contributions will be reviewed and, if they pass review, accepted.  For more
+details refer to the [website][3].
 
 
 Resources
 ---------
 
-The libxs development Git tree can be found on Github at
-<http://github.com/crossroads-io/libxs>.
+The libxs development Git tree can be found [on Github][4].
 
-Development is coordinated on the <crossroads-dev@groups.crossroads.io>
-mailing list. Vist <http://groups.crossroads.io/> to join or view archives
+Development is coordinated on the [mailing list][5].
+Visit [the archives][6] to join or view archives
 of previous discussion.
 
-Extensive documentation is provided with the distribution. Refer to
-`doc/xs.html`, or the 'xs(7)' manual page after you have installed libxs on
+Extensive documentation is provided with the distribution.  Refer to
+`doc/xs.html`, or the `xs(7)` manual page after you have installed libxs on
 your system.
 
 Further resources, language bindings, tutorials, and more can be found on
-the Crossroads website at <http://www.crossroads.io/>.
+the [Crossroads website][7].
 
 
 Copying
 -------
 
 Free use of this software is granted under the terms of the GNU Lesser General
-Public License (LGPL). For details see the files `COPYING` and `COPYING.LESSER`
+Public License (LGPL).  For details see the files `COPYING` and `COPYING.LESSER`
 included with the libxs distribution.
 
 As a special exception, the copyright holders of libxs grant you the right
-to link the library statically with your software. Refer to the end of
+to link the library statically with your software.  Refer to the end of
 the `COPYING.LESSER` file included with the libxs distribution for details.
+
+
+[1]: <https://github.com/crossroads-io/libxs/issues>   "Bug Tracker"
+[2]: <http://www.crossroads.io/dev:legal>              "Legal Information"
+[3]: <http://www.crossroads.io/dev:code-review>        "Code Review"
+[4]: <http://github.com/crossroads-io/libxs>           "LibXS Project Sources"
+[5]: <crossroads-dev@groups.crossroads.io>             "Mailing List"
+[6]: <http://groups.crossroads.io/>                    "Mailing List Archives"
+[7]: <http://www.crossroads.io/>                       "LibXS Project Site"
