@@ -97,7 +97,7 @@ xs::stream_engine_t::~stream_engine_t ()
 		wsa_assert (rc != SOCKET_ERROR);
 #else
 		int rc = close (s);
-        errno_assert (rc == 0);
+        errno_assert (rc == 0 || errno == ECONNRESET);
 #endif
 		s = retired_fd;
     }
