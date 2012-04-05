@@ -17,9 +17,11 @@ autom4te.cache
 *.html
 *.pdf
 *.ps
+*.patch
 .*
 *~
 .*~
+tests/*.exe
 tests/pair_inproc
 tests/pair_ipc
 tests/pair_tcp
@@ -44,6 +46,7 @@ tests/libzmq21
 tests/resubscribe
 src/platform.hpp*
 src/stamp-h1
+perf/*.exe
 perf/local_lat
 perf/local_thr
 perf/remote_lat
