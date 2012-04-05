@@ -107,6 +107,10 @@
 #include "libzmq21.cpp"
 #undef XS_TEST_MAIN
 
+#define XS_TEST_MAIN resubscribe
+#include "resubscribe.cpp"
+#undef XS_TEST_MAIN
+
 int main ()
 {
     int rc;
@@ -148,6 +152,8 @@ int main ()
     rc = wireformat ();
     assert (rc == 0);
     rc = libzmq21 ();
+    assert (rc == 0);
+    rc = resubscribe ();
     assert (rc == 0);
 
     fprintf (stderr, "SUCCESS\n");

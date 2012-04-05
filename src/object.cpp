@@ -154,6 +154,11 @@ xs::io_thread_t *xs::object_t::choose_io_thread (uint64_t affinity_)
     return ctx->choose_io_thread (affinity_);
 }
 
+xs_filter_t *xs::object_t::get_filter (int filter_id_)
+{
+    return ctx->get_filter (filter_id_);
+}
+
 void xs::object_t::send_stop ()
 {
     //  'stop' command goes always from administrative thread to

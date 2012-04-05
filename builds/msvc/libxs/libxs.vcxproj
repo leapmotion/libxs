@@ -104,6 +104,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\clock.cpp" />
+    <ClCompile Include="..\..\..\src\core.cpp" />
     <ClCompile Include="..\..\..\src\ctx.cpp" />
     <ClCompile Include="..\..\..\src\decoder.cpp" />
     <ClCompile Include="..\..\..\src\devpoll.cpp" />
@@ -122,7 +123,6 @@
     <ClCompile Include="..\..\..\src\lb.cpp" />
     <ClCompile Include="..\..\..\src\mailbox.cpp" />
     <ClCompile Include="..\..\..\src\msg.cpp" />
-    <ClCompile Include="..\..\..\src\mtrie.cpp" />
     <ClCompile Include="..\..\..\src\object.cpp" />
     <ClCompile Include="..\..\..\src\options.cpp" />
     <ClCompile Include="..\..\..\src\own.cpp" />
@@ -135,6 +135,7 @@
     <ClCompile Include="..\..\..\src\precompiled.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\prefix_filter.cpp" />
     <ClCompile Include="..\..\..\src\pub.cpp" />
     <ClCompile Include="..\..\..\src\pull.cpp" />
     <ClCompile Include="..\..\..\src\push.cpp" />
@@ -152,7 +153,6 @@
     <ClCompile Include="..\..\..\src\tcp_connecter.cpp" />
     <ClCompile Include="..\..\..\src\tcp_listener.cpp" />
     <ClCompile Include="..\..\..\src\thread.cpp" />
-    <ClCompile Include="..\..\..\src\trie.cpp" />
     <ClCompile Include="..\..\..\src\upoll.cpp" />
     <ClCompile Include="..\..\..\src\xpub.cpp" />
     <ClCompile Include="..\..\..\src\xrep.cpp" />
@@ -170,6 +170,7 @@
     <ClInclude Include="..\..\..\src\clock.hpp" />
     <ClInclude Include="..\..\..\src\command.hpp" />
     <ClInclude Include="..\..\..\src\config.hpp" />
+    <ClInclude Include="..\..\..\src\core.hpp" />
     <ClInclude Include="..\..\..\src\ctx.hpp" />
     <ClInclude Include="..\..\..\src\decoder.hpp" />
     <ClInclude Include="..\..\..\src\devpoll.hpp" />
@@ -191,7 +192,6 @@
     <ClInclude Include="..\..\..\src\likely.hpp" />
     <ClInclude Include="..\..\..\src\mailbox.hpp" />
     <ClInclude Include="..\..\..\src\msg.hpp" />
-    <ClInclude Include="..\..\..\src\mtrie.hpp" />
     <ClInclude Include="..\..\..\src\mutex.hpp" />
     <ClInclude Include="..\..\..\src\object.hpp" />
     <ClInclude Include="..\..\..\src\options.hpp" />
@@ -203,6 +203,7 @@
     <ClInclude Include="..\..\..\src\pipe.hpp" />
     <ClInclude Include="..\..\..\src\poll.hpp" />
     <ClInclude Include="..\..\..\src\precompiled.hpp" />
+    <ClInclude Include="..\..\..\src\prefix_filter.hpp" />
     <ClInclude Include="..\..\..\src\pub.hpp" />
     <ClInclude Include="..\..\..\src\pull.hpp" />
     <ClInclude Include="..\..\..\src\push.hpp" />
@@ -221,7 +222,6 @@
     <ClInclude Include="..\..\..\src\tcp_connecter.hpp" />
     <ClInclude Include="..\..\..\src\tcp_listener.hpp" />
     <ClInclude Include="..\..\..\src\thread.hpp" />
-    <ClInclude Include="..\..\..\src\trie.hpp" />
     <ClInclude Include="..\..\..\src\upoll.hpp" />
     <ClInclude Include="..\..\..\src\windows.hpp" />
     <ClInclude Include="..\..\..\src\wire.hpp" />

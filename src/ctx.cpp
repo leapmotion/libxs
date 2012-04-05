@@ -35,6 +35,7 @@
 #include "pipe.hpp"
 #include "err.hpp"
 #include "msg.hpp"
+#include "prefix_filter.hpp"
 
 xs::ctx_t::ctx_t () :
     tag (0xbadcafe0),
@@ -46,6 +47,9 @@ xs::ctx_t::ctx_t () :
     max_sockets (512),
     io_thread_count (1)
 {
+    //  Plug in the standard plugins.
+    int rc = plug (prefix_filter);
+    xs_assert (rc == 0);
 }
 
 bool xs::ctx_t::check_tag ()
@@ -124,6 +128,28 @@ int xs::ctx_t::terminate ()
     return 0;
 }
 
+int xs::ctx_t::plug (const void *ext_)
+{
+    if (!ext_) {
+        errno = EFAULT;
+        return -1;
+    }
+
+    //  The extension is a message filter plug-in.
+    xs_filter_t *filter = (xs_filter_t*) ext_;
+    if (filter->type == XS_PLUGIN_FILTER && filter->version == 1) {
+       opt_sync.lock ();
+       filters [filter->id (NULL)] = filter;
+       opt_sync.unlock ();
+       return 0;
+    }
+
+    //  Specified extension type is not supported by this version of
+    //  the library.
+    errno = ENOTSUP;
+    return -1;
+}
+
 int xs::ctx_t::setctxopt (int option_, const void *optval_, size_t optvallen_)
 {
     switch (option_) {
@@ -145,6 +171,8 @@ int xs::ctx_t::setctxopt (int option_, const void *optval_, size_t optvallen_)
         io_thread_count = *((int*) optval_);
         opt_sync.unlock ();
         break;
+    case XS_PLUGIN:
+        return plug (optval_);
     default:
         errno = EINVAL;
         return -1;
@@ -254,6 +282,17 @@ void xs::ctx_t::destroy_socket (class socket_base_t *socket_)
 xs::object_t *xs::ctx_t::get_reaper ()
 {
     return reaper;
+}
+
+xs_filter_t *xs::ctx_t::get_filter (int filter_id_)
+{
+    xs_filter_t *result = NULL;
+    opt_sync.lock ();
+    filters_t::iterator it = filters.find (filter_id_);
+    if (it != filters.end ())
+        result = it->second;
+    opt_sync.unlock ();
+    return result;
 }
 
 void xs::ctx_t::send_command (uint32_t tid_, const command_t &command_)

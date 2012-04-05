@@ -22,7 +22,8 @@ noinst_PROGRAMS = pair_inproc \
                   emptyctx \
                   polltimeo \
                   wireformat \
-                  libzmq21
+                  libzmq21 \
+                  resubscribe
 
 pair_inproc_SOURCES = pair_inproc.cpp testutil.hpp
 pair_tcp_SOURCES = pair_tcp.cpp testutil.hpp
@@ -44,5 +45,6 @@ emptyctx_SOURCES = emptyctx.cpp
 polltimeo_SOURCES = polltimeo.cpp testutil.hpp
 wireformat_SOURCES = wireformat.cpp
 libzmq21_SOURCES = libzmq21.cpp
+resubscribe_SOURCES = resubscribe.cpp
 
 TESTS = $(noinst_PROGRAMS)

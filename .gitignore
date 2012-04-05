@@ -40,6 +40,8 @@ tests/max_sockets
 tests/emptyctx
 tests/polltimeo
 tests/wireformat
+tests/libzmq21
+tests/resubscribe
 src/platform.hpp*
 src/stamp-h1
 perf/local_lat

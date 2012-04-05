@@ -23,6 +23,7 @@ libxs_la_SOURCES = \
     clock.hpp \
     command.hpp \
     config.hpp \
+    core.hpp \
     ctx.hpp \
     decoder.hpp \
     devpoll.hpp \
@@ -44,7 +45,6 @@ libxs_la_SOURCES = \
     likely.hpp \
     mailbox.hpp \
     msg.hpp \
-    mtrie.hpp \
     mutex.hpp \
     object.hpp \
     options.hpp \
@@ -56,6 +56,7 @@ libxs_la_SOURCES = \
     platform.hpp \
     poll.hpp \
     pair.hpp \
+    prefix_filter.hpp \
     pub.hpp \
     pull.hpp \
     push.hpp \
@@ -74,7 +75,6 @@ libxs_la_SOURCES = \
     tcp_connecter.hpp \
     tcp_listener.hpp \
     thread.hpp \
-    trie.hpp \
     upoll.hpp \
     windows.hpp \
     wire.hpp \
@@ -85,6 +85,7 @@ libxs_la_SOURCES = \
     ypipe.hpp \
     yqueue.hpp \
     clock.cpp \
+    core.cpp \
     ctx.cpp \
     decoder.cpp \
     devpoll.cpp \
@@ -103,7 +104,6 @@ libxs_la_SOURCES = \
     lb.cpp \
     mailbox.cpp \
     msg.cpp \
-    mtrie.cpp \
     object.cpp \
     options.cpp \
     own.cpp \
@@ -113,6 +113,7 @@ libxs_la_SOURCES = \
     pgm_socket.cpp \
     pipe.cpp \
     poll.cpp \
+    prefix_filter.cpp \
     pull.cpp \
     push.cpp \
     reaper.cpp \
@@ -130,7 +131,6 @@ libxs_la_SOURCES = \
     tcp_connecter.cpp \
     tcp_listener.cpp \
     thread.cpp \
-    trie.cpp \
     upoll.cpp \
     xpub.cpp \
     xrep.cpp \

@@ -95,6 +95,9 @@ namespace xs
         //  Version of wire protocol to use.
         int protocol;
 
+        //  Filter ID to be used with subscriptions and unsubscriptions.
+        int filter_id;
+
         //  If true, session reads all the pending messages from the pipe and
         //  sends them to the network when socket is closed.
         bool delay_on_close;

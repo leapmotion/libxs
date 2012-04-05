@@ -21,15 +21,17 @@
 #ifndef __XS_XPUB_HPP_INCLUDED__
 #define __XS_XPUB_HPP_INCLUDED__
 
+#include "../include/xs.h"
+
 #include <deque>
 #include <string>
 
 #include "socket_base.hpp"
 #include "session_base.hpp"
-#include "mtrie.hpp"
 #include "array.hpp"
 #include "dist.hpp"
 #include "blob.hpp"
+#include "core.hpp"
 
 namespace xs
 {
@@ -39,8 +41,7 @@ namespace xs
     class pipe_t;
     class io_thread_t;
 
-    class xpub_t :
-        public socket_base_t
+    class xpub_t : public socket_base_t, public core_t
     {
     public:
 
@@ -59,16 +60,18 @@ namespace xs
 
     private:
 
-        //  Function to be applied to the trie to send all the subsciptions
-        //  upstream.
-        static void send_unsubscription (unsigned char *data_, size_t size_,
-            void *arg_);
+        //  Overloaded functions from core_t.
+        int filter_unsubscribed (const unsigned char *data_, size_t size_);
+        int filter_matching (void *subscriber_);
 
-        //  Function to be applied to each matching pipes.
-        static void mark_as_matching (xs::pipe_t *pipe_, void *arg_);
-
-        //  List of all subscriptions mapped to corresponding pipes.
-        mtrie_t subscriptions;
+        //  The repository of subscriptions.
+        struct filter_t
+        {
+            xs_filter_t *type;
+            void *instance;
+        };
+        typedef std::vector <filter_t> filters_t;
+        filters_t filters;
 
         //  Distributor of messages holding the list of outbound pipes.
         dist_t dist;
@@ -80,6 +83,9 @@ namespace xs
         //  applied to the trie, but not yet received by the user.
         typedef std::deque <blob_t> pending_t;
         pending_t pending;
+
+        //  Different values stored while filter extensions are being executed.
+        int tmp_filter_id;
 
         xpub_t (const xpub_t&);
         const xpub_t &operator = (const xpub_t&);

@@ -25,7 +25,8 @@
 #include <map>
 #include <vector>
 #include <string>
-#include <stdarg.h>
+
+#include "../include/xs.h"
 
 #include "mailbox.hpp"
 #include "array.hpp"
@@ -88,6 +89,10 @@ namespace xs
         //  Returns reaper thread object.
         xs::object_t *get_reaper ();
 
+        //  Get the filter associated with the specified filter ID or NULL
+        //  If such filter is not registered.
+        xs_filter_t *get_filter (int filter_id_);
+
         //  Management of inproc endpoints.
         int register_endpoint (const char *addr_, endpoint_t &endpoint_);
         void unregister_endpoints (xs::socket_base_t *socket_);
@@ -101,6 +106,9 @@ namespace xs
         ~ctx_t ();
 
     private:
+
+        //  Plug in the extension specified.
+        int plug (const void *ext_);
 
         //  Used to check whether the object is a context.
         uint32_t tag;
@@ -160,6 +168,10 @@ namespace xs
 
         //  Synchronisation of access to context options.
         mutex_t opt_sync;
+
+        //  List of all filters plugged into the context.
+        typedef std::map <int, xs_filter_t*> filters_t;
+        filters_t filters;
 
         ctx_t (const ctx_t&);
         const ctx_t &operator = (const ctx_t&);

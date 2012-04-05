@@ -22,6 +22,8 @@
 #ifndef __XS_OBJECT_HPP_INCLUDED__
 #define __XS_OBJECT_HPP_INCLUDED__
 
+#include "../include/xs.h"
+
 #include "stdint.hpp"
 
 namespace xs
@@ -63,6 +65,9 @@ namespace xs
 
         //  Chooses least loaded I/O thread.
         xs::io_thread_t *choose_io_thread (uint64_t affinity_);
+
+        //  Functions related to extensions.
+        xs_filter_t *get_filter (int filter_id_);
 
         //  Derived object can use these functions to send commands
         //  to other objects.
