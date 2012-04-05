@@ -425,6 +425,19 @@ int xs::socket_base_t::connect (const char *addr_)
             pipes [0]->flush ();
         }
 
+        //  If required, send the identity of the peer to the local socket.
+        if (peer.options.send_identity) {
+            msg_t id;
+            rc = id.init_size (peer.options.identity_size);
+            xs_assert (rc == 0);
+            memcpy (id.data (), peer.options.identity,
+                peer.options.identity_size);
+            id.set_flags (msg_t::identity);
+            bool written = ppair [1]->write (&id);
+            xs_assert (written);
+            ppair [1]->flush ();
+        }
+
         //  Attach remote end of the pipe to the peer socket. Note that peer's
         //  seqnum was incremented in find_endpoint function. We don't need it
         //  increased here.
