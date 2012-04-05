@@ -111,7 +111,8 @@ XS_EXPORT void xs_version (int *major, int *minor, int *patch);
 #define EFSM (XS_HAUSNUMERO + 51)
 #define ENOCOMPATPROTO (XS_HAUSNUMERO + 52)
 #define ETERM (XS_HAUSNUMERO + 53)
-#define EMTHREAD (XS_HAUSNUMERO + 54)
+#define EMTHREAD (XS_HAUSNUMERO + 54)  /*  Kept for backward compatibility.   */
+                                       /*  Not used anymore.                  */
 
 /*  This function retrieves the errno as it is known to Crossroads library.   */
 /*  The goal of this function is to make the code 100% portable, including    */

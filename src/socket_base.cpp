@@ -326,10 +326,7 @@ int xs::socket_base_t::bind (const char *addr_)
     //  Remaining trasnports require to be run in an I/O thread, so at this
     //  point we'll choose one.
     io_thread_t *thread = choose_io_thread (options.affinity);
-    if (!thread) {
-        errno = EMTHREAD;
-        return -1;
-    }
+    xs_assert (thread);
 
     if (protocol == "tcp") {
         tcp_listener_t *listener = new (std::nothrow) tcp_listener_t (
@@ -437,10 +434,7 @@ int xs::socket_base_t::connect (const char *addr_)
 
     //  Choose the I/O thread to run the session in.
     io_thread_t *thread = choose_io_thread (options.affinity);
-    if (!thread) {
-        errno = EMTHREAD;
-        return -1;
-    }
+    xs_assert (thread);
 
     //  Create session.
     session_base_t *session = session_base_t::create (thread, true, this,

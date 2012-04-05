@@ -58,8 +58,6 @@ The requested 'transport' protocol is not compatible with the socket type.
 The 'context' associated with the specified 'socket' was terminated.
 *ENOTSOCK*::
 The provided 'socket' was invalid.
-*EMTHREAD*::
-No I/O thread is available to accomplish the task.
 
 
 EXAMPLE

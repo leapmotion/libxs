@@ -49,8 +49,6 @@ const char *xs::errno_to_string (int errno_)
         return "The protocol is not compatible with the socket type";
     case ETERM:
         return "Context was terminated";
-    case EMTHREAD:
-        return "No thread available";
     default:
 #if defined _MSC_VER
 #pragma warning (push)
