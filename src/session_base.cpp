@@ -395,14 +395,14 @@ void xs::session_base_t::start_connecting (bool wait_)
 
     //  Choose I/O thread to run connecter in. Given that we are already
     //  running in an I/O thread, there must be at least one available.
-    io_thread_t *io_thread = choose_io_thread (options.affinity);
+    io_thread_t *thread = choose_io_thread (options.affinity);
     xs_assert (io_thread);
 
     //  Create the connecter object.
 
     if (protocol == "tcp") {
         tcp_connecter_t *connecter = new (std::nothrow) tcp_connecter_t (
-            io_thread, this, options, address.c_str (), wait_);
+            thread, this, options, address.c_str (), wait_);
         alloc_assert (connecter);
         launch_child (connecter);
         return;
@@ -411,7 +411,7 @@ void xs::session_base_t::start_connecting (bool wait_)
 #if !defined XS_HAVE_WINDOWS && !defined XS_HAVE_OPENVMS
     if (protocol == "ipc") {
         ipc_connecter_t *connecter = new (std::nothrow) ipc_connecter_t (
-            io_thread, this, options, address.c_str (), wait_);
+            thread, this, options, address.c_str (), wait_);
         alloc_assert (connecter);
         launch_child (connecter);
         return;
@@ -433,7 +433,7 @@ void xs::session_base_t::start_connecting (bool wait_)
 
             //  PGM sender.
             pgm_sender_t *pgm_sender =  new (std::nothrow) pgm_sender_t (
-                io_thread, options);
+                thread, options);
             alloc_assert (pgm_sender);
 
             int rc = pgm_sender->init (udp_encapsulation, address.c_str ());
@@ -445,7 +445,7 @@ void xs::session_base_t::start_connecting (bool wait_)
 
             //  PGM receiver.
             pgm_receiver_t *pgm_receiver =  new (std::nothrow) pgm_receiver_t (
-                io_thread, options);
+                thread, options);
             alloc_assert (pgm_receiver);
 
             int rc = pgm_receiver->init (udp_encapsulation, address.c_str ());

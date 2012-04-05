@@ -101,7 +101,6 @@ int XS_TEST_MAIN ()
         assert (rc == 0);
         rc = xs_recvmsg (xreq, &msg, 0);
         assert (rc >= 0);
-        int rcvmore;
         rc = xs_getsockopt (xreq, XS_RCVMORE, &rcvmore, &sz);
         assert (rc == 0);
         rc = xs_sendmsg (xrep, &msg, rcvmore ? XS_SNDMORE : 0);

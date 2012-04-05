@@ -84,7 +84,7 @@ void xs::tune_tcp_socket (fd_t s_, bool keepalive_)
 
     if (keepalive_) { 
         int keepalive = 1;
-        int rc = setsockopt (s_, SOL_SOCKET, SO_KEEPALIVE, (char*) &keepalive,
+        rc = setsockopt (s_, SOL_SOCKET, SO_KEEPALIVE, (char*) &keepalive,
             sizeof (int));
 #ifdef XS_HAVE_WINDOWS
         wsa_assert (rc != SOCKET_ERROR);

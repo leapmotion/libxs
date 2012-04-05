@@ -77,6 +77,8 @@ int xs::req_t::xsend (msg_t *msg_, int flags_)
 
 int xs::req_t::xrecv (msg_t *msg_, int flags_)
 {
+    int rc;
+
     //  If request wasn't send, we can't wait for reply.
     if (!receiving_reply) {
         errno = EFSM;
@@ -92,7 +94,7 @@ int xs::req_t::xrecv (msg_t *msg_, int flags_)
         // TODO: This should also close the connection with the peer!
         if (unlikely (!(msg_->flags () & msg_t::more) || msg_->size () != 0)) {
             while (true) {
-                int rc = xreq_t::xrecv (msg_, flags_);
+                rc = xreq_t::xrecv (msg_, flags_);
                 errno_assert (rc == 0);
                 if (!(msg_->flags () & msg_t::more))
                     break;
@@ -106,7 +108,7 @@ int xs::req_t::xrecv (msg_t *msg_, int flags_)
         message_begins = false;
     }
 
-    int rc = xreq_t::xrecv (msg_, flags_);
+    rc = xreq_t::xrecv (msg_, flags_);
     if (rc != 0)
         return rc;
 

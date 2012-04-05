@@ -325,17 +325,17 @@ int xs::socket_base_t::bind (const char *addr_)
 
     //  Remaining trasnports require to be run in an I/O thread, so at this
     //  point we'll choose one.
-    io_thread_t *io_thread = choose_io_thread (options.affinity);
-    if (!io_thread) {
+    io_thread_t *thread = choose_io_thread (options.affinity);
+    if (!thread) {
         errno = EMTHREAD;
         return -1;
     }
 
     if (protocol == "tcp") {
         tcp_listener_t *listener = new (std::nothrow) tcp_listener_t (
-            io_thread, this, options);
+            thread, this, options);
         alloc_assert (listener);
-        int rc = listener->set_address (address.c_str ());
+        rc = listener->set_address (address.c_str ());
         if (rc != 0) {
             delete listener;
             return -1;
@@ -347,9 +347,9 @@ int xs::socket_base_t::bind (const char *addr_)
 #if !defined XS_HAVE_WINDOWS && !defined XS_HAVE_OPENVMS
     if (protocol == "ipc") {
         ipc_listener_t *listener = new (std::nothrow) ipc_listener_t (
-            io_thread, this, options);
+            thread, this, options);
         alloc_assert (listener);
-        int rc = listener->set_address (address.c_str ());
+        rc = listener->set_address (address.c_str ());
         if (rc != 0) {
             delete listener;
             return -1;
@@ -407,14 +407,14 @@ int xs::socket_base_t::connect (const char *addr_)
 
         //  Create a bi-directional pipe to connect the peers.
         object_t *parents [2] = {this, peer.socket};
-        pipe_t *pipes [2] = {NULL, NULL};
+        pipe_t *ppair [2] = {NULL, NULL};
         int hwms [2] = {sndhwm, rcvhwm};
         bool delays [2] = {options.delay_on_disconnect, options.delay_on_close};
-        int rc = pipepair (parents, pipes, hwms, delays, options.protocol);
+        rc = pipepair (parents, ppair, hwms, delays, options.protocol);
         errno_assert (rc == 0);
 
         //  Attach local end of the pipe to this socket object.
-        attach_pipe (pipes [0]);
+        attach_pipe (ppair [0]);
 
         //  If required, send the identity of the local socket to the peer.
         if (options.send_identity) {
@@ -423,36 +423,36 @@ int xs::socket_base_t::connect (const char *addr_)
             xs_assert (rc == 0);
             memcpy (id.data (), options.identity, options.identity_size);
             id.set_flags (msg_t::identity);
-            bool written = pipes [0]->write (&id);
+            bool written = ppair [0]->write (&id);
             xs_assert (written);
         }
 
         //  Attach remote end of the pipe to the peer socket. Note that peer's
         //  seqnum was incremented in find_endpoint function. We don't need it
         //  increased here.
-        send_bind (peer.socket, pipes [1], false);
+        send_bind (peer.socket, ppair [1], false);
 
         return 0;
     }
 
     //  Choose the I/O thread to run the session in.
-    io_thread_t *io_thread = choose_io_thread (options.affinity);
-    if (!io_thread) {
+    io_thread_t *thread = choose_io_thread (options.affinity);
+    if (!thread) {
         errno = EMTHREAD;
         return -1;
     }
 
     //  Create session.
-    session_base_t *session = session_base_t::create (io_thread, true, this,
+    session_base_t *session = session_base_t::create (thread, true, this,
         options, protocol.c_str (), address.c_str ());
     errno_assert (session);
 
     //  Create a bi-directional pipe.
     object_t *parents [2] = {this, session};
-    pipe_t *pipes [2] = {NULL, NULL};
+    pipe_t *ppair [2] = {NULL, NULL};
     int hwms [2] = {options.sndhwm, options.rcvhwm};
     bool delays [2] = {options.delay_on_disconnect, options.delay_on_close};
-    rc = pipepair (parents, pipes, hwms, delays, options.protocol);
+    rc = pipepair (parents, ppair, hwms, delays, options.protocol);
     errno_assert (rc == 0);
 
     // PGM does not support subscription forwarding; ask for all data to be
@@ -462,10 +462,10 @@ int xs::socket_base_t::connect (const char *addr_)
         icanhasall = true;
 
     //  Attach local end of the pipe to the socket object.
-    attach_pipe (pipes [0], icanhasall);
+    attach_pipe (ppair [0], icanhasall);
 
     //  Attach remote end of the pipe to the session object later on.
-    session->attach_pipe (pipes [1]);
+    session->attach_pipe (ppair [1]);
 
     //  Activate the session. Make it a child of this socket.
     launch_child (session);

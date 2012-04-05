@@ -125,7 +125,7 @@ int xs::upoll (xs_pollitem_t *items_, int nitems_, int timeout_)
          else if (timeout_ < 0)
              timeout = -1;
          else
-             timeout = end - now;
+             timeout = (int) (end - now);
 
         //  Wait for events.
         while (true) {

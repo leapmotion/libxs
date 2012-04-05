@@ -47,7 +47,7 @@ int XS_TEST_MAIN ()
     //  Try to send 10 messages. Only 4 should succeed.
     for (int i = 0; i < 10; i++)
     {
-        int rc = xs_send (sc, NULL, 0, XS_DONTWAIT);
+        rc = xs_send (sc, NULL, 0, XS_DONTWAIT);
         if (i < 4)
             assert (rc == 0);
         else

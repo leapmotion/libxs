@@ -94,11 +94,11 @@ void xs::tcp_listener_t::in_event (fd_t fd_)
 
     //  Choose I/O thread to run connecter in. Given that we are already
     //  running in an I/O thread, there must be at least one available.
-    io_thread_t *io_thread = choose_io_thread (options.affinity);
-    xs_assert (io_thread);
+    io_thread_t *thread = choose_io_thread (options.affinity);
+    xs_assert (thread);
 
     //  Create and launch a session object. 
-    session_base_t *session = session_base_t::create (io_thread, false, socket,
+    session_base_t *session = session_base_t::create (thread, false, socket,
         options, NULL, NULL);
     errno_assert (session);
     session->inc_seqnum ();
