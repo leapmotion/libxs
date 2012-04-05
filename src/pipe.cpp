@@ -346,9 +346,9 @@ void xs::pipe_t::terminate (bool delay_)
     //  There are still pending messages available, but the user calls
     //  'terminate'. We can act as if all the pending messages were read.
     else if (state == pending && !delay) {
-            outpipe = NULL;
-            send_pipe_term_ack (peer);
-            state = terminating;
+        outpipe = NULL;
+        send_pipe_term_ack (peer);
+        state = terminating;
     }
 
     //  If there are pending messages still availabe, do nothing.
@@ -381,7 +381,8 @@ void xs::pipe_t::terminate (bool delay_)
 		msg_t msg;
 		msg.init_delimiter ();
 		outpipe->write (msg, false);
-		flush ();
+        if (state != terminating && !outpipe->flush ())
+            send_activate_read (peer);
     }
 }
 
