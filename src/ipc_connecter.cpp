@@ -66,8 +66,7 @@ xs::ipc_connecter_t::~ipc_connecter_t ()
         handle = NULL;
     }
 
-    if (s != retired_fd)
-        close ();
+    close ();
 }
 
 void xs::ipc_connecter_t::process_plug ()
@@ -209,7 +208,9 @@ int xs::ipc_connecter_t::open ()
 
 int xs::ipc_connecter_t::close ()
 {
-    xs_assert (s != retired_fd);
+    if (s == retired_fd)
+        return 0;
+
     int rc = ::close (s);
     if (rc != 0)
         return -1;

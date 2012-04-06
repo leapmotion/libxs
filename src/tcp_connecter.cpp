@@ -74,8 +74,7 @@ xs::tcp_connecter_t::~tcp_connecter_t ()
     if (handle)
         rm_fd (handle);
 
-    if (s != retired_fd)
-        close ();
+    close ();
 }
 
 void xs::tcp_connecter_t::process_plug ()
@@ -301,7 +300,9 @@ xs::fd_t xs::tcp_connecter_t::connect ()
 
 void xs::tcp_connecter_t::close ()
 {
-    xs_assert (s != retired_fd);
+    if (s == retired_fd)
+        return;
+
 #ifdef XS_HAVE_WINDOWS
     int rc = closesocket (s);
     wsa_assert (rc != SOCKET_ERROR);
