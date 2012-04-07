@@ -151,12 +151,15 @@ int xs::ipc_listener_t::close ()
 xs::fd_t xs::ipc_listener_t::accept ()
 {
     //  Accept one connection and deal with different failure modes.
+    //  The situation where connection cannot be accepted due to insufficient
+    //  resources is considered valid and treated by ignoring the connection.
     xs_assert (s != retired_fd);
     fd_t sock = ::accept (s, NULL, NULL);
     if (sock == -1) {
         errno_assert (errno == EAGAIN || errno == EWOULDBLOCK ||
             errno == EINTR || errno == ECONNABORTED || errno == EPROTO ||
-            errno == ENOBUFS);
+            errno == ENOBUFS || errno == ENOMEM || errno == EMFILE ||
+            errno == ENFILE);
         return retired_fd;
     }
     return sock;
