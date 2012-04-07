@@ -84,15 +84,17 @@ xs::handle_t xs::devpoll_t::add_fd (fd_t fd_,
     //  Increase the load metric of the thread.
     adjust_load (1);
 
-    return fd_;
+    return fdtoptr (fd_);
 }
 
 void xs::devpoll_t::rm_fd (handle_t handle_)
 {
-    assert (fd_table [handle_].valid);
+    fd_t fd = ptrtofd (handle_);
 
-    devpoll_ctl (handle_, POLLREMOVE);
-    fd_table [handle_].valid = false;
+    assert (fd_table [fd].valid);
+
+    devpoll_ctl (fd, POLLREMOVE);
+    fd_table [fd].valid = false;
 
     //  Decrease the load metric of the thread.
     adjust_load (-1);
@@ -100,30 +102,38 @@ void xs::devpoll_t::rm_fd (handle_t handle_)
 
 void xs::devpoll_t::set_pollin (handle_t handle_)
 {
-    devpoll_ctl (handle_, POLLREMOVE);
-    fd_table [handle_].events |= POLLIN;
-    devpoll_ctl (handle_, fd_table [handle_].events);
+    fd_t fd = ptrtofd (handle_);
+
+    devpoll_ctl (fd, POLLREMOVE);
+    fd_table [fd].events |= POLLIN;
+    devpoll_ctl (fd, fd_table [fd].events);
 }
 
 void xs::devpoll_t::reset_pollin (handle_t handle_)
 {
-    devpoll_ctl (handle_, POLLREMOVE);
-    fd_table [handle_].events &= ~((short) POLLIN);
-    devpoll_ctl (handle_, fd_table [handle_].events);
+    fd_t fd = ptrtofd (handle_);
+
+    devpoll_ctl (fd, POLLREMOVE);
+    fd_table [fd].events &= ~((short) POLLIN);
+    devpoll_ctl (fd, fd_table [fd].events);
 }
 
 void xs::devpoll_t::set_pollout (handle_t handle_)
 {
-    devpoll_ctl (handle_, POLLREMOVE);
-    fd_table [handle_].events |= POLLOUT;
-    devpoll_ctl (handle_, fd_table [handle_].events);
+    fd_t fd = ptrtofd (handle_);
+
+    devpoll_ctl (fd, POLLREMOVE);
+    fd_table [fd].events |= POLLOUT;
+    devpoll_ctl (fd, fd_table [fd].events);
 }
 
 void xs::devpoll_t::reset_pollout (handle_t handle_)
 {
-    devpoll_ctl (handle_, POLLREMOVE);
-    fd_table [handle_].events &= ~((short) POLLOUT);
-    devpoll_ctl (handle_, fd_table [handle_].events);
+    fd_t fd = ptrtofd (handle_);
+
+    devpoll_ctl (fd, POLLREMOVE);
+    fd_table [fd].events &= ~((short) POLLOUT);
+    devpoll_ctl (fd, fd_table [fd].events);
 }
 
 void xs::devpoll_t::xstart ()
