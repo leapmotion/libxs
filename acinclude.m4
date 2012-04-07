@@ -651,11 +651,18 @@ AC_DEFUN([LIBXS_CHECK_POLLER_DEVPOLL], [{
     AC_LINK_IFELSE(
         [AC_LANG_PROGRAM(
         [
+#include <sys/ioctl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/poll.h>
 #include <sys/devpoll.h>
         ],
 [[
-struct pollfd t_devpoll;
-int fd = open("/dev/poll", O_RDWR);
+struct dvpoll p;
+p.dp_timeout = 0;
+p.dp_nfds = 0;
+p.dp_fds = (struct pollfd *) 0;
+return 0;
 ]]
         )],
         [libxs_cv_have_poller_devpoll="yes" ; $1],
