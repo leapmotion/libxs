@@ -76,6 +76,11 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <fcntl.h>
+#endif
+
+#if defined XS_HAVE_OPENVMS
+#include <ioctl.h>
 #endif
 
 xs::signaler_t::signaler_t ()
@@ -226,8 +231,17 @@ int xs::signaler_t::make_fdpair (fd_t *r_, fd_t *w_)
 #if defined XS_HAVE_EVENTFD
 
     // Create eventfd object.
+#if defined EFD_CLOEXEC
+    fd_t fd = eventfd (0, EFD_CLOEXEC);
+    errno_assert (fd != -1);
+#else
     fd_t fd = eventfd (0, 0);
     errno_assert (fd != -1);
+#if defined FD_CLOEXEC
+    int rc = fcntl (fd, F_SETFD, FD_CLOEXEC);
+    errno_assert (rc != -1);
+#endif
+#endif
     *w_ = fd;
     *r_ = fd;
     return 0;
@@ -384,8 +398,19 @@ int xs::signaler_t::make_fdpair (fd_t *r_, fd_t *w_)
 #else // All other implementations support socketpair()
 
     int sv [2];
+#if defined XS_HAVE_SOCK_CLOEXEC
+    int rc = socketpair (AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, sv);
+    errno_assert (rc == 0);
+#else
     int rc = socketpair (AF_UNIX, SOCK_STREAM, 0, sv);
     errno_assert (rc == 0);
+#if defined FD_CLOEXEC
+    rc = fcntl (sv [0], F_SETFD, FD_CLOEXEC);
+    errno_assert (rc != -1);
+    rc = fcntl (sv [1], F_SETFD, FD_CLOEXEC);
+    errno_assert (rc != -1);
+#endif
+#endif
     *w_ = sv [0];
     *r_ = sv [1];
     return 0;
