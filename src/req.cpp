@@ -87,7 +87,7 @@ int xs::req_t::xrecv (msg_t *msg_, int flags_)
 
     //  First part of the reply should be the original request ID.
     if (message_begins) {
-        int rc = xreq_t::xrecv (msg_, flags_);
+        rc = xreq_t::xrecv (msg_, flags_);
         if (rc != 0)
             return rc;
 
