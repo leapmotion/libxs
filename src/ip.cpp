@@ -57,6 +57,13 @@ xs::fd_t xs::open_socket (int domain_, int type_, int protocol_)
     errno_assert (rc != -1);
 #endif
 
+    //  On Windows, preventing sockets to be inherited by child processes is
+    //  done using SetHandleInformation function.
+#if defined XS_HAVE_WINDOWS && defined HANDLE_FLAG_INHERIT
+    BOOL brc = SetHandleInformation ((HANDLE) s, HANDLE_FLAG_INHERIT, 0);
+    win_assert (brc);
+#endif
+
     return s;
 }
 
