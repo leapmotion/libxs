@@ -169,6 +169,12 @@ namespace xs
         //  Synchronisation of access to context options.
         mutex_t opt_sync;
 
+        //  List of all dynamically loaded extension libraries.
+#if defined XS_HAVE_WINDOWS
+        typedef std::vector <HMODULE> plugins_t;
+        plugins_t plugins;
+#endif
+
         //  List of all filters plugged into the context.
         typedef std::map <int, xs_filter_t*> filters_t;
         filters_t filters;

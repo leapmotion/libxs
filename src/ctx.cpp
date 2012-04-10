@@ -53,6 +53,63 @@ xs::ctx_t::ctx_t () :
     //  Plug in the standard plugins.
     rc = plug (prefix_filter);
     errno_assert (rc == 0);
+
+
+    //  Now plug in all the extensions found in plugin directory.
+
+#if defined XS_HAVE_WINDOWS
+
+    //  Find out the path to the plugins.
+    char files_common [MAX_PATH];
+    HRESULT hr = SHGetFolderPath (NULL, CSIDL_PROGRAM_FILES_COMMON,
+        NULL, SHGFP_TYPE_CURRENT, files_common);
+    xs_assert (hr == S_OK);
+    std::string path = files_common;
+    WIN32_FIND_DATA ffd;
+    HANDLE fh = FindFirstFile ((path + "\\xs\\plugins\\*").c_str (), &ffd);
+    if (fh == INVALID_HANDLE_VALUE)
+        return;
+    while (true) {
+
+        //  Ignore the files without .xsp extension.
+        std::string file = ffd.cFileName;
+        if (file.size () < 4)
+            goto next;
+        if (file.substr (file.size () - 4) != ".xsp")
+            goto next;
+
+        //  Load the library and locate the extension point.
+        HMODULE dl = LoadLibrary ((path + "\\xs\\" + ffd.cFileName).c_str ());
+        if (!dl)
+            goto next;
+        file = std::string ("xsp_") + file.substr (0, file.size () - 4) +
+            "_init";
+        void *(*initfn) ();
+        *(void**)(&initfn) = GetProcAddress (dl, file.c_str ());
+        if (!initfn)
+            goto next;
+
+        //  Plug the extension into the context.
+        rc = plug (initfn ());
+        if (rc != 0) {
+            FreeLibrary (dl);
+            goto next;
+        }
+
+        //  Store the library handle so that we can unload it
+        //  when context is terminated.
+        opt_sync.lock ();
+        plugins.push_back (dl);
+        opt_sync.unlock ();
+
+next:
+        if (FindNextFile (fh, &ffd) == 0)
+            break;
+    }
+    BOOL brc = FindClose (fh);
+    win_assert (brc != 0);
+
+#endif
 }
 
 bool xs::ctx_t::check_tag ()
@@ -127,6 +184,15 @@ int xs::ctx_t::terminate ()
         xs_assert (sockets.empty ());
     }
     slot_sync.unlock ();
+
+    //  Unload any dynamically loaded extension libraries.
+    opt_sync.lock ();
+#if defined XS_HAVE_WINDOWS
+    for (plugins_t::iterator it = plugins.begin ();
+          it != plugins.end (); ++it)
+        FreeLibrary (*it);
+#endif
+    opt_sync.unlock ();
 
     //  Deallocate the resources.
     delete this;

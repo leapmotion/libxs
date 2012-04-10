@@ -37,9 +37,6 @@
 #ifndef NOVIRTUALKEYCODES
 #define NOVIRTUALKEYCODES // VK_*
 #endif
-#ifndef NOWINMESSAGES
-#define NOWINMESSAGES     // WM_*, EM_*, LB_*, CB_*
-#endif
 #ifndef NOWINSTYLES
 #define NOWINSTYLES       // WS_*, CS_*, ES_*, LBS_*, SBS_*, CBS_*
 #endif
@@ -76,9 +73,6 @@
 #ifndef NOCOLOR
 #define NOCOLOR           // Screen colors
 #endif
-#ifndef NOCTLMGR
-#define NOCTLMGR          // Control and Dialog routines
-#endif
 #ifndef NODRAWTEXT
 #define NODRAWTEXT        // DrawText() and DT_*
 #endif
@@ -87,9 +81,6 @@
 #endif
 #ifndef NOKERNEL
 #define NOKERNEL          // All KERNEL defines and routines
-#endif
-#ifndef NOUSER
-#define NOUSER            // All USER defines and routines
 #endif
 #ifndef NONLS
 #define NONLS             // All NLS defines and routines
@@ -105,9 +96,6 @@
 #endif
 #ifndef NOMINMAX
 #define NOMINMAX          // Macros min(a,b) and max(a,b)
-#endif
-#ifndef NOMSG
-#define NOMSG             // typedef MSG and associated routines
 #endif
 #ifndef NOOPENFILE
 #define NOOPENFILE        // OpenFile(), OemToAnsi, AnsiToOem, and OF_*
@@ -176,4 +164,8 @@
 #ifndef AI_NUMERICSERV
 #define AI_NUMERICSERV 0x0400
 #endif
+
+#include <Shlobj.h>
+
 #endif
+
