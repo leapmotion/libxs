@@ -315,7 +315,8 @@ int xs::stream_engine_t::write (const void *data_, size_t size_)
         return 0;
 
     //  Signalise peer failure.
-    if (nbytes == -1 && (errno == ECONNRESET || errno == EPIPE))
+    if (nbytes == -1 && (errno == ECONNRESET || errno == EPIPE ||
+          errno == ETIMEDOUT))
         return -1;
 
     errno_assert (nbytes != -1);
