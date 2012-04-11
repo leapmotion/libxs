@@ -22,86 +22,11 @@
 #ifndef __XS_PREFIX_FILTER_HPP_INCLUDED__
 #define __XS_PREFIX_FILTER_HPP_INCLUDED__
 
-#include <stddef.h>
-#include <map>
-
-#include "stdint.hpp"
-
 namespace xs
 {
 
     //  Canonical extension object.
     extern void *prefix_filter;
-
-    class prefix_filter_t
-    {
-    public:
-
-        prefix_filter_t ();
-        ~prefix_filter_t ();
-
-        int subscribe (void *core_, void *subscriber_,
-            const unsigned char *data_, size_t size_);
-        int unsubscribe (void *core_, void *subscriber_,
-            const unsigned char *data_, size_t size_);
-        void unsubscribe_all (void *core_, void *subscriber_);
-        void enumerate (void *core_);
-        int match (void *core_, const unsigned char *data_, size_t size_);
-        void match_all (void *core_, const unsigned char *data_, size_t size_);
-
-    private:
-
-        struct node_t
-        {
-            //  Pointer to particular subscriber associated with
-            //  the reference count.
-            typedef std::map <void*, int> subscribers_t;
-            subscribers_t *subscribers;
-
-            unsigned char min;
-            unsigned short count;
-            unsigned short live_nodes;
-            union {
-                struct node_t *node;
-                struct node_t **table;
-            } next;
-
-        };
-
-        static void init (node_t *node_);
-        static void close (node_t *node_);
-
-        //  Add key to the trie. Returns true if it's a new subscription
-        //  rather than a duplicate.
-        static bool add (node_t *node_, const unsigned char *prefix_,
-            size_t size_, void *subscriber_);
-
-        //  Remove specific subscription from the trie. Return true is it
-        //  was actually removed rather than de-duplicated.
-        static bool rm (node_t *node_, const unsigned char *prefix_,
-            size_t size_, void *subscriber_);
-
-        //  Remove all subscriptions for a specific peer from the trie.
-        //  If there are no subscriptions left on some topics, invoke the
-        //  supplied callback function.
-        static void rm (node_t *node_, void *subscriber_, void *arg_);
-
-        static void rm_helper (node_t *node_, void *subscriber_,
-            unsigned char **buff_, size_t buffsize_, size_t maxbuffsize_,
-            void *arg_);
-
-        //  Lists all the subscriptions in the trie.
-        static void list (node_t *node_, unsigned char **buff_,
-            size_t buffsize_, size_t maxbuffsize_, void *arg_);
-
-        //  Checks whether node can be safely removed.
-        static bool is_redundant (node_t *node_);
-
-        node_t root;
-
-        prefix_filter_t (const prefix_filter_t&);
-        const prefix_filter_t &operator = (const prefix_filter_t&);
-    };
 
 }
 
