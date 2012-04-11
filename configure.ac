@@ -101,6 +101,8 @@ AS_CASE(["${host_os}"],
                 AC_DEFINE([XS_HAVE_ANDROID], [1], [Have Android OS])
             ]
         )
+
+        AC_CHECK_LIB([dl], [dlopen])
      ],
     [*solaris*], [
         # Define on Solaris to enable all library features

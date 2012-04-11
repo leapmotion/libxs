@@ -26,6 +26,11 @@
 #include <unistd.h>
 #endif
 
+#if defined XS_HAVE_LINUX
+#include <dlfcn.h>
+#include <dirent.h>
+#endif
+
 #include <new>
 #include <string.h>
 
@@ -109,6 +114,69 @@ next:
     BOOL brc = FindClose (fh);
     win_assert (brc != 0);
 
+#elif defined XS_HAVE_LINUX
+
+    //  Load all the installed plug-ins.
+    std::string path (XS_PREFIX_PATH);
+    path += "/lib/xs/plugins";
+
+    DIR *dp = opendir (path.c_str ());
+    if (!dp && errno == ENOENT)
+        return;
+    errno_assert (dp);
+
+    dirent dir, *dirp;
+    while (true) {
+        rc = readdir_r (dp, &dir, &dirp);
+        assert (rc == 0);
+        if (!dirp)
+            break;
+        if (dir.d_type == DT_REG) {
+
+            //  Ignore the files without .xsp extension.
+            std::string file = dir.d_name;
+            if (file.size () < 4)
+                continue;
+            if (file.substr (file.size () - 4) != ".xsp")
+                continue;
+            
+            //  Open the specified dynamic library.
+            std::string filename = path + "/" + file;
+            void *dl = dlopen (filename.c_str (), RTLD_LOCAL | RTLD_NOW);
+            if (!dl)
+                continue;
+
+            //  Find the initial entry point in the library. void pointer
+            //  returned by dlsym is converted to function pointer using
+            //  "union cast". There's no other way to do that as POSIX and
+            //  C++ standards collide at this spot.
+            file = std::string ("xsp_") + file.substr (0, file.size () - 4) +
+                "_init";
+            dlerror ();
+            union {
+                void *pdata;
+                void *(*pfunc) ();
+            } initfn;
+            initfn.pdata = dlsym (dl, file.c_str ());
+            if (!initfn.pdata)
+                continue;
+
+            //  Plug the extension into the context.
+            int rc = plug (initfn.pfunc ());
+            if (rc != 0) {
+                dlclose (dl);
+                continue;
+            }
+
+            //  Store the library handle so that we can unload it
+            //  when context is terminated.
+            opt_sync.lock ();
+            plugins.push_back (dl);
+            opt_sync.unlock ();
+        }
+    }
+    closedir (dp);
+
 #endif
 }
 
@@ -186,13 +254,19 @@ int xs::ctx_t::terminate ()
     slot_sync.unlock ();
 
     //  Unload any dynamically loaded extension libraries.
-    opt_sync.lock ();
 #if defined XS_HAVE_WINDOWS
+    opt_sync.lock ();
     for (plugins_t::iterator it = plugins.begin ();
           it != plugins.end (); ++it)
         FreeLibrary (*it);
-#endif
     opt_sync.unlock ();
+#elif defined XS_HAVE_LINUX
+    opt_sync.lock ();
+    for (plugins_t::iterator it = plugins.begin ();
+          it != plugins.end (); ++it)
+        dlclose (*it);
+    opt_sync.unlock ();
+#endif
 
     //  Deallocate the resources.
     delete this;

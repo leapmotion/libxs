@@ -173,6 +173,9 @@ namespace xs
 #if defined XS_HAVE_WINDOWS
         typedef std::vector <HMODULE> plugins_t;
         plugins_t plugins;
+#elif defined XS_HAVE_LINUX
+        typedef std::vector <void*> plugins_t;
+        plugins_t plugins;
 #endif
 
         //  List of all filters plugged into the context.
