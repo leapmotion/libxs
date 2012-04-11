@@ -144,10 +144,11 @@ else
 libxs_la_LDFLAGS = -version-info @LIBXS_ABI_VERSION@ @LIBXS_EXTRA_LDFLAGS@
 endif
 
+libxs_la_CPPFLAGS = -DXS_PREFIX_PATH='"$(prefix)"'
 libxs_la_CXXFLAGS = @LIBXS_EXTRA_CXXFLAGS@
 
 if BUILD_PGM
-libxs_la_CPPFLAGS = -I$(top_srcdir)/@pgm_srcdir@/include/
+libxs_la_CPPFLAGS += -I$(top_srcdir)/@pgm_srcdir@/include/
 libxs_la_LIBADD = $(top_srcdir)/@pgm_srcdir@/libpgm_noinst.la
 endif
 
