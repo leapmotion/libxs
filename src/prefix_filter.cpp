@@ -468,7 +468,7 @@ static int id (void *core_)
 
 static void *pf_create (void *core_)
 {
-    pfx_node_t *root = (pfx_node_t*) malloc (sizeof (pfx_node_t*));
+    pfx_node_t *root = (pfx_node_t*) malloc (sizeof (pfx_node_t));
     alloc_assert (root);
     pfx_init (root);
     return (void*) root;
@@ -477,6 +477,7 @@ static void *pf_create (void *core_)
 static void pf_destroy (void *core_, void *pf_)
 {
     pfx_close ((pfx_node_t*) pf_);
+    free (pf_);
 }
 
 static int pf_subscribe (void *core_, void *pf_, void *subscriber_,
@@ -546,7 +547,7 @@ static void pf_match (void *core_, void *pf_,
 
 static void *sf_create (void *core_)
 {
-    pfx_node_t *root = (pfx_node_t*) malloc (sizeof (pfx_node_t*));
+    pfx_node_t *root = (pfx_node_t*) malloc (sizeof (pfx_node_t));
     alloc_assert (root);
     pfx_init (root);
     return (void*) root;
@@ -555,6 +556,7 @@ static void *sf_create (void *core_)
 static void sf_destroy (void *core_, void *sf_)
 {
     pfx_close ((pfx_node_t*) sf_);
+    free (sf_);
 }
 
 static int sf_subscribe (void *core_, void *sf_,
