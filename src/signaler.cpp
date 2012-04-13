@@ -131,7 +131,11 @@ void xs::signaler_t::send ()
 #else
     unsigned char dummy = 0;
     while (true) {
+#if defined MSG_NOSIGNAL
+        ssize_t nbytes = ::send (w, &dummy, sizeof (dummy), MSG_NOSIGNAL);
+#else
         ssize_t nbytes = ::send (w, &dummy, sizeof (dummy), 0);
+#endif
         if (unlikely (nbytes == -1 && errno == EINTR))
             continue;
         xs_assert (nbytes == sizeof (dummy));

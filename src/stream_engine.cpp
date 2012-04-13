@@ -305,7 +305,11 @@ int xs::stream_engine_t::write (const void *data_, size_t size_)
 
 #else
 
+#if defined MSG_NOSIGNAL
+    ssize_t nbytes = send (s, data_, size_, MSG_NOSIGNAL);
+#else
     ssize_t nbytes = send (s, data_, size_, 0);
+#endif
 
     //  Several errors are OK. When speculative write is being done we may not
     //  be able to write a single byte from the socket. Also, SIGSTOP issued
