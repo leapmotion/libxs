@@ -162,6 +162,7 @@ xs::fd_t xs::ipc_listener_t::accept ()
             errno == ENFILE);
         return retired_fd;
     }
+    tune_socket (sock);
     return sock;
 }
 

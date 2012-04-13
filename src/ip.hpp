@@ -28,9 +28,15 @@ namespace xs
 {
 
     //  Same as socket(2), but allows for transparent tweaking the options.
+    //  These functions automatically tune the socket so there's no need to
+    //  call tune_socket/tune_tcp_socket afterwards.
     fd_t open_socket (int domain_, int type_, int protocol_);
+    fd_t open_tcp_socket (int domain_, bool keepalive_);
 
-    //  Tunes the supplied TCP socket for the best latency.
+    //  Tunes the supplied socket. Use these functions if you've got
+    //  the socket in some other way, not by open_socket/open_tcp_socket
+    //  (e.g. using accept()).
+    void tune_socket (fd_t s_);
     void tune_tcp_socket (fd_t s_, bool keeaplive_);
 
     //  Sets the socket into non-blocking mode.

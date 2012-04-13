@@ -107,8 +107,6 @@ void xs::tcp_connecter_t::out_event (fd_t fd_)
         return;
     }
 
-    tune_tcp_socket (fd, options.keepalive ? true : false);
-
     //  Create the engine object for this connection.
     stream_engine_t *engine = new (std::nothrow) stream_engine_t (fd, options);
     alloc_assert (engine);
@@ -207,16 +205,9 @@ int xs::tcp_connecter_t::open ()
     xs_assert (s == retired_fd);
 
     //  Create the socket.
-    s = open_socket (address.family (), SOCK_STREAM, IPPROTO_TCP);
-#ifdef XS_HAVE_WINDOWS
-    if (s == INVALID_SOCKET) {
-        wsa_error_to_errno ();
-        return -1;
-    }
-#else
+    s = open_tcp_socket (address.family (), options.keepalive ? true : false);
     if (s == -1)
         return -1;
-#endif
 
     //  On some systems, IPv4 mapping in IPv6 sockets is disabled by default.
     //  Switch it on in such cases.

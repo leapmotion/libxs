@@ -82,11 +82,8 @@ void xs::tcp_listener_t::in_event (fd_t fd_)
     fd_t fd = accept ();
 
     //  If connection was reset by the peer in the meantime, just ignore it.
-    //  TODO: Handle specific errors like ENFILE/EMFILE etc.
     if (fd == retired_fd)
         return;
-
-    tune_tcp_socket (fd, options.keepalive ? true : false);
 
     //  Create the engine object for this connection.
     stream_engine_t *engine = new (std::nothrow) stream_engine_t (fd, options);
@@ -127,11 +124,7 @@ int xs::tcp_listener_t::set_address (const char *addr_)
         return -1;
 
     //  Create a listening socket.
-    s = open_socket (address.family (), SOCK_STREAM, IPPROTO_TCP);
-#ifdef XS_HAVE_WINDOWS
-    if (s == INVALID_SOCKET)
-        wsa_error_to_errno ();
-#endif
+    s = open_tcp_socket (address.family (), false);
 
     //  IPv6 address family not supported, try automatic downgrade to IPv4.
     if (address.family () == AF_INET6 && errno == EAFNOSUPPORT &&
@@ -139,18 +132,11 @@ int xs::tcp_listener_t::set_address (const char *addr_)
         rc = address.resolve (addr_, true, true);
         if (rc != 0)
             return rc;
-        s = ::socket (address.family (), SOCK_STREAM, IPPROTO_TCP);
+        s = open_tcp_socket (address.family (), false);
     }
 
-#ifdef XS_HAVE_WINDOWS
-    if (s == INVALID_SOCKET) {
-        wsa_error_to_errno ();
+    if (s == retired_fd)
         return -1;
-    }
-#else
-    if (s == -1)
-        return -1;
-#endif
 
     //  On some systems, IPv4 mapping in IPv6 sockets is disabled by default.
     //  Switch it on in such cases.
@@ -219,6 +205,7 @@ xs::fd_t xs::tcp_listener_t::accept ()
         return retired_fd;
     }
 #endif
+    tune_tcp_socket (sock, options.keepalive ? true : false);
     return sock;
 }
 

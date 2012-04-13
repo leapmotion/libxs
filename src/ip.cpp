@@ -46,24 +46,35 @@ xs::fd_t xs::open_socket (int domain_, int type_, int protocol_)
 #endif
 
     fd_t s = socket (domain_, type_, protocol_);
-    if (s == retired_fd)
+    if (s == retired_fd) {
+#ifdef XS_HAVE_WINDOWS
+        wsa_error_to_errno ();
+#endif
         return retired_fd;
+    }
+    tune_socket (s);
+    return s;
+}
 
-    //  If there's no SOCK_CLOEXEC, let's try the second best option. Note that
-    //  race condition can cause socket not to be closed (if fork happens
-    //  between socket creation and this point).
-#if !defined XS_HAVE_SOCK_CLOEXEC && defined FD_CLOEXEC
-    int rc = fcntl (s, F_SETFD, FD_CLOEXEC);
+void xs::tune_socket (fd_t s_)
+{
+    //  Prevent socket to be inherited by child processes.
+#if defined FD_CLOEXEC
+    int rc = fcntl (s_, F_SETFD, FD_CLOEXEC);
     errno_assert (rc != -1);
 #endif
-
-    //  On Windows, preventing sockets to be inherited by child processes is
-    //  done using SetHandleInformation function.
 #if defined XS_HAVE_WINDOWS && defined HANDLE_FLAG_INHERIT
-    BOOL brc = SetHandleInformation ((HANDLE) s, HANDLE_FLAG_INHERIT, 0);
+    BOOL brc = SetHandleInformation ((HANDLE) s_, HANDLE_FLAG_INHERIT, 0);
     win_assert (brc);
 #endif
+}
 
+xs::fd_t xs::open_tcp_socket (int domain_, bool keepalive_)
+{
+    fd_t s = open_socket (domain_, SOCK_STREAM, IPPROTO_TCP);
+    if (s == retired_fd)
+        return retired_fd;
+    tune_tcp_socket (s, keepalive_);
     return s;
 }
 

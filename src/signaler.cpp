@@ -288,17 +288,13 @@ int xs::signaler_t::make_fdpair (fd_t *r_, fd_t *w_)
 
     //  Create listening socket.
     SOCKET listener;
-    listener = open_socket (AF_INET, SOCK_STREAM, 0);
+    listener = open_tcp_socket (AF_INET, false);
     wsa_assert (listener != INVALID_SOCKET);
 
-    //  Set SO_REUSEADDR and TCP_NODELAY on listening socket.
-    BOOL so_reuseaddr = 1;
+    //  Set SO_REUSEADDR on the listening socket.
+    BOOL reuseaddr = 1;
     int rc = setsockopt (listener, SOL_SOCKET, SO_REUSEADDR,
-        (char *)&so_reuseaddr, sizeof (so_reuseaddr));
-    wsa_assert (rc != SOCKET_ERROR);
-    BOOL tcp_nodelay = 1;
-    rc = setsockopt (listener, IPPROTO_TCP, TCP_NODELAY,
-        (char *)&tcp_nodelay, sizeof (tcp_nodelay));
+        (char*) &reuseaddr, sizeof (reuseaddr));
     wsa_assert (rc != SOCKET_ERROR);
 
     //  Bind listening socket to the local port.
@@ -315,13 +311,8 @@ int xs::signaler_t::make_fdpair (fd_t *r_, fd_t *w_)
     wsa_assert (rc != SOCKET_ERROR);
 
     //  Create the writer socket.
-    *w_ = WSASocket (AF_INET, SOCK_STREAM, 0, NULL, 0,  0);
+    *w_ = open_tcp_socket (AF_INET, false);
     wsa_assert (*w_ != INVALID_SOCKET);
-
-    //  Set TCP_NODELAY on writer socket.
-    rc = setsockopt (*w_, IPPROTO_TCP, TCP_NODELAY,
-        (char *)&tcp_nodelay, sizeof (tcp_nodelay));
-    wsa_assert (rc != SOCKET_ERROR);
 
     //  Connect writer to the listener.
     rc = connect (*w_, (sockaddr *) &addr, sizeof (addr));
@@ -330,6 +321,7 @@ int xs::signaler_t::make_fdpair (fd_t *r_, fd_t *w_)
     //  Accept connection from writer.
     *r_ = accept (listener, NULL, NULL);
     wsa_assert (*r_ != INVALID_SOCKET);
+    tune_tcp_socket (*r_, false);
 
     //  We don't need the listening socket anymore. Close it.
     rc = closesocket (listener);
@@ -355,17 +347,14 @@ int xs::signaler_t::make_fdpair (fd_t *r_, fd_t *w_)
     lcladdr.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
     lcladdr.sin_port = 0;
 
-    int listener = open_socket (AF_INET, SOCK_STREAM, 0);
+    int listener = open_tcp_socket (AF_INET, false);
     errno_assert (listener != -1);
 
     int on = 1;
-    int rc = setsockopt (listener, IPPROTO_TCP, TCP_NODELAY, &on, sizeof (on));
-    errno_assert (rc != -1);
-
     rc = setsockopt (listener, IPPROTO_TCP, TCP_NODELACK, &on, sizeof (on));
     errno_assert (rc != -1);
 
-    rc = bind(listener, (struct sockaddr*) &lcladdr, sizeof (lcladdr));
+    rc = bind (listener, (struct sockaddr*) &lcladdr, sizeof (lcladdr));
     errno_assert (rc != -1);
 
     socklen_t lcladdr_len = sizeof (lcladdr);
@@ -376,11 +365,8 @@ int xs::signaler_t::make_fdpair (fd_t *r_, fd_t *w_)
     rc = listen (listener, 1);
     errno_assert (rc != -1);
 
-    *w_ = open_socket (AF_INET, SOCK_STREAM, 0);
+    *w_ = open_tcp_socket (AF_INET, false);
     errno_assert (*w_ != -1);
-
-    rc = setsockopt (*w_, IPPROTO_TCP, TCP_NODELAY, &on, sizeof (on));
-    errno_assert (rc != -1);
 
     rc = setsockopt (*w_, IPPROTO_TCP, TCP_NODELACK, &on, sizeof (on));
     errno_assert (rc != -1);
@@ -390,6 +376,7 @@ int xs::signaler_t::make_fdpair (fd_t *r_, fd_t *w_)
 
     *r_ = accept (listener, NULL, NULL);
     errno_assert (*r_ != -1);
+    tune_tcp_socket (*r_);
 
     close (listener);
 
