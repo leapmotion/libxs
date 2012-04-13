@@ -173,4 +173,10 @@ inline void bounce (void *sb, void *sc)
     assert (memcmp (buf2, content, 32) == 0);
 }
 
+//  Check whether measured time is the expected time (in milliseconds).
+//  The upper tolerance is 1/2 sec so that the test doesn't fail even on
+//  very slow or very loaded systems.
+#define time_assert(actual,expected) \
+   assert (actual > ((expected) - 50) && actual < ((expected) + 500)); 
+
 #endif

@@ -52,9 +52,7 @@ int XS_TEST_MAIN ()
     rc = xs_term (ctx);
     assert (rc == 0);
     int ms = (int) xs_stopwatch_stop (watch) / 1000;
-#if !defined _WIN32 || !defined _DEBUG
-    assert (ms > 50 && ms < 150);
-#endif
+    time_assert (ms, linger);
 
     return 0;
 }
