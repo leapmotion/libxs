@@ -1,7 +1,7 @@
 /*
     Copyright (c) 2009-2012 250bpm s.r.o.
     Copyright (c) 2007-2009 iMatix Corporation
-    Copyright (c) 2007-2011 Other contributors as noted in the AUTHORS file
+    Copyright (c) 2007-2012 Other contributors as noted in the AUTHORS file
 
     This file is part of Crossroads I/O project.
 
@@ -29,6 +29,8 @@
 #define XS_ATOMIC_COUNTER_MUTEX
 #elif (defined __i386__ || defined __x86_64__) && defined __GNUC__
 #define XS_ATOMIC_COUNTER_X86
+#elif defined __ARM_ARCH_7A__ && defined __GNUC__
+#define XS_ATOMIC_COUNTER_ARM
 #elif defined XS_HAVE_WINDOWS
 #define XS_ATOMIC_COUNTER_WINDOWS
 #elif (defined XS_HAVE_SOLARIS || defined XS_HAVE_NETBSD)
@@ -88,6 +90,19 @@ namespace xs
                 : "=r" (old_value), "=m" (value)
                 : "0" (increment_), "m" (value)
                 : "cc", "memory");
+#elif defined XS_ATOMIC_COUNTER_ARM
+            integer_t flag, tmp;
+            __asm__ volatile (
+                "       dmb     sy\n\t"
+                "1:     ldrex   %0, [%5]\n\t"
+                "       add     %2, %0, %4\n\t"
+                "       strex   %1, %2, [%5]\n\t"
+                "       teq     %1, #0\n\t"
+                "       bne     1b\n\t"
+                "       dmb     sy\n\t"
+                : "=&r"(old_value), "=&r"(flag), "=&r"(tmp), "+Qo"(value)
+                : "Ir"(increment_), "r"(&value)
+                : "cc");
 #elif defined XS_ATOMIC_COUNTER_MUTEX
             sync.lock ();
             old_value = value;
@@ -118,6 +133,20 @@ namespace xs
                 : "0" (oldval), "m" (*val)
                 : "cc", "memory");
             return oldval != decrement;
+#elif defined XS_ATOMIC_COUNTER_ARM
+            integer_t old_value, flag, tmp;
+            __asm__ volatile (
+                "       dmb     sy\n\t"
+                "1:     ldrex   %0, [%5]\n\t"
+                "       sub     %2, %0, %4\n\t"
+                "       strex   %1, %2, [%5]\n\t"
+                "       teq     %1, #0\n\t"
+                "       bne     1b\n\t"
+                "       dmb     sy\n\t"
+                : "=&r"(old_value), "=&r"(flag), "=&r"(tmp), "+Qo"(value)
+                : "Ir"(decrement), "r"(&value)
+                : "cc");
+            return old_value - decrement != 0;
 #elif defined XS_ATOMIC_COUNTER_MUTEX
             sync.lock ();
             value -= decrement;
@@ -156,6 +185,9 @@ namespace xs
 #endif
 #if defined XS_ATOMIC_COUNTER_X86
 #undef XS_ATOMIC_COUNTER_X86
+#endif
+#if defined XS_ATOMIC_COUNTER_ARM
+#undef XS_ATOMIC_COUNTER_ARM
 #endif
 #if defined XS_ATOMIC_COUNTER_MUTEX
 #undef XS_ATOMIC_COUNTER_MUTEX
