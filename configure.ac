@@ -121,7 +121,10 @@ AS_CASE(["${host_os}"],
     ],
     [*freebsd*], [
         # Define on FreeBSD to enable all library features
-        CPPFLAGS="-D__BSD_VISIBLE $CPPFLAGS"
+        # -D_GNU_SOURCE should not hurt on the "real" FreeBSD, it just
+        # enables getline(3), but may help on Debian GNU/kFreeBSD, where
+        # libc is GNU Libc or derived.
+        CPPFLAGS="-D__BSD_VISIBLE -D_GNU_SOURCE $CPPFLAGS"
         AC_DEFINE([XS_HAVE_FREEBSD], [1], [Have FreeBSD OS])
     ],
     [*darwin*], [
