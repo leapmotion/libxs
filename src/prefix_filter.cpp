@@ -422,43 +422,6 @@ static bool pfx_rm (pfx_node_t *node_, const unsigned char *prefix_,
     return ret;
 }
 
-static void pfx_list (pfx_node_t *node_, unsigned char **buff_,
-    size_t buffsize_, size_t maxbuffsize_, void *arg_)
-{
-    //  If this node is a subscription, apply the function.
-    if (node_->subscribers) {
-        int rc = xs_filter_subscribed (arg_, *buff_, buffsize_);
-        errno_assert (rc == 0);
-    }
-
-    //  Adjust the buffer.
-    if (buffsize_ >= maxbuffsize_) {
-        maxbuffsize_ = buffsize_ + 256;
-        *buff_ = (unsigned char*) realloc (*buff_, maxbuffsize_);
-        xs_assert (*buff_);
-    }
-
-    //  If there are no subnodes in the trie, return.
-    if (node_->count == 0)
-        return;
-
-    //  If there's one subnode (optimisation).
-    if (node_->count == 1) {
-        (*buff_) [buffsize_] = node_->min;
-        buffsize_++;
-        pfx_list (node_->next.node, buff_, buffsize_, maxbuffsize_, arg_);
-        return;
-    }
-
-    //  If there are multiple subnodes.
-    for (unsigned short c = 0; c != node_->count; c++) {
-        (*buff_) [buffsize_] = node_->min + c;
-        if (node_->next.table [c])
-            pfx_list (node_->next.table [c], buff_, buffsize_ + 1,
-                maxbuffsize_, arg_);
-    }
-}
-
 //  Implementation of the public filter interface.
 
 static int id (void *core_)
@@ -562,20 +525,15 @@ static void sf_destroy (void *core_, void *sf_)
 static int sf_subscribe (void *core_, void *sf_,
     const unsigned char *data_, size_t size_)
 {
-    return pfx_add ((pfx_node_t*) sf_, data_, size_, NULL) ? 1 : 0;
+    pfx_add ((pfx_node_t*) sf_, data_, size_, NULL);
+    return 0;
 }
 
 static int sf_unsubscribe (void *core_, void *sf_,
     const unsigned char *data_, size_t size_)
 {
-    return pfx_rm ((pfx_node_t*) sf_, data_, size_, NULL) ? 1 : 0;
-}
-
-static void sf_enumerate (void *core_, void *sf_)
-{
-    unsigned char *buff = NULL;
-    pfx_list ((pfx_node_t*) sf_, &buff, 0, 0, core_);
-    free (buff);
+    pfx_rm ((pfx_node_t*) sf_, data_, size_, NULL);
+    return 0;
 }
 
 static int sf_match (void *core_, void *sf_,
@@ -627,7 +585,6 @@ static xs_filter_t pfx_filter = {
     sf_destroy,
     sf_subscribe,
     sf_unsubscribe,
-    sf_enumerate,
     sf_match,
 };
 

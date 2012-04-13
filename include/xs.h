@@ -294,7 +294,6 @@ typedef struct
         const unsigned char *data, size_t size);
     int (*sf_unsubscribe) (void *core, void *sf,
         const unsigned char *data, size_t size);
-    void (*sf_enumerate) (void *core, void *sf);
     int (*sf_match) (void *core, void *sf,
         const unsigned char *data, size_t size);
 

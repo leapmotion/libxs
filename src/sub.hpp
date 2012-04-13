@@ -22,6 +22,10 @@
 #ifndef __XS_SUB_HPP_INCLUDED__
 #define __XS_SUB_HPP_INCLUDED__
 
+#include <vector>
+
+#include "../include/xs.h"
+
 #include "xsub.hpp"
 
 namespace xs
@@ -43,9 +47,32 @@ namespace xs
 
         int xsetsockopt (int option_, const void *optval_, size_t optvallen_);
         int xsend (xs::msg_t *msg_, int flags_);
+        int xrecv (xs::msg_t *msg_, int flags_);
+        bool xhas_in ();
         bool xhas_out ();
 
+        //  The repository of subscriptions.
+        struct filter_t
+        {
+            xs_filter_t *type;
+            void *instance;
+        };
+        typedef std::vector <filter_t> filters_t;
+        filters_t filters;
+
+        //  If true, part of a multipart message was already received, but
+        //  there are following parts still waiting.
+        bool more;
+
+        //  If true, 'message' contains a matching message to return on the
+        //  next recv call.
+        bool has_message;
+        msg_t message;
+
     private:
+
+        //  Check whether the message matches at least one subscription.
+        bool match (xs::msg_t *msg_);
 
         sub_t (const sub_t&);
         const sub_t &operator = (const sub_t&);

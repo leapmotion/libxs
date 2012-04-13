@@ -49,10 +49,9 @@ xs::options_t::options_t () :
     ipv4only (1),
     keepalive (0),
     protocol (0),
-    filter_id (XS_FILTER_PREFIX),
+    filter (XS_FILTER_PREFIX),
     delay_on_close (true),
     delay_on_disconnect (true),
-    filter (false),
     send_identity (false),
     recv_identity (false),
     socket_id (0)
@@ -256,7 +255,7 @@ int xs::options_t::setsockopt (int option_, const void *optval_,
             errno = EINVAL;
             return -1;
         }
-        filter_id = *((int*) optval_);
+        filter = *((int*) optval_);
         return 0;
 
     }
@@ -454,7 +453,7 @@ int xs::options_t::getsockopt (int option_, void *optval_, size_t *optvallen_)
             errno = EINVAL;
             return -1;
         }
-        *((int*) optval_) = filter_id;
+        *((int*) optval_) = filter;
         *optvallen_ = sizeof (int);
         return 0;
 
