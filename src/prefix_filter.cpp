@@ -525,14 +525,16 @@ static void sf_destroy (void *core_, void *sf_)
 static int sf_subscribe (void *core_, void *sf_,
     const unsigned char *data_, size_t size_)
 {
-    pfx_add ((pfx_node_t*) sf_, data_, size_, NULL);
+    if (pfx_add ((pfx_node_t*) sf_, data_, size_, NULL))
+        return xs_filter_subscribed (core_, data_, size_);
     return 0;
 }
 
 static int sf_unsubscribe (void *core_, void *sf_,
     const unsigned char *data_, size_t size_)
 {
-    pfx_rm ((pfx_node_t*) sf_, data_, size_, NULL);
+    if (pfx_rm ((pfx_node_t*) sf_, data_, size_, NULL))
+        return xs_filter_unsubscribed (core_, data_, size_);
     return 0;
 }
 

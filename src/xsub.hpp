@@ -28,7 +28,6 @@
 #include "socket_base.hpp"
 #include "session_base.hpp"
 #include "dist.hpp"
-#include "core.hpp"
 #include "fq.hpp"
 
 namespace xs
@@ -38,7 +37,7 @@ namespace xs
     class pipe_t;
     class io_thread_t;
 
-    class xsub_t : public socket_base_t, public core_t
+    class xsub_t : public socket_base_t
     {
     public:
 

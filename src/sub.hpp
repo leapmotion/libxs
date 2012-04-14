@@ -27,6 +27,7 @@
 #include "../include/xs.h"
 
 #include "xsub.hpp"
+#include "core.hpp"
 
 namespace xs
 {
@@ -36,20 +37,25 @@ namespace xs
     class io_thread_t;
     class socket_base_t;
 
-    class sub_t : public xsub_t
+    class sub_t : public xsub_t, public core_t
     {
     public:
 
         sub_t (xs::ctx_t *parent_, uint32_t tid_, int sid_);
         ~sub_t ();
 
-    protected:
+    private:
 
+        //  Overloaded functions from socket_base_t.
         int xsetsockopt (int option_, const void *optval_, size_t optvallen_);
         int xsend (xs::msg_t *msg_, int flags_);
         int xrecv (xs::msg_t *msg_, int flags_);
         bool xhas_in ();
         bool xhas_out ();
+
+        //  Overloaded functions from core_t.
+        int filter_subscribed (const unsigned char *data_, size_t size_);
+        int filter_unsubscribed (const unsigned char *data_, size_t size_);
 
         //  The repository of subscriptions.
         struct filter_t
@@ -68,8 +74,6 @@ namespace xs
         //  next recv call.
         bool has_message;
         msg_t message;
-
-    private:
 
         //  Check whether the message matches at least one subscription.
         bool match (xs::msg_t *msg_);
