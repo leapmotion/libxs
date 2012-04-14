@@ -35,44 +35,25 @@ namespace xs
 
     typedef void (thread_fn) (void*);
 
-    //  Class encapsulating OS thread. Thread initiation/termination is done
-    //  using special functions rather than in constructor/destructor so that
-    //  thread isn't created during object construction by accident, causing
-    //  newly created thread to access half-initialised object. Same applies
-    //  to the destruction process: Thread should be terminated before object
-    //  destruction begins, otherwise it can access half-destructed object.
+    //  Class encapsulating OS thread.
 
-    class thread_t
+    struct thread_t
     {
-    public:
-
-        inline thread_t ()
-        {
-        }
-
-        //  Creates OS thread. 'tfn' is main thread function. It'll be passed
-        //  'arg' as an argument.
-        void start (thread_fn *tfn_, void *arg_);
-
-        //  Waits for thread termination.
-        void stop ();
-
-        //  These are internal members. They should be private, however then
-        //  they would not be accessible from the main C routine of the thread.
         thread_fn *tfn;
         void *arg;
-        
-    private:
-
 #ifdef XS_HAVE_WINDOWS
-        HANDLE descriptor;
+        HANDLE handle;
 #else
-        pthread_t descriptor;
+        pthread_t handle;
 #endif
-
-        thread_t (const thread_t&);
-        const thread_t &operator = (const thread_t&);
     };
+
+    //  Creates OS thread. 'tfn' is main thread function. It'll be passed
+    //  'arg' as an argument.
+    void thread_start (thread_t *self_, thread_fn *tfn_, void *arg_);
+
+    //  Waits for thread termination.
+    void thread_stop (thread_t *self_);
 
 }
 

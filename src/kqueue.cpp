@@ -55,7 +55,7 @@ xs::kqueue_t::kqueue_t (xs::ctx_t *ctx_, uint32_t tid_) :
 
 xs::kqueue_t::~kqueue_t ()
 {
-    worker.stop ();
+    thread_stop (&worker);
     close (kqueue_fd);
 }
 
@@ -144,7 +144,7 @@ void xs::kqueue_t::reset_pollout (handle_t handle_)
 
 void xs::kqueue_t::xstart ()
 {
-    worker.start (worker_routine, this);
+    thread_start (&worker, worker_routine, this);
 }
 
 void xs::kqueue_t::xstop ()

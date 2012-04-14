@@ -35,20 +35,20 @@ extern "C"
     }
 }
 
-void xs::thread_t::start (thread_fn *tfn_, void *arg_)
+void xs::thread_start (xs::thread_t *self_, thread_fn *tfn_, void *arg_)
 {
-    tfn = tfn_;
-    arg =arg_;
-    descriptor = (HANDLE) _beginthreadex (NULL, 0,
-        &::thread_routine, this, 0 , NULL);
-    win_assert (descriptor != NULL);    
+    self_->tfn = tfn_;
+    self_->arg =arg_;
+    self_->handle = (HANDLE) _beginthreadex (NULL, 0,
+        &::thread_routine, self_, 0 , NULL);
+    win_assert (self_->handle != NULL);    
 }
 
-void xs::thread_t::stop ()
+void xs::thread_stop (xs::thread_t *self_)
 {
-    DWORD rc = WaitForSingleObject (descriptor, INFINITE);
+    DWORD rc = WaitForSingleObject (self_->handle, INFINITE);
     win_assert (rc != WAIT_FAILED);
-    BOOL rc2 = CloseHandle (descriptor);
+    BOOL rc2 = CloseHandle (self_->handle);
     win_assert (rc2 != 0);
 }
 
@@ -76,23 +76,19 @@ extern "C"
     }
 }
 
-void xs::thread_t::start (thread_fn *tfn_, void *arg_)
+void xs::thread_start (xs::thread_t *self_, thread_fn *tfn_, void *arg_)
 {
-    tfn = tfn_;
-    arg =arg_;
-    int rc = pthread_create (&descriptor, NULL, thread_routine, this);
+    self_->tfn = tfn_;
+    self_->arg =arg_;
+    int rc = pthread_create (&self_->handle, NULL, thread_routine, self_);
     posix_assert (rc);
 }
 
-void xs::thread_t::stop ()
+void xs::thread_stop (xs::thread_t *self_)
 {
-    int rc = pthread_join (descriptor, NULL);
+    int rc = pthread_join (self_->handle, NULL);
     posix_assert (rc);
 }
 
 #endif
-
-
-
-
 

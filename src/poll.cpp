@@ -41,7 +41,7 @@ xs::poll_t::poll_t (xs::ctx_t *ctx_, uint32_t tid_) :
 
 xs::poll_t::~poll_t ()
 {
-    worker.stop ();
+    thread_stop (&worker);
 }
 
 xs::handle_t xs::poll_t::add_fd (fd_t fd_, i_poll_events *events_)
@@ -109,7 +109,7 @@ void xs::poll_t::reset_pollout (handle_t handle_)
 
 void xs::poll_t::xstart ()
 {
-    worker.start (worker_routine, this);
+    thread_start (&worker, worker_routine, this);
 }
 
 void xs::poll_t::xstop ()

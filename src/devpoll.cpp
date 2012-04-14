@@ -47,7 +47,7 @@ xs::devpoll_t::devpoll_t (xs::ctx_t *ctx_, uint32_t tid_) :
 
 xs::devpoll_t::~devpoll_t ()
 {
-    worker.stop ();
+    thread_stop (&worker);
     close (devpoll_fd);
 }
 
@@ -138,7 +138,7 @@ void xs::devpoll_t::reset_pollout (handle_t handle_)
 
 void xs::devpoll_t::xstart ()
 {
-    worker.start (worker_routine, this);
+    thread_start (&worker, worker_routine, this);
 }
 
 void xs::devpoll_t::xstop ()
