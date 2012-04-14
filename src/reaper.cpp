@@ -27,16 +27,20 @@ xs::reaper_t::reaper_t (class ctx_t *ctx_, uint32_t tid_) :
     sockets (0),
     terminating (false)
 {
+    int rc = mailbox_init (&mailbox);
+    errno_assert (rc == 0);
+
     io_thread = io_thread_t::create (ctx_, tid_);
     xs_assert (io_thread);
 
-    mailbox_handle = io_thread->add_fd (mailbox.get_fd (), this);
+    mailbox_handle = io_thread->add_fd (mailbox_fd (&mailbox), this);
     io_thread->set_pollin (mailbox_handle);
 }
 
 xs::reaper_t::~reaper_t ()
 {
     delete io_thread;
+    mailbox_close (&mailbox);
 }
 
 xs::mailbox_t *xs::reaper_t::get_mailbox ()
@@ -61,7 +65,7 @@ void xs::reaper_t::in_event (fd_t fd_)
 
         //  Get the next command. If there is none, exit.
         command_t cmd;
-        int rc = mailbox.recv (&cmd, 0);
+        int rc = mailbox_recv (&mailbox, &cmd, 0);
         if (rc != 0 && errno == EINTR)
             continue;
         if (rc != 0 && errno == EAGAIN)

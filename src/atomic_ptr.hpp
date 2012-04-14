@@ -22,6 +22,8 @@
 #ifndef __XS_ATOMIC_PTR_HPP_INCLUDED__
 #define __XS_ATOMIC_PTR_HPP_INCLUDED__
 
+#include <stddef.h>
+
 #include "platform.hpp"
 
 #if defined XS_FORCE_MUTEXES

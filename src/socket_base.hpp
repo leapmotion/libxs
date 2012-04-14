@@ -130,6 +130,11 @@ namespace xs
 
     private:
 
+        //  Initialise the object. This function is separate from constructor
+        //  so that it can return errors. If not successful, it deallocates
+        //  the socket straight away.
+        int init ();
+
         //  To be called after processing commands or invoking any command
         //  handlers explicitly. If required, it will deallocate the socket.
         void check_destroy ();
@@ -174,6 +179,7 @@ namespace xs
 
         //  Socket's mailbox object.
         mailbox_t mailbox;
+        bool initialised;
 
         //  List of attached pipes.
         typedef array_t <pipe_t, 3> pipes_t;

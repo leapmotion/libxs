@@ -47,9 +47,12 @@ xs::ctx_t::ctx_t () :
     max_sockets (512),
     io_thread_count (1)
 {
+    int rc = mailbox_init (&term_mailbox);
+    errno_assert (rc == 0);
+
     //  Plug in the standard plugins.
-    int rc = plug (prefix_filter);
-    xs_assert (rc == 0);
+    rc = plug (prefix_filter);
+    errno_assert (rc == 0);
 }
 
 bool xs::ctx_t::check_tag ()
@@ -80,6 +83,9 @@ xs::ctx_t::~ctx_t ()
     //  corresponding io_thread/socket objects.
     if (slots)
         free (slots);
+
+    //  Deallocate the termination mailbox.
+    mailbox_close (&term_mailbox);
 
     //  Remove the tag, so that the object is considered dead.
     tag = 0xdeadbeef;
@@ -112,7 +118,7 @@ int xs::ctx_t::terminate ()
 
         //  Wait till reaper thread closes all the sockets.
         command_t cmd;
-        int rc = term_mailbox.recv (&cmd, -1);
+        int rc = mailbox_recv (&term_mailbox, &cmd, -1);
         if (rc == -1 && errno == EINTR)
             return -1;
         xs_assert (rc == 0);
@@ -297,7 +303,7 @@ xs_filter_t *xs::ctx_t::get_filter (int filter_id_)
 
 void xs::ctx_t::send_command (uint32_t tid_, const command_t &command_)
 {
-    slots [tid_]->send (command_);
+    mailbox_send (slots [tid_], command_);
 }
 
 xs::io_thread_t *xs::ctx_t::choose_io_thread (uint64_t affinity_)

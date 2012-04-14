@@ -22,60 +22,69 @@
 #include "mailbox.hpp"
 #include "err.hpp"
 
-xs::mailbox_t::mailbox_t ()
+int xs::mailbox_init (mailbox_t *self_)
 {
+    //  Initlialise the signaler.
+    int rc = signaler_init (&self_->signaler);
+    if (rc != 0)
+        return -1;
+
     //  Get the pipe into passive state. That way, if the users starts by
     //  polling on the associated file descriptor it will get woken up when
     //  new command is posted.
-    bool ok = cpipe.read (NULL);
+    bool ok = self_->cpipe.read (NULL);
     xs_assert (!ok);
-    active = false;
+    self_->active = false;
+    return 0;
 }
 
-xs::mailbox_t::~mailbox_t ()
+void xs::mailbox_close (mailbox_t *self_)
 {
+    //  Deallocate the signaler.
+    signaler_close (&self_->signaler);
+
     //  TODO: Retrieve and deallocate commands inside the cpipe.
 }
 
-xs::fd_t xs::mailbox_t::get_fd ()
+xs::fd_t xs::mailbox_fd (mailbox_t *self_)
 {
-    return signaler.get_fd ();
+    return signaler_fd (&self_->signaler);
 }
 
-void xs::mailbox_t::send (const command_t &cmd_)
+void xs::mailbox_send (mailbox_t *self_, const command_t &cmd_)
 {
-    sync.lock ();
-    cpipe.write (cmd_, false);
-    bool ok = cpipe.flush ();
-    sync.unlock ();
+    self_->sync.lock ();
+    self_->cpipe.write (cmd_, false);
+    bool ok = self_->cpipe.flush ();
+    self_->sync.unlock ();
     if (!ok)
-        signaler.send ();
+        signaler_send (&self_->signaler);
 }
 
-int xs::mailbox_t::recv (command_t *cmd_, int timeout_)
+int xs::mailbox_recv (mailbox_t *self_, command_t *cmd_, int timeout_)
 {
     //  Try to get the command straight away.
-    if (active) {
-        bool ok = cpipe.read (cmd_);
+    if (self_->active) {
+        bool ok = self_->cpipe.read (cmd_);
         if (ok)
             return 0;
 
         //  If there are no more commands available, switch into passive state.
-        active = false;
-        signaler.recv ();
+        self_->active = false;
+        signaler_recv (&self_->signaler);
     }
 
     //  Wait for signal from the command sender.
-    int rc = signaler.wait (timeout_);
+    int rc = signaler_wait (&self_->signaler, timeout_);
     if (rc != 0 && (errno == EAGAIN || errno == EINTR))
         return -1;
+    errno_assert (rc == 0);
 
     //  We've got the signal. Now we can switch into active state.
-    active = true;
+    self_->active = true;
 
     //  Get a command.
-    errno_assert (rc == 0);
-    bool ok = cpipe.read (cmd_);
+    bool ok = self_->cpipe.read (cmd_);
     xs_assert (ok);
     return 0;
 }

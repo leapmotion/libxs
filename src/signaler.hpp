@@ -31,32 +31,30 @@ namespace xs
     //  given moment. Attempt to send a signal before receiving the previous
     //  one will result in undefined behaviour.
 
-    class signaler_t
-    {
-    public:
-
-        signaler_t ();
-        ~signaler_t ();
-
-        fd_t get_fd ();
-        void send ();
-        int wait (int timeout_);
-        void recv ();
-        
-    private:
-
-        //  Creates a pair of filedescriptors that will be used
-        //  to pass the signals.
-        static int make_fdpair (fd_t *r_, fd_t *w_);
-
-        //  Underlying write & read file descriptor.
+    typedef struct {
         fd_t w;
         fd_t r;
+    } signaler_t;
 
-        //  Disable copying of signaler_t object.
-        signaler_t (const signaler_t&);
-        const signaler_t &operator = (const signaler_t&);
-    };
+    //  Initialise the signaler.
+    int signaler_init (signaler_t *self_);
+
+    //  Destroy the signaler.
+    void signaler_close (signaler_t *self_);
+
+    //  Return file decriptor that you can poll on to get notified when
+    //  signal is sent.
+    fd_t signaler_fd (signaler_t *self_);
+
+    //  Send a signal.
+    void signaler_send (signaler_t *self_);
+
+    //  Wait for a signal. up to timout_ milliseconds.
+    //  The signale is *not* consumed by this function.
+    int signaler_wait (signaler_t *self_, int timeout_);
+
+    //  Wait for and consume a signal.
+    void signaler_recv (signaler_t *self_);
 
 }
 

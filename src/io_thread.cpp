@@ -48,15 +48,18 @@ xs::io_thread_t *xs::io_thread_t::create (xs::ctx_t *ctx_, uint32_t tid_)
 xs::io_thread_t::io_thread_t (xs::ctx_t *ctx_, uint32_t tid_) :
     object_t (ctx_, tid_)
 {
+    int rc = mailbox_init (&mailbox);
+    errno_assert (rc == 0);
 }
 
 xs::io_thread_t::~io_thread_t ()
 {
+    mailbox_close (&mailbox);
 }
 
 void xs::io_thread_t::start ()
 {
-    mailbox_handle = add_fd (mailbox.get_fd (), this);
+    mailbox_handle = add_fd (mailbox_fd (&mailbox), this);
     set_pollin (mailbox_handle);
     xstart ();
 }
@@ -149,7 +152,7 @@ void xs::io_thread_t::in_event (fd_t fd_)
 
         //  Get the next command. If there is none, exit.
         command_t cmd;
-        int rc = mailbox.recv (&cmd, 0);
+        int rc = mailbox_recv (&mailbox, &cmd, 0);
         if (rc != 0 && errno == EINTR)
             continue;
         if (rc != 0 && errno == EAGAIN)

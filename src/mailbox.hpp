@@ -22,32 +22,22 @@
 #ifndef __XS_MAILBOX_HPP_INCLUDED__
 #define __XS_MAILBOX_HPP_INCLUDED__
 
-#include <stddef.h>
-
-#include "platform.hpp"
 #include "signaler.hpp"
-#include "fd.hpp"
 #include "config.hpp"
 #include "command.hpp"
 #include "ypipe.hpp"
 #include "mutex.hpp"
+#include "fd.hpp"
 
 namespace xs
 {
 
-    class mailbox_t
+    //  Mailbox stores a list of commands sent to a particular object.
+    //  Multiple threads can send commands to the mailbox in parallel.
+    //  Only a single thread can read commands from the mailbox.
+
+    typedef struct
     {
-    public:
-
-        mailbox_t ();
-        ~mailbox_t ();
-
-        fd_t get_fd ();
-        void send (const command_t &cmd_);
-        int recv (command_t *cmd_, int timeout_);
-        
-    private:
-
         //  The pipe to store actual commands.
         typedef ypipe_t <command_t, command_pipe_granularity> cpipe_t;
         cpipe_t cpipe;
@@ -65,10 +55,13 @@ namespace xs
         //  read commands from it.
         bool active;
 
-        //  Disable copying of mailbox_t object.
-        mailbox_t (const mailbox_t&);
-        const mailbox_t &operator = (const mailbox_t&);
-    };
+    }  mailbox_t;
+
+    int mailbox_init (mailbox_t *self_);
+    void mailbox_close (mailbox_t *self_);
+    fd_t mailbox_fd (mailbox_t *self_);
+    void mailbox_send (mailbox_t *self_, const command_t &cmd_);
+    int mailbox_recv (mailbox_t *self_, command_t *cmd_, int timeout_);
 
 }
 
