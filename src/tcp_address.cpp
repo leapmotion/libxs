@@ -162,7 +162,7 @@ int xs::tcp_address_t::resolve_nic_name (const char *nic_, bool ipv4only_)
     //  Get the addresses.
     ifaddrs* ifa = NULL;
     int rc = getifaddrs (&ifa);
-    xs_assert (rc == 0);    
+    errno_assert (rc == 0);    
     xs_assert (ifa != NULL);
 
     //  Find the corresponding network interface.
