@@ -20,9 +20,9 @@
 
 #include "platform.hpp"
 
-#if defined XS_FORCE_SELECT
+#if defined XS_HAVE_SELECT
 #define XS_SIGNALER_WAIT_BASED_ON_SELECT
-#elif defined XS_FORCE_POLL
+#elif defined XS_HAVE_POLL
 #define XS_SIGNALER_WAIT_BASED_ON_POLL
 #elif defined XS_HAVE_LINUX || defined XS_HAVE_FREEBSD ||\
     defined XS_HAVE_OPENBSD || defined XS_HAVE_SOLARIS ||\
