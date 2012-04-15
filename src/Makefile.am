@@ -64,6 +64,7 @@ libxs_la_SOURCES = \
     reaper.hpp \
     rep.hpp \
     req.hpp \
+    respondent.hpp \
     select.hpp \
     session_base.hpp \
     signaler.hpp \
@@ -71,6 +72,7 @@ libxs_la_SOURCES = \
     stdint.hpp \
     stream_engine.hpp \
     sub.hpp \
+    surveyor.hpp \
     tcp_address.hpp \
     tcp_connecter.hpp \
     tcp_listener.hpp \
@@ -81,7 +83,9 @@ libxs_la_SOURCES = \
     xpub.hpp \
     xrep.hpp \
     xreq.hpp \
+    xrespondent.hpp \
     xsub.hpp \
+    xsurveyor.hpp \
     ypipe.hpp \
     yqueue.hpp \
     clock.cpp \
@@ -121,12 +125,14 @@ libxs_la_SOURCES = \
     random.cpp \
     rep.cpp \
     req.cpp \
+    respondent.cpp \
     select.cpp \
     session_base.cpp \
     signaler.cpp \
     socket_base.cpp \
     stream_engine.cpp \
     sub.cpp \
+    surveyor.cpp \
     tcp_address.cpp \
     tcp_connecter.cpp \
     tcp_listener.cpp \
@@ -135,7 +141,9 @@ libxs_la_SOURCES = \
     xpub.cpp \
     xrep.cpp \
     xreq.cpp \
+    xrespondent.cpp \
     xsub.cpp \
+    xsurveyor.cpp \
     xs.cpp
 
 if ON_MINGW

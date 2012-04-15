@@ -143,12 +143,14 @@
     <ClCompile Include="..\..\..\src\reaper.cpp" />
     <ClCompile Include="..\..\..\src\rep.cpp" />
     <ClCompile Include="..\..\..\src\req.cpp" />
+    <ClCompile Include="..\..\..\src\respondent.cpp" />
     <ClCompile Include="..\..\..\src\select.cpp" />
     <ClCompile Include="..\..\..\src\session_base.cpp" />
     <ClCompile Include="..\..\..\src\signaler.cpp" />
     <ClCompile Include="..\..\..\src\socket_base.cpp" />
     <ClCompile Include="..\..\..\src\stream_engine.cpp" />
     <ClCompile Include="..\..\..\src\sub.cpp" />
+    <ClCompile Include="..\..\..\src\surveyor.cpp" />
     <ClCompile Include="..\..\..\src\tcp_address.cpp" />
     <ClCompile Include="..\..\..\src\tcp_connecter.cpp" />
     <ClCompile Include="..\..\..\src\tcp_listener.cpp" />
@@ -157,8 +159,10 @@
     <ClCompile Include="..\..\..\src\xpub.cpp" />
     <ClCompile Include="..\..\..\src\xrep.cpp" />
     <ClCompile Include="..\..\..\src\xreq.cpp" />
+    <ClCompile Include="..\..\..\src\xrespondent.cpp" />
     <ClCompile Include="..\..\..\src\xsub.cpp" />
     <ClCompile Include="..\..\..\src\xs.cpp" />
+    <ClCompile Include="..\..\..\src\xsurveyor.cpp" />
     <ClCompile Include="..\..\..\src\xszmq.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -211,6 +215,7 @@
     <ClInclude Include="..\..\..\src\reaper.hpp" />
     <ClInclude Include="..\..\..\src\rep.hpp" />
     <ClInclude Include="..\..\..\src\req.hpp" />
+    <ClInclude Include="..\..\..\src\respondent.hpp" />
     <ClInclude Include="..\..\..\src\select.hpp" />
     <ClInclude Include="..\..\..\src\session_base.hpp" />
     <ClInclude Include="..\..\..\src\signaler.hpp" />
@@ -218,6 +223,7 @@
     <ClInclude Include="..\..\..\src\stdint.hpp" />
     <ClInclude Include="..\..\..\src\stream_engine.hpp" />
     <ClInclude Include="..\..\..\src\sub.hpp" />
+    <ClInclude Include="..\..\..\src\surveyor.hpp" />
     <ClInclude Include="..\..\..\src\tcp_address.hpp" />
     <ClInclude Include="..\..\..\src\tcp_connecter.hpp" />
     <ClInclude Include="..\..\..\src\tcp_listener.hpp" />
@@ -228,7 +234,9 @@
     <ClInclude Include="..\..\..\src\xpub.hpp" />
     <ClInclude Include="..\..\..\src\xrep.hpp" />
     <ClInclude Include="..\..\..\src\xreq.hpp" />
+    <ClInclude Include="..\..\..\src\xrespondent.hpp" />
     <ClInclude Include="..\..\..\src\xsub.hpp" />
+    <ClInclude Include="..\..\..\src\xsurveyor.hpp" />
     <ClInclude Include="..\..\..\src\ypipe.hpp" />
     <ClInclude Include="..\..\..\src\yqueue.hpp" />
     <ClInclude Include="..\platform.hpp" />

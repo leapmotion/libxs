@@ -42,6 +42,10 @@
 #include "push.hpp"
 #include "pull.hpp"
 #include "pair.hpp"
+#include "surveyor.hpp"
+#include "xsurveyor.hpp"
+#include "respondent.hpp"
+#include "xrespondent.hpp"
 
 xs::session_base_t *xs::session_base_t::create (class io_thread_t *io_thread_,
     bool connect_, class socket_base_t *socket_, const options_t &options_,
@@ -91,6 +95,22 @@ xs::session_base_t *xs::session_base_t::create (class io_thread_t *io_thread_,
         break;
     case XS_PAIR:
         s = new (std::nothrow) pair_session_t (io_thread_, connect_,
+            socket_, options_, protocol_, address_);
+        break;
+    case XS_SURVEYOR:
+        s = new (std::nothrow) surveyor_session_t (io_thread_, connect_,
+            socket_, options_, protocol_, address_);
+        break;
+    case XS_XSURVEYOR:
+        s = new (std::nothrow) xsurveyor_session_t (io_thread_, connect_,
+            socket_, options_, protocol_, address_);
+        break;
+    case XS_RESPONDENT:
+        s = new (std::nothrow) respondent_session_t (io_thread_, connect_,
+            socket_, options_, protocol_, address_);
+        break;
+    case XS_XRESPONDENT:
+        s = new (std::nothrow) xrespondent_session_t (io_thread_, connect_,
             socket_, options_, protocol_, address_);
         break;
     default:

@@ -61,6 +61,10 @@
 #include "xrep.hpp"
 #include "xpub.hpp"
 #include "xsub.hpp"
+#include "surveyor.hpp"
+#include "xsurveyor.hpp"
+#include "respondent.hpp"
+#include "xrespondent.hpp"
 
 bool xs::socket_base_t::check_tag ()
 {
@@ -105,6 +109,18 @@ xs::socket_base_t *xs::socket_base_t::create (int type_, class ctx_t *parent_,
         break;
     case XS_XSUB:
         s = new (std::nothrow) xsub_t (parent_, tid_, sid_);
+        break;
+    case XS_SURVEYOR:
+        s = new (std::nothrow) surveyor_t (parent_, tid_, sid_);
+        break;
+    case XS_XSURVEYOR:
+        s = new (std::nothrow) xsurveyor_t (parent_, tid_, sid_);
+        break;
+    case XS_RESPONDENT:
+        s = new (std::nothrow) respondent_t (parent_, tid_, sid_);
+        break;
+    case XS_XRESPONDENT:
+        s = new (std::nothrow) xrespondent_t (parent_, tid_, sid_);
         break;
     default:
         errno = EINVAL;

@@ -172,6 +172,10 @@ XS_EXPORT int xs_setctxopt (void *context, int option, const void *optval,
 #define XS_PUSH 8
 #define XS_XPUB 9
 #define XS_XSUB 10
+#define XS_SURVEYOR 11
+#define XS_RESPONDENT 12
+#define XS_XSURVEYOR 13
+#define XS_XRESPONDENT 14
 
 /*  Legacy socket type aliases.                                               */
 #define XS_ROUTER XS_XREP
