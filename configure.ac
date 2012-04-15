@@ -10,7 +10,7 @@ AC_INIT([libxs], [m4_esyscmd([./version.sh])],
     [crossroads-dev@groups.crossroads.io], [libxs], [http://www.crossroads.io/])
 
 AC_CONFIG_AUX_DIR([config])
-AC_CONFIG_MACRO_DIR([config])
+AC_CONFIG_MACRO_DIR([m4])
 AM_CONFIG_HEADER([src/platform.hpp])
 AM_INIT_AUTOMAKE([tar-ustar dist-zip foreign])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
@@ -63,7 +63,13 @@ LIBXS_CHECK_ENABLE_DEBUG
 LIBXS_WITH_GCOV
 
 # Checks for libraries.
-AC_CHECK_LIB([pthread], [pthread_create])
+AX_PTHREAD([
+    LIBS="$PTHREAD_LIBS $LIBS"
+    CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+    CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
+    CC="$PTHREAD_CC"
+])
+
 AC_CHECK_LIB([rt], [clock_gettime])
 
 # Set pedantic
@@ -77,9 +83,6 @@ libxs_dso_visibility="yes"
 
 # Whether we are on mingw or not.
 libxs_on_mingw32="no"
-
-# Set some default features required by Crossroads code.
-CPPFLAGS="-D_REENTRANT -D_THREAD_SAFE $CPPFLAGS"
 
 # For host type checks
 AC_CANONICAL_HOST
