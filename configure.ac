@@ -47,6 +47,9 @@ AM_PROG_CC_C_O
 AC_PROG_SED
 AC_PROG_AWK
 
+# Enable system extensions
+AC_USE_SYSTEM_EXTENSIONS
+
 # Libtool configuration for different targets. See acinclude.m4
 AC_ARG_VAR([XMLTO], [Path to xmlto command])
 AC_PATH_PROG([XMLTO], [xmlto])
@@ -90,10 +93,6 @@ AC_CANONICAL_HOST
 # OS-specific tests
 AS_CASE(["${host_os}"],
     [*linux*], [
-        # Define on Linux to enable all library features. Define if using a gnu compiler
-        AS_IF([test "x$GXX" = "xyes"], [
-            CPPFLAGS="-D_GNU_SOURCE $CPPFLAGS"
-        ])
         AC_DEFINE([XS_HAVE_LINUX], [1], [Have Linux OS])
 
         AS_CASE(["${host_os}"],
@@ -105,8 +104,6 @@ AS_CASE(["${host_os}"],
         AC_CHECK_LIB([dl], [dlopen])
      ],
     [*solaris*], [
-        # Define on Solaris to enable all library features
-        CPPFLAGS="-D_PTHREADS $CPPFLAGS"
         AC_DEFINE([XS_HAVE_SOLARIS], [1], [Have Solaris OS])
         AC_CHECK_LIB([socket], [socket])
         AC_CHECK_LIB([nsl], [gethostbyname])
@@ -125,16 +122,9 @@ AS_CASE(["${host_os}"],
         ])
     ],
     [*freebsd*], [
-        # Define on FreeBSD to enable all library features
-        # -D_GNU_SOURCE should not hurt on the "real" FreeBSD, it just
-        # enables getline(3), but may help on Debian GNU/kFreeBSD, where
-        # libc is GNU Libc or derived.
-        CPPFLAGS="-D__BSD_VISIBLE -D_GNU_SOURCE $CPPFLAGS"
         AC_DEFINE([XS_HAVE_FREEBSD], [1], [Have FreeBSD OS])
     ],
     [*darwin*], [
-        # Define on Darwin to enable all library features
-        CPPFLAGS="-D_DARWIN_C_SOURCE $CPPFLAGS"
         libxs_pedantic="no"
         libxs_werror="no"
         AC_DEFINE([XS_HAVE_OSX], [1], [Have DarwinOSX OS])
@@ -143,8 +133,6 @@ AS_CASE(["${host_os}"],
         AC_LANG_POP([C++])
      ],
     [*netbsd*], [
-        # Define on NetBSD to enable all library features
-        CPPFLAGS="-D_NETBSD_SOURCE $CPPFLAGS"
         AC_DEFINE([XS_HAVE_NETBSD], [1], [Have NetBSD OS])
         # NetBSD 5.0 and newer provides atomic operations but we can
         # only use these on systems where PR #42842 has been fixed so
@@ -166,8 +154,6 @@ AS_CASE(["${host_os}"],
         ])
     ],
     [openbsd*], [
-        # Define on OpenBSD to enable all library features
-        CPPFLAGS="-D_BSD_SOURCE $CPPFLAGS"
         AC_DEFINE([XS_HAVE_OPENBSD], [1], [Have OpenBSD OS])
     ],
     [*nto-qnx*], [
@@ -179,8 +165,6 @@ AS_CASE(["${host_os}"],
         AC_DEFINE([XS_HAVE_AIX], [1], [Have AIX OS])
     ],
     [*hpux*], [
-        # Define on HP-UX to enable all library features
-        CPPFLAGS="-D_POSIX_C_SOURCE=200112L $CPPFLAGS"
         AC_DEFINE([XS_HAVE_HPUX], [1], [Have HPUX OS])
         LIBXS_CHECK_LANG_FLAG_PREPEND([-Ae])
         AC_CHECK_FUNCS([gethrtime])
@@ -207,8 +191,6 @@ AS_CASE(["${host_os}"],
         ])
     ],
     [*cygwin*], [
-        # Define on Cygwin to enable all library features
-        CPPFLAGS="-D_GNU_SOURCE $CPPFLAGS"
         AC_DEFINE([XS_HAVE_CYGWIN], [1], [Have Cygwin])
         AS_IF([test "x$enable_static" = "xyes"], [
             AC_MSG_ERROR([Building static libraries is not supported under Cygwin])
