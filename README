@@ -116,10 +116,10 @@ to link the library statically with your software.  Refer to the end of
 the `COPYING.LESSER` file included with the libxs distribution for details.
 
 
-[1]: <https://github.com/crossroads-io/libxs/issues>   "Bug Tracker"
-[2]: <http://www.crossroads.io/dev:legal>              "Legal Information"
-[3]: <http://www.crossroads.io/dev:code-review>        "Code Review"
-[4]: <http://github.com/crossroads-io>                 "Crossroads I/O Project Sources"
-[5]: <crossroads-dev@groups.crossroads.io>             "Mailing List"
-[6]: <http://groups.crossroads.io/>                    "Mailing List Archives"
-[7]: <http://www.crossroads.io/>                       "Crossroads I/O Project Site"
+[1]: https://github.com/crossroads-io/libxs/issues   "Bug Tracker"
+[2]: http://www.crossroads.io/dev:legal              "Legal Information"
+[3]: http://www.crossroads.io/dev:code-review        "Code Review"
+[4]: http://github.com/crossroads-io                 "Crossroads I/O Project Sources"
+[5]: crossroads-dev@groups.crossroads.io             "Mailing List"
+[6]: http://groups.crossroads.io/                    "Mailing List Archives"
+[7]: http://www.crossroads.io/                       "Crossroads I/O Project Site"
