@@ -267,16 +267,6 @@ int xs::xrep_t::xrecv (msg_t *msg_, int flags_)
     return 0;
 }
 
-int xs::xrep_t::rollback (void)
-{
-    if (current_out) {
-        current_out->rollback ();
-        current_out = NULL;
-        more_out = false;
-    }
-    return 0;
-}
-
 bool xs::xrep_t::xhas_in ()
 {
     //  If we are in  the middle of reading the messages, there are
@@ -310,9 +300,10 @@ bool xs::xrep_t::xhas_in ()
 
 bool xs::xrep_t::xhas_out ()
 {
-    //  In theory, XREP socket is always ready for writing. Whether actual
-    //  attempt to write succeeds depends on whitch pipe the message is going
-    //  to be routed to.
+    //  XREP socket is always ready for writing. Whether actual
+    //  attempt to send will succeed depends on whether the pipe the message
+    //  is routed to is available for writing. If it's not, message will be
+    //  dropped.
     return true;
 }
 

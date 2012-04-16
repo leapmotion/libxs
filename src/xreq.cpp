@@ -68,7 +68,7 @@ int xs::xreq_t::xrecv (msg_t *msg_, int flags_)
         return 0;
     }
 
-    //  XREQ socket doesn't use identities. We can safely drop it and 
+    //  XREQ socket doesn't use identities. We can safely drop them.
     while (true) {
         int rc = fq.recv (msg_, flags_);
         if (rc != 0)

@@ -55,9 +55,12 @@ int xs::req_t::xsend (msg_t *msg_, int flags_)
         errno_assert (rc == 0);
         bottom.set_flags (msg_t::more);
         rc = xreq_t::xsend (&bottom, 0);
-        if (rc != 0)
+        if (rc != 0) {
+            bottom.close ();
             return -1;
+        }
         message_begins = false;
+        bottom.close ();
     }
 
     bool more = msg_->flags () & msg_t::more ? true : false;

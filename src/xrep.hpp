@@ -58,11 +58,6 @@ namespace xs
         void xwrite_activated (xs::pipe_t *pipe_);
         void xterminated (xs::pipe_t *pipe_);
 
-    protected:
-
-        //  Rollback any message parts that were sent but not yet flushed.
-        int rollback ();
-
     private:
 
         //  Fair queueing object for inbound pipes.
