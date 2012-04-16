@@ -98,6 +98,9 @@ namespace xs
         //  Filter ID to be used with subscriptions and unsubscriptions.
         int filter;
 
+        //  Timeout for the survey in milliseconds. -1 means infinite.
+        int survey_timeout;
+
         //  If true, session reads all the pending messages from the pipe and
         //  sends them to the network when socket is closed.
         bool delay_on_close;

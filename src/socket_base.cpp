@@ -552,13 +552,13 @@ int xs::socket_base_t::send (msg_t *msg_, int flags_)
 
     //  In case of non-blocking send we'll simply propagate
     //  the error - including EAGAIN - up the stack.
-    if (flags_ & XS_DONTWAIT || options.sndtimeo == 0)
+    int timeout = sndtimeo ();
+    if (flags_ & XS_DONTWAIT || timeout == 0)
         return -1;
 
     //  Compute the time when the timeout should occur.
     //  If the timeout is infite, don't care. 
     clock_t clock ;
-    int timeout = options.sndtimeo;
     uint64_t end = timeout < 0 ? 0 : (clock.now_ms () + timeout);
 
     //  Oops, we couldn't send the message. Wait for the next
@@ -627,7 +627,8 @@ int xs::socket_base_t::recv (msg_t *msg_, int flags_)
     //  For non-blocking recv, commands are processed in case there's an
     //  activate_reader command already waiting int a command pipe.
     //  If it's not, return EAGAIN.
-    if (flags_ & XS_DONTWAIT || options.rcvtimeo == 0) {
+    int timeout = rcvtimeo ();
+    if (flags_ & XS_DONTWAIT || timeout == 0) {
         if (unlikely (process_commands (0, false) != 0))
             return -1;
         ticks = 0;
@@ -643,7 +644,6 @@ int xs::socket_base_t::recv (msg_t *msg_, int flags_)
     //  Compute the time when the timeout should occur.
     //  If the timeout is infite, don't care. 
     clock_t clock ;
-    int timeout = options.rcvtimeo;
     uint64_t end = timeout < 0 ? 0 : (clock.now_ms () + timeout);
 
     //  In blocking scenario, commands are processed over and over again until
@@ -924,5 +924,15 @@ void xs::socket_base_t::extract_flags (msg_t *msg_)
   
     //  Remove MORE flag.
     rcvmore = msg_->flags () & msg_t::more ? true : false;
+}
+
+int xs::socket_base_t::rcvtimeo ()
+{
+    return options.rcvtimeo;
+}
+
+int xs::socket_base_t::sndtimeo ()
+{
+    return options.sndtimeo;
 }
 

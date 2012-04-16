@@ -23,6 +23,7 @@
 
 #include "xsurveyor.hpp"
 #include "stdint.hpp"
+#include "clock.hpp"
 
 namespace xs
 {
@@ -44,6 +45,7 @@ namespace xs
         int xrecv (xs::msg_t *msg_, int flags_);
         bool xhas_in ();
         bool xhas_out ();
+        int rcvtimeo ();
 
     private:
 
@@ -52,6 +54,12 @@ namespace xs
 
         //  The ID of the ongoing survey.
         uint32_t survey_id;
+
+        //  The time instant when the current survey expires.
+        uint64_t timeout;
+
+        //  Provides a way to measure time quickly.
+        clock_t clock;
 
         surveyor_t (const surveyor_t&);
         const surveyor_t &operator = (const surveyor_t&);

@@ -50,6 +50,7 @@ xs::options_t::options_t () :
     keepalive (0),
     protocol (0),
     filter (XS_FILTER_PREFIX),
+    survey_timeout (-1),
     delay_on_close (true),
     delay_on_disconnect (true),
     send_identity (false),
@@ -258,6 +259,18 @@ int xs::options_t::setsockopt (int option_, const void *optval_,
         filter = *((int*) optval_);
         return 0;
 
+    case XS_SURVEY_TIMEOUT:
+        if (type != XS_SURVEYOR) {
+            errno = ENOTSUP;
+            return -1;
+        }
+        if (optvallen_ != sizeof (int)) {
+            errno = EINVAL;
+            return -1;
+        }
+        survey_timeout = *((int*) optval_);
+        return 0;
+
     }
 
     errno = EINVAL;
@@ -454,6 +467,19 @@ int xs::options_t::getsockopt (int option_, void *optval_, size_t *optvallen_)
             return -1;
         }
         *((int*) optval_) = filter;
+        *optvallen_ = sizeof (int);
+        return 0;
+
+    case XS_SURVEY_TIMEOUT:
+        if (type != XS_SURVEYOR) {
+            errno = ENOTSUP;
+            return -1;
+        }
+        if (*optvallen_ < sizeof (int)) {
+            errno = EINVAL;
+            return -1;
+        }
+        *((int*) optval_) = survey_timeout;
         *optvallen_ = sizeof (int);
         return 0;
 

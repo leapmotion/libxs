@@ -18,6 +18,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
+
 #include "surveyor.hpp"
 #include "err.hpp"
 #include "msg.hpp"
@@ -28,7 +30,8 @@
 xs::surveyor_t::surveyor_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
     xsurveyor_t (parent_, tid_, sid_),
     receiving_responses (false),
-    survey_id (generate_random ())
+    survey_id (generate_random ()),
+    timeout (0)
 {
     options.type = XS_SURVEYOR;
 }
@@ -67,6 +70,12 @@ int xs::surveyor_t::xsend (msg_t *msg_, int flags_)
 
     //  Start waiting for responses from the peers.
     receiving_responses = true;
+
+    //  Set up the timeout for the survey (-1 means infinite).
+    if (!options.survey_timeout)
+        timeout = -1;
+    else
+        timeout = clock.now_ms () + options.survey_timeout;
 
     return 0;
 }
@@ -119,6 +128,16 @@ bool xs::surveyor_t::xhas_in ()
 bool xs::surveyor_t::xhas_out ()
 {
     return xsurveyor_t::xhas_out ();
+}
+
+int xs::surveyor_t::rcvtimeo ()
+{
+    int t = timeout - clock.now_ms ();
+    if (t < 0)
+        return options.rcvtimeo;
+    if (options.rcvtimeo < 0)
+        return t;
+    return std::min (t, options.rcvtimeo); 
 }
 
 xs::surveyor_session_t::surveyor_session_t (io_thread_t *io_thread_,

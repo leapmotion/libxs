@@ -118,6 +118,18 @@ int XS_TEST_MAIN ()
     rc = xs_recv (surveyor, buf, sizeof (buf), 0);
     assert (rc == 4);
 
+    //  Now let's test whether survey timeout works as expected.
+    int timeout = 100;
+    rc = xs_setsockopt (surveyor, XS_SURVEY_TIMEOUT, &timeout, sizeof (int));
+    assert (rc == 0);
+    rc = xs_send (surveyor, "ABC", 3, 0);
+    assert (rc == 3);
+    void *watch = xs_stopwatch_start ();
+    rc = xs_recv (surveyor, buf, sizeof (buf), 0);
+    assert (rc == - 1 && errno == EAGAIN);
+    unsigned long elapsed = xs_stopwatch_stop (watch) / 1000;
+    time_assert (elapsed, (unsigned long) timeout);
+
     rc = xs_close (respondent2);
     assert (rc == 0);
     rc = xs_close (respondent1);

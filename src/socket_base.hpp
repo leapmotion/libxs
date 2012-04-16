@@ -119,6 +119,10 @@ namespace xs
         virtual bool xhas_in ();
         virtual int xrecv (xs::msg_t *msg_, int flags_);
 
+        //  Allow derived classes to modify timeouts.
+        virtual int rcvtimeo ();
+        virtual int sndtimeo ();
+
         //  i_pipe_events will be forwarded to these functions.
         virtual void xread_activated (pipe_t *pipe_);
         virtual void xwrite_activated (pipe_t *pipe_);
