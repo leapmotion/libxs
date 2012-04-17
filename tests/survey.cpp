@@ -130,6 +130,46 @@ int XS_TEST_MAIN ()
     unsigned long elapsed = xs_stopwatch_stop (watch) / 1000;
     time_assert (elapsed, (unsigned long) timeout);
 
+    //  Test whether responses for old surveys are discarded. First,
+    //  initiate new survey.
+    rc = xs_setsockopt (surveyor, XS_SURVEY_TIMEOUT, &timeout, sizeof (int));
+    assert (rc == 0);
+    rc = xs_send (surveyor, "DE", 2, 0);
+    assert (rc == 2);
+
+    //  Read, process and reply to the old survey.
+    rc = xs_recv (xrespondent, buf, sizeof (buf), 0);
+    assert (rc == 4);
+    rc = xs_send (xrespondent, buf, 4, XS_SNDMORE);
+    assert (rc == 4);
+    rc = xs_recv (xrespondent, buf, sizeof (buf), 0);
+    assert (rc == 4);
+    rc = xs_send (xrespondent, buf, 4, XS_SNDMORE);
+    assert (rc == 4);
+    rc = xs_recv (xrespondent, buf, sizeof (buf), 0);
+    assert (rc == 3);
+    rc = xs_send (xrespondent, buf, 3, 0);
+    assert (rc == 3);
+
+    //  Read, process and reply to the new survey.
+    rc = xs_recv (xrespondent, buf, sizeof (buf), 0);
+    assert (rc == 4);
+    rc = xs_send (xrespondent, buf, 4, XS_SNDMORE);
+    assert (rc == 4);
+    rc = xs_recv (xrespondent, buf, sizeof (buf), 0);
+    assert (rc == 4);
+    rc = xs_send (xrespondent, buf, 4, XS_SNDMORE);
+    assert (rc == 4);
+    rc = xs_recv (xrespondent, buf, sizeof (buf), 0);
+    assert (rc == 2);
+    rc = xs_send (xrespondent, buf, 2, 0);
+    assert (rc == 2);
+
+    //  Get the response and check it's the response to the new survey and
+    //  that response to the old survey was silently discarded.
+    rc = xs_recv (surveyor, buf, sizeof (buf), 0);
+    assert (rc == 2);
+
     rc = xs_close (respondent2);
     assert (rc == 0);
     rc = xs_close (respondent1);
@@ -142,6 +182,6 @@ int XS_TEST_MAIN ()
     assert (rc == 0);
     rc = xs_term (ctx);
     assert (rc == 0);
-
+    
     return 0 ;
 }
