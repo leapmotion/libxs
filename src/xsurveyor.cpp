@@ -26,6 +26,10 @@ xs::xsurveyor_t::xsurveyor_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
     socket_base_t (parent_, tid_, sid_)
 {
     options.type = XS_XSURVEYOR;
+
+    //  When the XSURVEYOR socket is close it makes no sense to send any pending
+    //  surveys. The responses will be unroutable anyway.
+    options.delay_on_close = false;
 }
 
 xs::xsurveyor_t::~xsurveyor_t ()

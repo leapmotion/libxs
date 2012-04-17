@@ -36,6 +36,10 @@ xs::xrespondent_t::xrespondent_t (class ctx_t *parent_, uint32_t tid_,
 {
     options.type = XS_XRESPONDENT;
 
+    //  If the connection disappears it makes no sense to read any more surveys
+    //  from it. The responses will be unroutable anyway.
+    options.delay_on_disconnect = false;
+
     prefetched_msg.init ();
 }
 
