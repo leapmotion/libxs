@@ -603,109 +603,171 @@ int main (int argc, char *argv [])
     )
 }])
 
-dnl ################################################################################
-dnl # LIBXS_CHECK_POLLER_KQUEUE([action-if-found], [action-if-not-found])          #
-dnl # Checks kqueue polling system                                                 #
-dnl ################################################################################
-AC_DEFUN([LIBXS_CHECK_POLLER_KQUEUE], [{
-    AC_LINK_IFELSE(
-        [AC_LANG_PROGRAM(
-        [
+###############################################################################
+# LIBXS_CHECK_KQUEUE                                                          #
+# Checks for kqueue() and defines XS_HAVE_KQUEUE if it is found               #
+###############################################################################
+
+AC_DEFUN([LIBXS_CHECK_KQUEUE], [
+    AH_TEMPLATE([XS_HAVE_KQUEUE], [Defined to 1 if your system has kqueue()])
+
+    AS_VAR_PUSHDEF([ac_var], [acx_cv_have_kqueue])
+    AC_CACHE_CHECK([for kqueue()], [ac_var], [
+        AC_LINK_IFELSE([
+            AC_LANG_PROGRAM([
 #include <sys/types.h>
 #include <sys/event.h>
 #include <sys/time.h>
-        ],
-[[
+                ], [[
 struct kevent t_kev;
 kqueue();
-]]
-        )],
-        [libxs_cv_have_poller_kqueue="yes" ; $1],
-        [libxs_cv_have_poller_kqueue="no" ; $2])
-}])
+                ]]
+            )],
+            [AS_VAR_SET([ac_var], [yes])],
+            [AS_VAR_SET([ac_var], [no])])])
+    AS_IF([test yes = AS_VAR_GET([ac_var])], [AC_DEFINE([XS_HAVE_KQUEUE], [1])])
+    AS_VAR_POPDEF([ac_var])
+])
 
-dnl ################################################################################
-dnl # LIBXS_CHECK_POLLER_EPOLL([action-if-found], [action-if-not-found])           #
-dnl # Checks epoll polling system                                                  #
-dnl ################################################################################
-AC_DEFUN([LIBXS_CHECK_POLLER_EPOLL], [{
-    AC_LINK_IFELSE(
-        [AC_LANG_PROGRAM(
-        [
+###############################################################################
+# LIBXS_CHECK_EPOLL                                                           #
+# Checks for epoll() and defines XS_HAVE_EPOLL if it is found                 #
+###############################################################################
+
+AC_DEFUN([LIBXS_CHECK_EPOLL], [
+    AH_TEMPLATE([XS_HAVE_EPOLL], [Defined to 1 if your system has epoll()])
+
+    AS_VAR_PUSHDEF([ac_var], [acx_cv_have_epoll])
+    AC_CACHE_CHECK([for epoll()], [ac_var], [
+        AC_LINK_IFELSE([
+            AC_LANG_PROGRAM([
 #include <sys/epoll.h>
-        ],
-[[
+                ], [[
 struct epoll_event t_ev;
 epoll_create(10);
-]]
-        )],
-        [libxs_cv_have_poller_epoll="yes" ; $1],
-        [libxs_cv_have_poller_epoll="no" ; $2])
-}])
+                ]]
+            )],
+            [AS_VAR_SET([ac_var], [yes])],
+            [AS_VAR_SET([ac_var], [no])])])
+    AS_IF([test yes = AS_VAR_GET([ac_var])], [AC_DEFINE([XS_HAVE_EPOLL], [1])])
+    AS_VAR_POPDEF([ac_var])
+])
 
-dnl ################################################################################
-dnl # LIBXS_CHECK_POLLER_DEVPOLL([action-if-found], [action-if-not-found])         #
-dnl # Checks devpoll polling system                                                #
-dnl ################################################################################
-AC_DEFUN([LIBXS_CHECK_POLLER_DEVPOLL], [{
-    AC_LINK_IFELSE(
-        [AC_LANG_PROGRAM(
-        [
+###############################################################################
+# LIBXS_CHECK_DEVPOLL                                                         #
+# Checks for /dev/poll and defines XS_HAVE_DEVPOLL if it is found             #
+###############################################################################
+
+AC_DEFUN([LIBXS_CHECK_DEVPOLL], [
+    AH_TEMPLATE([XS_HAVE_DEVPOLL], [Defined to 1 if your system has /dev/poll])
+
+    AS_VAR_PUSHDEF([ac_var], [acx_cv_have_devpoll])
+    AC_CACHE_CHECK([for /dev/poll], [ac_var], [
+        AC_LINK_IFELSE([
+            AC_LANG_PROGRAM([
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/poll.h>
 #include <sys/devpoll.h>
-        ],
-[[
+                ], [[
 struct dvpoll p;
 p.dp_timeout = 0;
 p.dp_nfds = 0;
 p.dp_fds = (struct pollfd *) 0;
 return 0;
-]]
-        )],
-        [libxs_cv_have_poller_devpoll="yes" ; $1],
-        [libxs_cv_have_poller_devpoll="no" ; $2])
-}])
+                ]]
+            )],
+            [AS_VAR_SET([ac_var], [yes])],
+            [AS_VAR_SET([ac_var], [no])])])
+    AS_IF([test yes = AS_VAR_GET([ac_var])], [
+        AC_DEFINE([XS_HAVE_DEVPOLL], [1])
+    ])
+    AS_VAR_POPDEF([ac_var])
+])
 
-dnl ################################################################################
-dnl # LIBXS_CHECK_POLLER_POLL([action-if-found], [action-if-not-found])            #
-dnl # Checks poll polling system                                                   #
-dnl ################################################################################
-AC_DEFUN([LIBXS_CHECK_POLLER_POLL], [{
-    AC_LINK_IFELSE(
-        [AC_LANG_PROGRAM(
-        [
-#include <poll.h>
-        ],
-[[
+###############################################################################
+# LIBXS_CHECK_POLL                                                            #
+# Checks for poll() and defines XS_HAVE_POLL if it is found                   #
+###############################################################################
+
+AC_DEFUN([LIBXS_CHECK_POLL], [
+    AH_TEMPLATE([XS_HAVE_POLL], [Defined to 1 if your system has poll()])
+
+    AC_CHECK_HEADERS([ \
+        poll.h \
+        sys/types.h \
+        sys/select.h \
+        sys/poll.h
+    ])
+
+    AS_VAR_PUSHDEF([ac_var], [acx_cv_have_poll])
+    AC_CACHE_CHECK([for poll()], [ac_var], [
+        AC_LINK_IFELSE([
+            AC_LANG_PROGRAM([
+#if HAVE_SYS_TYPES_H
+#   include <sys/types.h>
+#endif
+
+#if HAVE_SYS_SELECT_H
+#   include <sys/select.h>
+#endif
+
+#if HAVE_SYS_POLL_H
+#   include <sys/poll.h>
+#elif HAVE_POLL_H
+#   include <poll.h>
+#endif
+                ], [[
 struct pollfd t_poll;
 poll(&t_poll, 1, 1);
-]]
-        )],
-        [libxs_cv_have_poller_poll="yes" ; $1],
-        [libxs_cv_have_poller_poll="no" ; $2])
-}])
+                ]]
+            )],
+            [AS_VAR_SET([ac_var], [yes])],
+            [AS_VAR_SET([ac_var], [no])])])
+    AS_IF([test yes = AS_VAR_GET([ac_var])], [AC_DEFINE([XS_HAVE_POLL], [1])])
+    AS_VAR_POPDEF([ac_var])
+])
 
-dnl ################################################################################
-dnl # LIBXS_CHECK_POLLER_SELECT([action-if-found], [action-if-not-found])          #
-dnl # Checks select polling system                                                 #
-dnl ################################################################################
-AC_DEFUN([LIBXS_CHECK_POLLER_SELECT], [{
-    AC_LINK_IFELSE(
-        [AC_LANG_PROGRAM(
-        [
+###############################################################################
+# LIBXS_CHECK_SELECT                                                          #
+# Checks for select() and defines XS_HAVE_SELECT if it is found               #
+###############################################################################
+
+AC_DEFUN([LIBXS_CHECK_SELECT], [
+    AH_TEMPLATE([XS_HAVE_SELECT], [Defined to 1 if your system has select()])
+
+    AC_CHECK_HEADERS([ \
+        unistd.h \
+        sys/types.h \
+        sys/time.h \
+        sys/select.h
+    ])
+
+    AS_VAR_PUSHDEF([ac_var], [acx_cv_have_select])
+    AC_CACHE_CHECK([for select()], [ac_var], [
+        AC_LINK_IFELSE([
+            AC_LANG_PROGRAM([
 #ifdef XS_HAVE_WINDOWS
-#include "winsock2.h"
-#elif defined XS_HAVE_OPENVMS
-#include <sys/types.h>
-#include <sys/time.h>
+#   include "winsock2.h"
 #else
-#include <sys/select.h>
+#   if HAVE_UNISTD_H
+#       include <unistd.h>
+#   endif
+#
+#   if HAVE_SYS_TYPES_H
+#       include <sys/types.h>
+#   endif
+#
+#   if HAVE_SYS_TIME_H
+#       include <sys/time.h>
+#   endif
+#
+#   if HAVE_SYS_SELECT_H
+#       include <sys/select.h>
+#   endif
 #endif
-        ],
-[[
+                ], [[
 fd_set t_rfds;
 struct timeval tv;
 
@@ -716,79 +778,11 @@ tv.tv_sec = 5;
 tv.tv_usec = 0;
 
 select(1, &t_rfds, NULL, NULL, &tv);
-]]
-        )],
-        [libxs_cv_have_poller_select="yes" ; $1],
-        [libxs_cv_have_poller_select="no" ; $2])
-}])
-
-dnl ################################################################################
-dnl # LIBXS_CHECK_POLLER([action-if-found], [action-if-not-found])                 #
-dnl # Choose polling system                                                        #
-dnl ################################################################################
-AC_DEFUN([LIBXS_CHECK_POLLER], [{
-
-    # Templates to be picked up by autoheader
-    AH_TEMPLATE([XS_HAVE_KQUEUE], [Defined to 1 if your system has kqueue()])
-    AH_TEMPLATE([XS_HAVE_EPOLL], [Defined to 1 if your system has epoll()])
-    AH_TEMPLATE([XS_HAVE_DEVPOLL], [Defined to 1 if your system has /dev/poll])
-    AH_TEMPLATE([XS_HAVE_POLL], [Defined to 1 if your system has poll()])
-    AH_TEMPLATE([XS_HAVE_SELECT], [Defined to 1 if your system has select()])
-
-    # Allow user to disable doc build
-    AC_ARG_WITH([poller], [AS_HELP_STRING([--with-poller],
-                [choose polling system manually. valid values are kqueue, epoll, devpoll, poll or select [default=autodetect]])])
-
-    AC_MSG_CHECKING([for suitable polling system])
-
-    case "${with_poller}" in
-        kqueue|epoll|devpoll|poll|select)
-            # User has chosen polling system
-            libxs_cv_poller="${with_poller}"
-        ;;
-
-        *)
-            # try to find suitable polling system. the order of testing is:
-            # kqueue -> epoll -> devpoll -> poll -> select
-            for subsystem in kqueue epoll devpoll poll select; do
-
-                case "${subsystem}" in
-                    kqueue)
-                        LIBXS_CHECK_POLLER_KQUEUE([libxs_cv_poller=$subsystem], [])
-                    ;;
-
-                    epoll)
-                        LIBXS_CHECK_POLLER_EPOLL([libxs_cv_poller=$subsystem], [])
-                    ;;
-
-                    devpoll)
-                        LIBXS_CHECK_POLLER_DEVPOLL([libxs_cv_poller=$subsystem], [])
-                    ;;
-
-                    poll)
-                        LIBXS_CHECK_POLLER_POLL([libxs_cv_poller=$subsystem], [])
-                    ;;
-
-                    select)
-                        LIBXS_CHECK_POLLER_SELECT([libxs_cv_poller=$subsystem], [])
-                    ;;
-                esac
-
-                if test "x${libxs_cv_poller}" != "x"; then
-                    break
-                fi
-            done
-      ;;
-    esac
-
-    AS_IF([test "x${libxs_cv_poller}" != "x"], [
-        AC_MSG_RESULT([using $libxs_cv_poller])
-        $1
-    ], [
-        AC_MSG_RESULT([no suitable polling system found])
-        $2
-    ])
-
-    AC_DEFINE_UNQUOTED(AS_TR_CPP(xs_have_${libxs_cv_poller}))
-}])
+                ]]
+            )],
+            [AS_VAR_SET([ac_var], [yes])],
+            [AS_VAR_SET([ac_var], [no])])])
+    AS_IF([test yes = AS_VAR_GET([ac_var])], [AC_DEFINE([XS_HAVE_SELECT], [1])])
+    AS_VAR_POPDEF([ac_var])
+])
 

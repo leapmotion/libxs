@@ -220,10 +220,6 @@ AS_CASE(["${host_cpu}"],
 # Check whether to build docs / install man pages
 LIBXS_CHECK_DOC_BUILD
 
-# Check polling system
-LIBXS_CHECK_POLLER([],
-    [AC_MSG_ERROR([Unable to continue without polling system])])
-
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([ \
@@ -244,6 +240,80 @@ AC_CHECK_HEADERS([ \
 # Check if we have ifaddrs.h header file.
 AC_CHECK_HEADERS([ifaddrs.h],
     [AC_DEFINE([XS_HAVE_IFADDRS], [1], [Have ifaddrs.h header.])])
+
+###############################################################################
+# Check polling system                                                        #
+###############################################################################
+
+# Allow users to override the polling system
+AC_ARG_WITH([poller],
+    [AS_HELP_STRING([--with-poller],
+        [choose polling system manually. valid values are kqueue, epoll, devpoll, poll or select [default=autodetect]])],
+    [], [with_poller=autodetect])
+
+# Check the various polling systems
+LIBXS_CHECK_KQUEUE
+LIBXS_CHECK_EPOLL
+LIBXS_CHECK_DEVPOLL
+LIBXS_CHECK_POLL
+LIBXS_CHECK_SELECT
+
+# Select the best available poller
+AS_CASE([${with_poller}],
+    [kqueue], [
+        AS_IF([test x$acx_cv_have_kqueue != xyes], [
+            AC_MSG_ERROR([kqueue() poller selected but not available])
+        ])
+        AC_DEFINE([XS_FORCE_KQUEUE], [1], [Forces use of kqueue()])
+        libxs_cv_poller=kqueue
+    ],
+    [epoll], [
+        AS_IF([test x$acx_cv_have_epoll != xyes], [
+            AC_MSG_ERROR([epoll() poller selected but not available])
+        ])
+        AC_DEFINE([XS_FORCE_EPOLL], [1], [Forces use of epoll()])
+        libxs_cv_poller=epoll
+    ],
+    [devpoll], [
+        AS_IF([test x$acx_cv_have_devpoll != xyes], [
+            AC_MSG_ERROR([/dev/poll poller selected but not available])
+        ])
+        AC_DEFINE([XS_FORCE_DEVPOLL], [1], [Forces use of /dev/poll])
+        libxs_cv_poller=devpoll
+    ],
+    [poll], [
+        AS_IF([test x$acx_cv_have_poll != xyes], [
+            AC_MSG_ERROR([poll() poller selected but not available])
+        ])
+        AC_DEFINE([XS_FORCE_POLL], [1], [Forces use of poll()])
+        libxs_cv_poller=poll
+    ],
+    [select], [
+        AS_IF([test x$acx_cv_have_select != xyes], [
+            AC_MSG_ERROR([select() poller selected but not available])
+        ])
+        AC_DEFINE([XS_FORCE_SELECT], [1], [Forces use of select()])
+        libxs_cv_poller=select
+    ],
+    [autodetect], [
+        AS_IF([test x$acx_cv_have_kqueue = xyes], [
+            libxs_cv_poller=kqueue
+        ], [test x$acx_cv_have_epoll = xyes], [
+            libxs_cv_poller=epoll
+        ], [test x$acx_cv_have_devpoll = xyes], [
+            libxs_cv_poller=devpoll
+        ], [test x$acx_cv_have_poll = xyes], [
+            libxs_cv_poller=poll
+        ], [test x$acx_cv_have_select = xyes], [
+            libxs_cv_poller=select
+        ], [
+            AC_MSG_ERROR([no suitable polling system found])
+        ])
+    ],
+    [*], [
+        AC_MSG_ERROR([Invalid poller selected: ${with_poller}])
+    ]
+)
 
 # Force not to use eventfd
 AC_ARG_ENABLE([eventfd],
