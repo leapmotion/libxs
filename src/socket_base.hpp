@@ -32,6 +32,7 @@
 #include "atomic_counter.hpp"
 #include "mailbox.hpp"
 #include "stdint.hpp"
+#include "clock.hpp"
 #include "pipe.hpp"
 
 namespace xs
@@ -201,6 +202,9 @@ namespace xs
 
         //  True if the last message received had MORE flag set.
         bool rcvmore;
+
+        //  Improves efficiency of time measurement.
+        clock_t clock;
 
         socket_base_t (const socket_base_t&);
         const socket_base_t &operator = (const socket_base_t&);
