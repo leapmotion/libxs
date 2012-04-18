@@ -250,7 +250,7 @@ int zmq_getsockopt (void *s, int option, void *optval,
             return -1;
         }
         int val;
-        size_t size;
+        size_t size = sizeof (int);
         int rc = xs_getsockopt (s, option, &val, &size);
         if (rc < 0)
             return -1;
@@ -267,7 +267,7 @@ int zmq_getsockopt (void *s, int option, void *optval,
             return -1;
         }
         int val;
-        size_t size;
+        size_t size = sizeof (int);
         int rc = xs_getsockopt (s, XS_SNDHWM, &val, &size);
         if (rc < 0)
             return -1;
@@ -284,7 +284,7 @@ int zmq_getsockopt (void *s, int option, void *optval,
             return -1;
         }
         int val;
-        size_t size;
+        size_t size = sizeof (int);
         int rc = xs_getsockopt (s, option, &val, &size);
         if (rc < 0)
             return -1;
@@ -302,7 +302,7 @@ int zmq_getsockopt (void *s, int option, void *optval,
             return -1;
         }
         int val;
-        size_t size;
+        size_t size = sizeof (int);
         int rc = xs_getsockopt (s, option, &val, &size);
         if (rc < 0)
             return -1;
@@ -320,7 +320,7 @@ int zmq_getsockopt (void *s, int option, void *optval,
             return -1;
         }
         int val;
-        size_t size;
+        size_t size = sizeof (int);
         int rc = xs_getsockopt (s, option, &val, &size);
         if (rc < 0)
             return -1;
@@ -337,7 +337,7 @@ int zmq_getsockopt (void *s, int option, void *optval,
             return -1;
         }
         int val;
-        size_t size;
+        size_t size = sizeof (int);
         int rc = xs_getsockopt (s, option, &val, &size);
         if (rc < 0)
             return -1;
