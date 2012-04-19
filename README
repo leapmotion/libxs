@@ -61,7 +61,7 @@ Reporting Bugs
 
 To report a bug, send an email describing your problem to the Crossroads
 mailing list.  To make sure your bug report won't be missed, you can file a
-report in the [bug tracker][1].
+report in the bug tracker[1].
 
 To help Crossroads developers to fix the bug, please try to provide a minimal
 test program, ideally written in C, that reproduces the problem you are
@@ -77,23 +77,23 @@ Contributing to the Project
 ---------------------------
 
 Before contributing to the project make sure you understand the legal
-implications of doing so.  These are outlined on the [Crossroads I/O website][2].
+implications of doing so.  These are outlined on the Crossroads I/O website[2].
 
 To submit your contribution, send it as a patch (using `git format-patch`, `diff`,
 or similar) to the mailing list.  Make sure to use your real name, and prefix
 the subject of your post with `[PATCH]`.
 
 All contributions will be reviewed and, if they pass review, accepted.  For more
-details refer to the [website][3].
+details refer to the website[3].
 
 
 Resources
 ---------
 
-The libxs development Git tree can be found [on Github][4].
+The libxs development Git tree can be found on Github[4].
 
-Development is coordinated on the [mailing list][5].
-Visit [the archives][6] to join or view archives
+Development is coordinated on the mailing list[5].
+Visit the archives[6] to join or view archives
 of previous discussion.
 
 Extensive documentation is provided with the distribution.  Refer to
@@ -101,7 +101,7 @@ Extensive documentation is provided with the distribution.  Refer to
 your system.
 
 Further resources, language bindings, tutorials, and more can be found on
-the [Crossroads website][7].
+the Crossroads website[7].
 
 
 Copying
@@ -115,11 +115,19 @@ As a special exception, the copyright holders of libxs grant you the right
 to link the library statically with your software.  Refer to the end of
 the `COPYING.LESSER` file included with the libxs distribution for details.
 
+Footnotes
+---------
 
-[1]: https://github.com/crossroads-io/libxs/issues   "Bug Tracker"
-[2]: http://www.crossroads.io/dev:legal              "Legal Information"
-[3]: http://www.crossroads.io/dev:code-review        "Code Review"
-[4]: http://github.com/crossroads-io                 "Crossroads I/O Project Sources"
-[5]: crossroads-dev@groups.crossroads.io             "Mailing List"
-[6]: http://groups.crossroads.io/                    "Mailing List Archives"
-[7]: http://www.crossroads.io/                       "Crossroads I/O Project Site"
+[1]: Bug tracker: https://github.com/crossroads-io/libxs/issues
+
+[2]: Legal information: http://www.crossroads.io/dev:legal
+
+[3]: Code review: http://www.crossroads.io/dev:code-review
+
+[4]: Source code: http://github.com/crossroads-io                 
+
+[5]: Mailing list: crossroads-dev@groups.crossroads.io
+
+[6]: Mailing list archives: http://groups.crossroads.io/
+
+[7]: Project website: http://www.crossroads.io/
