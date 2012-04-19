@@ -23,7 +23,6 @@
 
 #include "xsurveyor.hpp"
 #include "stdint.hpp"
-#include "clock.hpp"
 
 namespace xs
 {
@@ -57,9 +56,6 @@ namespace xs
 
         //  The time instant when the current survey expires.
         uint64_t timeout;
-
-        //  Provides a way to measure time quickly.
-        clock_t clock;
 
         surveyor_t (const surveyor_t&);
         const surveyor_t &operator = (const surveyor_t&);

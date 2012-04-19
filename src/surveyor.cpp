@@ -75,7 +75,7 @@ int xs::surveyor_t::xsend (msg_t *msg_, int flags_)
     if (!options.survey_timeout)
         timeout = -1;
     else
-        timeout = clock.now_ms () + options.survey_timeout;
+        timeout = now_ms () + options.survey_timeout;
 
     return 0;
 }
@@ -132,7 +132,7 @@ bool xs::surveyor_t::xhas_out ()
 
 int xs::surveyor_t::rcvtimeo ()
 {
-    int t = timeout - clock.now_ms ();
+    int t = timeout - now_ms ();
     if (t < 0)
         return options.rcvtimeo;
     if (options.rcvtimeo < 0)

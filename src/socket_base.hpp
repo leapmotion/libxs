@@ -133,6 +133,9 @@ namespace xs
         //  Delay actual destruction of the socket.
         void process_destroy ();
 
+        //  Measure time in efficient manner.
+        uint64_t now_ms ();
+
     private:
 
         //  Initialise the object. This function is separate from constructor

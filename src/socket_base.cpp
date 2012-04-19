@@ -933,3 +933,7 @@ int xs::socket_base_t::sndtimeo ()
     return options.sndtimeo;
 }
 
+uint64_t xs::socket_base_t::now_ms ()
+{
+    return clock.now_ms ();
+}
