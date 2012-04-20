@@ -132,7 +132,7 @@ bool xs::surveyor_t::xhas_out ()
 
 int xs::surveyor_t::rcvtimeo ()
 {
-    int t = timeout - now_ms ();
+    int t = (int) (timeout - now_ms ());
     if (t < 0)
         return options.rcvtimeo;
     if (options.rcvtimeo < 0)
