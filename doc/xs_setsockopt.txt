@@ -361,6 +361,20 @@ Default value:: 0 (false)
 Applicable socket types:: all, when using TCP transport.
 
 
+XS_SURVEY_TIMEOUT: Sets the deadline for the survey
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Specifies how long to wait for responses to the survey. After the interval
+expires, any firther calls to xs_recv() will return EAGAIN error. All the
+responses received later on will be silently discarded. Value of -1 means
+infinite.
+
+[horizontal]
+Option value type:: int
+Option value unit:: milliseconds
+Default value:: -1 (infinite)
+Applicable socket types:: XS_SURVEYOR
+
 RETURN VALUE
 ------------
 The _xs_setsockopt()_ function shall return zero if successful. Otherwise it

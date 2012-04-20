@@ -282,6 +282,83 @@ Outgoing routing strategy:: N/A
 XS_HWM option action:: N/A
 
 
+Survey pattern
+~~~~~~~~~~~~~~
+Survey pattern can be used to post a survey to a set of notes and collect
+responses from them. The survey is distributed from surveyor to all connected
+respondents. Responses are routed back to the original surveyor.
+
+XS_SURVEYOR
+^^^^^^^^^^^
+
+XS_SURVEYOR socket type can be used to send surveys to all respondents in the
+topology and receive the replies from all of them. Each survey sent is
+distributed to all connected peers, and incoming replies are fair-queue. As you
+don't know the number of respondents in the topology you don't know the number
+of responses you are going to get, therefore you should use XS_SURVEY_TIMEOUT
+socket option to set the deadline for the survey.
+
+[horizontal]
+.Summary of XS_SURVEYOR characteristics
+Compatible peer sockets:: 'XS_RESPONDENT', 'XS_XRESPONDENT'
+Direction:: Bidirectional
+Send/receive pattern:: Send one message, receive many messages.
+Incoming routing strategy:: Fair-queued
+Outgoing routing strategy:: Fan out
+XS_HWM option action:: Drop
+
+XS_RESPONDENT
+^^^^^^^^^^^^^
+
+This socket type receives surveys from surveyors and sends responses. Incoming
+surveys are fair-queued. Outgoing responses are routed back to the original
+surveyor.
+
+[horizontal]
+.Summary of XS_RESPONDENT characteristics
+Compatible peer sockets:: 'XS_SURVEYOR', 'XS_XSURVEYOR'
+Direction:: Bidirectional
+Send/receive pattern:: Receive a survey, send one response.
+Incoming routing strategy:: Fair-queued
+Outgoing routing strategy:: Last peer
+XS_HWM option action:: Drop
+
+XS_XSURVEYOR
+^^^^^^^^^^^^
+
+A socket of type 'XS_XSURVEYOR' is a socket type underlying 'XS_SURVEYOR'.
+It doesn't impose the strict order of sends and recvs as 'XS_SURVEYOR' does and
+it is intended for use in intermediate devices in survey topologies.
+
+[horizontal]
+.Summary of XS_XSURVEYOR characteristics
+Compatible peer sockets:: 'XS_RESPONDENT', 'XS_XRESPONDENT'
+Direction:: Bidirectional
+Send/receive pattern:: Send surveys, receive responses.
+Incoming routing strategy:: Fair-queued
+Outgoing routing strategy:: Fan out
+XS_HWM option action:: Drop
+
+XS_XRESPONDENT
+^^^^^^^^^^^^^^
+
+A socket of type 'XS_XRESPONDENT' is a socket type underlying 'XS_RESPONDENT'.
+It doesn't impose the strict order of sends and recvs as 'XS_RESPONDENT' does
+and it is intended for use in intermediate devices in survey topologies.
+
+Incoming surveys are fair-queued. Each survey is prefixed by a message part
+identifying the surveyor it was received from. Outgoing responses are routed
+to the original surveyor based on the first message part.
+
+[horizontal]
+.Summary of XS_XRESPONDENT characteristics
+Compatible peer sockets:: 'XS_SURVEYOR', 'XS_XSURVEYOR'
+Direction:: Bidirectional
+Send/receive pattern:: Receive surveys, send responses.
+Incoming routing strategy:: Fair-queued
+Outgoing routing strategy:: See text
+XS_HWM option action:: Drop
+
 Exclusive pair pattern
 ~~~~~~~~~~~~~~~~~~~~~~
 The exclusive pair is an advanced pattern used for communicating exclusively
