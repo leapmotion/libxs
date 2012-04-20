@@ -22,9 +22,9 @@
 #ifndef __XS_SELECT_HPP_INCLUDED__
 #define __XS_SELECT_HPP_INCLUDED__
 
-#include "platform.hpp"
+#include "polling.hpp"
 
-#if defined XS_HAVE_SELECT
+#if defined XS_USE_ASYNC_SELECT
 
 #include "platform.hpp"
 

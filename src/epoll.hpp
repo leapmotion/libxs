@@ -22,9 +22,9 @@
 #ifndef __XS_EPOLL_HPP_INCLUDED__
 #define __XS_EPOLL_HPP_INCLUDED__
 
-#include "platform.hpp"
+#include "polling.hpp"
 
-#if defined XS_HAVE_EPOLL
+#if defined XS_USE_ASYNC_EPOLL
 
 #include <vector>
 #include <sys/epoll.h>

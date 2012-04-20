@@ -22,8 +22,9 @@
 #ifndef __XS_KQUEUE_HPP_INCLUDED__
 #define __XS_KQUEUE_HPP_INCLUDED__
 
-#include "platform.hpp"
-#if defined XS_HAVE_KQUEUE
+#include "polling.hpp"
+
+#if defined XS_USE_ASYNC_KQUEUE
 
 #include <vector>
 

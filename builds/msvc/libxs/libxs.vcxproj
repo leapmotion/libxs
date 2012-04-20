@@ -206,6 +206,7 @@
     <ClInclude Include="..\..\..\src\pgm_socket.hpp" />
     <ClInclude Include="..\..\..\src\pipe.hpp" />
     <ClInclude Include="..\..\..\src\poll.hpp" />
+    <ClInclude Include="..\..\..\src\polling.hpp" />
     <ClInclude Include="..\..\..\src\precompiled.hpp" />
     <ClInclude Include="..\..\..\src\prefix_filter.hpp" />
     <ClInclude Include="..\..\..\src\pub.hpp" />

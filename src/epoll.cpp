@@ -21,7 +21,7 @@
 
 #include "epoll.hpp"
 
-#if defined XS_HAVE_EPOLL
+#if defined XS_USE_ASYNC_EPOLL
 
 #include <sys/epoll.h>
 #include <stdlib.h>

@@ -301,6 +301,9 @@
     <ClInclude Include="..\..\..\src\poll.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\polling.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\src\precompiled.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

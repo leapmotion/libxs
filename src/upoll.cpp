@@ -26,27 +26,13 @@
 #include "clock.hpp"
 #include "likely.hpp"
 #include "platform.hpp"
-
-#if defined XS_HAVE_SELECT
-#define XS_POLL_BASED_ON_SELECT
-#elif defined XS_HAVE_POLL
-#define XS_POLL_BASED_ON_POLL
-#elif defined XS_HAVE_LINUX || defined XS_HAVE_FREEBSD ||\
-    defined XS_HAVE_OPENBSD || defined XS_HAVE_SOLARIS ||\
-    defined XS_HAVE_OSX || defined XS_HAVE_QNXNTO ||\
-    defined XS_HAVE_HPUX || defined XS_HAVE_AIX ||\
-    defined XS_HAVE_NETBSD
-#define XS_POLL_BASED_ON_POLL
-#elif defined XS_HAVE_WINDOWS || defined XS_HAVE_OPENVMS ||\
-	defined XS_HAVE_CYGWIN
-#define XS_POLL_BASED_ON_SELECT
-#endif
+#include "polling.hpp"
 
 //  On AIX platform, poll.h has to be included first to get consistent
 //  definition of pollfd structure (AIX uses 'reqevents' and 'retnevents'
 //  instead of 'events' and 'revents' and defines macros to map from POSIX-y
 //  names to AIX-specific names).
-#if defined XS_POLL_BASED_ON_POLL
+#if defined XS_USE_SYNC_POLL
 #include <poll.h>
 #endif
 
@@ -58,7 +44,7 @@
 
 int xs::upoll (xs_pollitem_t *items_, int nitems_, int timeout_)
 {
-#if defined XS_POLL_BASED_ON_POLL
+#if defined XS_USE_SYNC_POLL
     if (unlikely (nitems_ < 0)) {
         errno = EINVAL;
         return -1;
@@ -213,7 +199,7 @@ int xs::upoll (xs_pollitem_t *items_, int nitems_, int timeout_)
     free (pollfds);
     return nevents;
 
-#elif defined XS_POLL_BASED_ON_SELECT
+#elif defined XS_USE_SYNC_SELECT
 
     if (unlikely (nitems_ < 0)) {
         errno = EINVAL;
@@ -403,15 +389,7 @@ int xs::upoll (xs_pollitem_t *items_, int nitems_, int timeout_)
     return nevents;
 
 #else
-    //  Exotic platforms that support neither poll() nor select().
-    errno = ENOTSUP;
-    return -1;
+#error
 #endif
 }
 
-#if defined XS_POLL_BASED_ON_SELECT
-#undef XS_POLL_BASED_ON_SELECT
-#endif
-#if defined XS_POLL_BASED_ON_POLL
-#undef XS_POLL_BASED_ON_POLL
-#endif

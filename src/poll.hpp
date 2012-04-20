@@ -22,9 +22,9 @@
 #ifndef __XS_POLL_HPP_INCLUDED__
 #define __XS_POLL_HPP_INCLUDED__
 
-#include "platform.hpp"
+#include "polling.hpp"
 
-#if defined XS_HAVE_POLL
+#if defined XS_USE_ASYNC_POLL
 
 #include <poll.h>
 #include <stddef.h>

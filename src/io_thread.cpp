@@ -21,6 +21,7 @@
 #include "io_thread.hpp"
 #include "err.hpp"
 
+#include "polling.hpp"
 #include "select.hpp"
 #include "poll.hpp"
 #include "epoll.hpp"
@@ -30,15 +31,15 @@
 xs::io_thread_t *xs::io_thread_t::create (xs::ctx_t *ctx_, uint32_t tid_)
 {
     io_thread_t *result;
-#if defined XS_HAVE_SELECT
+#if defined XS_USE_ASYNC_SELECT
     result = new (std::nothrow) select_t (ctx_, tid_);
-#elif defined XS_HAVE_POLL
+#elif defined XS_USE_ASYNC_POLL
     result = new (std::nothrow) poll_t (ctx_, tid_);
-#elif defined XS_HAVE_EPOLL
+#elif defined XS_USE_ASYNC_EPOLL
     result = new (std::nothrow) epoll_t (ctx_, tid_);
-#elif defined XS_HAVE_DEVPOLL
+#elif defined XS_USE_ASYNC_DEVPOLL
     result = new (std::nothrow) devpoll_t (ctx_, tid_);
-#elif defined XS_HAVE_KQUEUE
+#elif defined XS_USE_ASYNC_KQUEUE
     result = new (std::nothrow) kqueue_t (ctx_, tid_);
 #endif
     alloc_assert (result);

@@ -21,7 +21,7 @@
 
 #include "kqueue.hpp"
 
-#if defined XS_HAVE_KQUEUE
+#if defined XS_USE_ASYNC_KQUEUE
 
 #include <sys/time.h>
 #include <sys/types.h>
@@ -31,6 +31,7 @@
 #include <algorithm>
 #include <new>
 
+#include "platform.hpp"
 #include "kqueue.hpp"
 #include "err.hpp"
 #include "config.hpp"

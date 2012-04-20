@@ -22,9 +22,9 @@
 #ifndef __XS_DEVPOLL_HPP_INCLUDED__
 #define __XS_DEVPOLL_HPP_INCLUDED__
 
-#include "platform.hpp"
+#include "polling.hpp"
 
-#if defined XS_HAVE_DEVPOLL
+#if defined XS_USE_ASYNC_DEVPOLL
 
 #include <vector>
 

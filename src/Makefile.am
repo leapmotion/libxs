@@ -55,6 +55,7 @@ libxs_la_SOURCES = \
     pipe.hpp \
     platform.hpp \
     poll.hpp \
+    polling.hpp \
     pair.hpp \
     prefix_filter.hpp \
     pub.hpp \

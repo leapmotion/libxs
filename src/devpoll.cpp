@@ -21,7 +21,7 @@
 
 #include "devpoll.hpp"
 
-#if defined XS_HAVE_DEVPOLL
+#if defined XS_USE_ASYNC_DEVPOLL
 
 #include <sys/devpoll.h>
 #include <sys/time.h>
@@ -33,6 +33,7 @@
 #include <limits.h>
 #include <algorithm>
 
+#include "platform.hpp"
 #include "devpoll.hpp"
 #include "err.hpp"
 #include "config.hpp"

@@ -19,29 +19,15 @@
 */
 
 #include "platform.hpp"
-
-#if defined XS_HAVE_SELECT
-#define XS_SIGNALER_WAIT_BASED_ON_SELECT
-#elif defined XS_HAVE_POLL
-#define XS_SIGNALER_WAIT_BASED_ON_POLL
-#elif defined XS_HAVE_LINUX || defined XS_HAVE_FREEBSD ||\
-    defined XS_HAVE_OPENBSD || defined XS_HAVE_SOLARIS ||\
-    defined XS_HAVE_OSX || defined XS_HAVE_QNXNTO ||\
-    defined XS_HAVE_HPUX || defined XS_HAVE_AIX ||\
-    defined XS_HAVE_NETBSD
-#define XS_SIGNALER_WAIT_BASED_ON_POLL
-#elif defined XS_HAVE_WINDOWS || defined XS_HAVE_OPENVMS ||\
-	defined XS_HAVE_CYGWIN
-#define XS_SIGNALER_WAIT_BASED_ON_SELECT
-#endif
+#include "polling.hpp"
 
 //  On AIX, poll.h has to be included before xs.h to get consistent
 //  definition of pollfd structure (AIX uses 'reqevents' and 'retnevents'
 //  instead of 'events' and 'revents' and defines macros to map from POSIX-y
 //  names to AIX-specific names).
-#if defined XS_SIGNALER_WAIT_BASED_ON_POLL
+#if defined XS_USE_SYNC_POLL
 #include <poll.h>
-#elif defined XS_SIGNALER_WAIT_BASED_ON_SELECT
+#elif defined XS_USE_SYNC_SELECT
 #if defined XS_HAVE_WINDOWS
 #include "windows.hpp"
 #elif defined XS_HAVE_HPUX
@@ -357,7 +343,7 @@ void xs::signaler_send (xs::signaler_t *self_)
 
 int xs::signaler_wait (xs::signaler_t *self_, int timeout_)
 {
-#ifdef XS_SIGNALER_WAIT_BASED_ON_POLL
+#ifdef XS_USE_SYNC_POLL
 
     struct pollfd pfd;
     pfd.fd = self_->r;
@@ -375,7 +361,7 @@ int xs::signaler_wait (xs::signaler_t *self_, int timeout_)
     xs_assert (pfd.revents & POLLIN);
     return 0;
 
-#elif defined XS_SIGNALER_WAIT_BASED_ON_SELECT
+#elif defined XS_USE_SYNC_SELECT
 
     fd_set fds;
     FD_ZERO (&fds);
@@ -406,6 +392,7 @@ int xs::signaler_wait (xs::signaler_t *self_, int timeout_)
 
 #else
 #error
+    return -1;
 #endif
 }
 
@@ -440,11 +427,4 @@ void xs::signaler_recv (xs::signaler_t *self_)
     xs_assert (dummy == 0);
 #endif
 }
-
-#if defined XS_SIGNALER_WAIT_BASED_ON_SELECT
-#undef XS_SIGNALER_WAIT_BASED_ON_SELECT
-#endif
-#if defined XS_SIGNALER_WAIT_BASED_ON_POLL
-#undef XS_SIGNALER_WAIT_BASED_ON_POLL
-#endif
 

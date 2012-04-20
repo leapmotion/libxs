@@ -21,7 +21,7 @@
 
 #include "select.hpp"
 
-#if defined XS_HAVE_SELECT
+#if defined XS_USE_ASYNC_SELECT
 
 #include "platform.hpp"
 #if defined XS_HAVE_WINDOWS
