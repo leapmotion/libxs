@@ -74,8 +74,6 @@ namespace xs
         void send_stop ();
         void send_plug (xs::own_t *destination_,
             bool inc_seqnum_ = true);
-        void send_own (xs::own_t *destination_,
-            xs::own_t *object_);
         void send_attach (xs::session_base_t *destination_,
              xs::i_engine *engine_, bool inc_seqnum_ = true);
         void send_bind (xs::own_t *destination_, xs::pipe_t *pipe_,
@@ -98,7 +96,6 @@ namespace xs
         //  called when command arrives from another thread.
         virtual void process_stop ();
         virtual void process_plug ();
-        virtual void process_own (xs::own_t *object_);
         virtual void process_attach (xs::i_engine *engine_);
         virtual void process_bind (xs::pipe_t *pipe_);
         virtual void process_activate_read ();

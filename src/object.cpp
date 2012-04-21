@@ -77,11 +77,6 @@ void xs::object_t::process_command (command_t &cmd_)
         process_seqnum ();
         break;
 
-    case command_t::own:
-        process_own (cmd_.args.own.object);
-        process_seqnum ();
-        break;
-
     case command_t::attach:
         process_attach (cmd_.args.attach.engine);
         process_seqnum ();
@@ -183,19 +178,6 @@ void xs::object_t::send_plug (own_t *destination_, bool inc_seqnum_)
 #endif
     cmd.destination = destination_;
     cmd.type = command_t::plug;
-    send_command (cmd);
-}
-
-void xs::object_t::send_own (own_t *destination_, own_t *object_)
-{
-    destination_->inc_seqnum ();
-    command_t cmd;
-#if defined XS_MAKE_VALGRIND_HAPPY
-    memset (&cmd, 0, sizeof (cmd));
-#endif
-    cmd.destination = destination_;
-    cmd.type = command_t::own;
-    cmd.args.own.object = object_;
     send_command (cmd);
 }
 
@@ -365,11 +347,6 @@ void xs::object_t::process_stop ()
 }
 
 void xs::object_t::process_plug ()
-{
-    xs_assert (false);
-}
-
-void xs::object_t::process_own (own_t *object_)
 {
     xs_assert (false);
 }

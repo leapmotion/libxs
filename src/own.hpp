@@ -68,7 +68,6 @@ namespace xs
     protected:
 
         //  Handlers for incoming commands.
-        void process_own (own_t *object_);
         void process_term_req (own_t *object_);
         void process_term_ack ();
         void process_seqnum ();

@@ -44,7 +44,6 @@ namespace xs
         {
             stop,
             plug,
-            own,
             attach,
             bind,
             activate_read,
@@ -70,11 +69,6 @@ namespace xs
             //  Sent to I/O object to make it register with its I/O thread.
             struct {
             } plug;
-
-            //  Sent to socket to let it know about the newly created object.
-            struct {
-                xs::own_t *object;
-            } own;
 
             //  Attach the engine to the session. If engine is NULL, it informs
             //  session that the connection have failed.

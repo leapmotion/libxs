@@ -76,8 +76,16 @@ void xs::own_t::launch_child (own_t *object_)
     //  Plug the object into the I/O thread.
     send_plug (object_);
 
-    //  Take ownership of the object.
-    send_own (this, object_);
+    //  If the object is already being shut down, new owned objects are
+    //  immediately asked to terminate. Note that linger is set to zero.
+    if (terminating) {
+        register_term_acks (1);
+        send_term (object_, 0);
+        return;
+    }
+
+    //  Store the reference to the owned object.
+    owned.insert (object_);
 }
 
 void xs::own_t::process_term_req (own_t *object_)
@@ -101,20 +109,6 @@ void xs::own_t::process_term_req (own_t *object_)
     //  Note that this object is the root of the (partial shutdown) thus, its
     //  value of linger is used, rather than the value stored by the children.
     send_term (object_, options.linger);
-}
-
-void xs::own_t::process_own (own_t *object_)
-{
-    //  If the object is already being shut down, new owned objects are
-    //  immediately asked to terminate. Note that linger is set to zero.
-    if (terminating) {
-        register_term_acks (1);
-        send_term (object_, 0);
-        return;
-    }
-
-    //  Store the reference to the owned object.
-    owned.insert (object_);
 }
 
 void xs::own_t::terminate ()
