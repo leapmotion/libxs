@@ -165,7 +165,7 @@ int main ()
     assert (rc == 0);
     rc = survey ();
     assert (rc == 0);
-    rc = shutdown ()
+    rc = shutdown ();
     assert (rc == 0);
     fprintf (stderr, "SUCCESS\n");
     sleep (1);
