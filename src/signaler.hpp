@@ -22,6 +22,28 @@
 #define __XS_SIGNALER_HPP_INCLUDED__
 
 #include "fd.hpp"
+#include "polling.hpp"
+
+//  On AIX, poll.h has to be included before xs.h to get consistent
+//  definition of pollfd structure (AIX uses 'reqevents' and 'retnevents'
+//  instead of 'events' and 'revents' and defines macros to map from POSIX-y
+//  names to AIX-specific names).
+#if defined XS_USE_SYNC_POLL
+#include <poll.h>
+#elif defined XS_USE_SYNC_SELECT
+#if defined XS_HAVE_WINDOWS
+#include "windows.hpp"
+#elif defined XS_HAVE_HPUX
+#include <sys/param.h>
+#include <sys/types.h>
+#include <sys/time.h>
+#elif defined XS_HAVE_OPENVMS
+#include <sys/types.h>
+#include <sys/time.h>
+#else
+#include <sys/select.h>
+#endif
+#endif
 
 namespace xs
 {
@@ -34,6 +56,9 @@ namespace xs
     typedef struct {
         fd_t w;
         fd_t r;
+#if defined XS_USE_SYNC_SELECT
+        fd_set fds;
+#endif
     } signaler_t;
 
     //  Initialise the signaler.

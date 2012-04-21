@@ -18,8 +18,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __XS_CORE_HPP_INCLUDED__
-#define __XS_CORE_HPP_INCLUDED__
+#ifndef __XS_POLLING_HPP_INCLUDED__
+#define __XS_POLLING_HPP_INCLUDED__
 
 #include "platform.hpp"
 

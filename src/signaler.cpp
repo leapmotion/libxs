@@ -18,31 +18,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "platform.hpp"
-#include "polling.hpp"
-
-//  On AIX, poll.h has to be included before xs.h to get consistent
-//  definition of pollfd structure (AIX uses 'reqevents' and 'retnevents'
-//  instead of 'events' and 'revents' and defines macros to map from POSIX-y
-//  names to AIX-specific names).
-#if defined XS_USE_SYNC_POLL
-#include <poll.h>
-#elif defined XS_USE_SYNC_SELECT
-#if defined XS_HAVE_WINDOWS
-#include "windows.hpp"
-#elif defined XS_HAVE_HPUX
-#include <sys/param.h>
-#include <sys/types.h>
-#include <sys/time.h>
-#elif defined XS_HAVE_OPENVMS
-#include <sys/types.h>
-#include <sys/time.h>
-#else
-#include <sys/select.h>
-#endif
-#endif
-
 #include "signaler.hpp"
+#include "platform.hpp"
 #include "likely.hpp"
 #include "stdint.hpp"
 #include "config.hpp"
@@ -287,6 +264,11 @@ int xs::signaler_init (xs::signaler_t *self_)
     //  Set both fds to non-blocking mode.
     unblock_socket (self_->w);
     unblock_socket (self_->r);
+
+#if defined XS_USE_SYNC_SELECT
+    FD_ZERO (&self_->fds);
+#endif
+
     return 0;
 }
 
@@ -362,21 +344,18 @@ int xs::signaler_wait (xs::signaler_t *self_, int timeout_)
     return 0;
 
 #elif defined XS_USE_SYNC_SELECT
-
-    fd_set fds;
-    FD_ZERO (&fds);
-    FD_SET (self_->r, &fds);
+    FD_SET (self_->r, &self_->fds);
     struct timeval timeout;
     if (timeout_ >= 0) {
         timeout.tv_sec = timeout_ / 1000;
         timeout.tv_usec = timeout_ % 1000 * 1000;
     }
 #ifdef XS_HAVE_WINDOWS
-    int rc = select (0, &fds, NULL, NULL,
+    int rc = select (0, &self_->fds, NULL, NULL,
         timeout_ >= 0 ? &timeout : NULL);
     wsa_assert (rc != SOCKET_ERROR);
 #else
-    int rc = select (self_->r + 1, &fds, NULL, NULL,
+    int rc = select (self_->r + 1, &self_->fds, NULL, NULL,
         timeout_ >= 0 ? &timeout : NULL);
     if (unlikely (rc < 0)) {
         xs_assert (errno == EINTR);
