@@ -33,23 +33,23 @@ int XS_TEST_MAIN ()
     void *xsurveyor = xs_socket (ctx, XS_XSURVEYOR);
     assert (xsurveyor);
     rc = xs_bind (xsurveyor, "inproc://a");
-    assert (rc == 0);
+    assert (rc != -1);
     void *xrespondent = xs_socket (ctx, XS_XRESPONDENT);
     assert (xrespondent);
     rc = xs_bind (xrespondent, "inproc://b");
-    assert (rc == 0);
+    assert (rc != -1);
     void *surveyor = xs_socket (ctx, XS_SURVEYOR);
     assert (surveyor);
     rc = xs_connect (surveyor, "inproc://b");
-    assert (rc == 0);
+    assert (rc != -1);
     void *respondent1 = xs_socket (ctx, XS_RESPONDENT);
     assert (respondent1);
     rc = xs_connect (respondent1, "inproc://a");
-    assert (rc == 0);
+    assert (rc != -1);
     void *respondent2 = xs_socket (ctx, XS_RESPONDENT);
     assert (respondent2);
     rc = xs_connect (respondent2, "inproc://a");
-    assert (rc == 0);
+    assert (rc != -1);
 
     //  Send the survey.
     rc = xs_send (surveyor, "ABC", 3, 0);

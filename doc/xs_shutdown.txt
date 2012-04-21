@@ -1,0 +1,69 @@
+xs_bind(3)
+==========
+
+
+NAME
+----
+xs_shutdown - shut down part of the socket
+
+
+SYNOPSIS
+--------
+*int xs_shutdown (void '*socket', int 'how');*
+
+
+DESCRIPTION
+-----------
+This function partially closes the socket. It disconnects or unbinds an endpoint
+previously connected or bound by _xs_bind()_ or _xs_connect()_. 'how' parameter
+is the endpoint ID as returned by _xs_bind()_ or _xs_connect()_.
+
+Endpoint shutdown honours 'linger' socket option. I.e. if there are any pending
+outbound messages, Crossroads will try to push them to the network for the
+specified amount of time before giving up.
+
+Note: inproc endpoints don't support partial shutdown at the moment.
+
+RETURN VALUE
+------------
+The _xs_shutdown()_ function shall return zero if successful. Otherwise it
+shall return `-1` and set 'errno' to one of the values defined below.
+
+ERRORS
+------
+*EINVAL*::
+The endpoint ID supplied doesn't correspond to any active endpoint.
+*ENOTSUP*::
+Specified endpoint doesn't support partial shutdown.
+*ETERM*::
+The 'context' associated with the specified 'socket' was terminated.
+*ENOTSOCK*::
+The provided 'socket' was invalid.
+
+
+EXAMPLE
+-------
+.Binding socket to an endpoint, then unbinding it
+----
+/* Create a socket */
+void *socket = xs_socket (context, XS_PUB);
+assert (socket);
+/* Bind it to a TCP endpoint */
+int id = xs_bind (socket, "tcp://*:5555");
+assert (id != -1);
+/* Unbind the socket from the endpoint */
+rc = xs_shutdown (socket, id);
+assert (rc == 0);
+----
+
+
+SEE ALSO
+--------
+linkxs:xs_connect[3]
+linkxs:xs_bind[3]
+linkxs:xs[7]
+
+
+AUTHORS
+-------
+This manual page was written by Martin Sustrik <sustrik@250bpm.com>.

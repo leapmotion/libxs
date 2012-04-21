@@ -35,14 +35,14 @@ int XS_TEST_MAIN ()
     int rc = xs_setsockopt (sb, XS_RCVHWM, &hwm, sizeof (hwm));
     assert (rc == 0);
     rc = xs_bind (sb, "inproc://a");
-    assert (rc == 0);
+    assert (rc != -1);
 
     void *sc = xs_socket (ctx, XS_PUSH);
     assert (sc);
     rc = xs_setsockopt (sc, XS_SNDHWM, &hwm, sizeof (hwm));
     assert (rc == 0);
     rc = xs_connect (sc, "inproc://a");
-    assert (rc == 0);
+    assert (rc != -1);
 
     //  Try to send 10 messages. Only 4 should succeed.
     for (int i = 0; i < 10; i++)

@@ -30,7 +30,7 @@ extern "C"
         void *sc = xs_socket (ctx_, XS_PUSH);
         assert (sc);
         int rc = xs_connect (sc, "inproc://timeout_test");
-        assert (rc == 0);
+        assert (rc != -1);
         sleep (1);
         rc = xs_close (sc);
         assert (rc == 0);
@@ -48,7 +48,7 @@ int XS_TEST_MAIN ()
     void *sb = xs_socket (ctx, XS_PULL);
     assert (sb);
     int rc = xs_bind (sb, "inproc://timeout_test");
-    assert (rc == 0);
+    assert (rc != -1);
 
     //  Check whether timeout is honoured.
     xs_pollitem_t pi;

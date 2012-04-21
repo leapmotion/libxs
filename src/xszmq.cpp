@@ -355,12 +355,14 @@ int zmq_getsockopt (void *s, int option, void *optval,
 
 int zmq_bind (void *s, const char *addr)
 {
-    return xs_bind (s, addr);
+    int rc = xs_bind (s, addr);
+    return rc < 0 ? -1 : 0;
 }
 
 int zmq_connect (void *s, const char *addr)
 {
-    return xs_connect (s, addr);
+    int rc = xs_connect (s, addr);
+    return rc < 0 ? -1 : 0;
 }
 
 int zmq_send (void *s, zmq_msg_t *msg, int flags)

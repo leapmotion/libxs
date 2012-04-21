@@ -224,6 +224,7 @@ XS_EXPORT int xs_getsockopt (void *s, int option, void *optval,
     size_t *optvallen);
 XS_EXPORT int xs_bind (void *s, const char *addr);
 XS_EXPORT int xs_connect (void *s, const char *addr);
+XS_EXPORT int xs_shutdown (void *s, int how);
 XS_EXPORT int xs_send (void *s, const void *buf, size_t len, int flags);
 XS_EXPORT int xs_recv (void *s, void *buf, size_t len, int flags);
 XS_EXPORT int xs_sendmsg (void *s, xs_msg_t *msg, int flags);

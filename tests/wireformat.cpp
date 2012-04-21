@@ -50,9 +50,9 @@ int XS_TEST_MAIN ()
 
     //  Bind the peer and get the message.
     int rc = xs_bind (pull, "tcp://127.0.0.1:5560");
-    assert (rc == 0);
+    assert (rc != -1);
     rc = xs_bind (push, "tcp://127.0.0.1:5561");
-    assert (rc == 0);
+    assert (rc != -1);
 
     // Connect to the peer using raw sockets.
     int rpush = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);

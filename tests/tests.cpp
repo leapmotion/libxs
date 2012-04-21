@@ -115,6 +115,10 @@
 #include "survey.cpp"
 #undef XS_TEST_MAIN
 
+#define XS_TEST_MAIN shutdown
+#include "shutdown.cpp"
+#undef XS_TEST_MAIN
+
 int main ()
 {
     int rc;
@@ -160,6 +164,8 @@ int main ()
     rc = resubscribe ();
     assert (rc == 0);
     rc = survey ();
+    assert (rc == 0);
+    rc = shutdown ()
     assert (rc == 0);
     fprintf (stderr, "SUCCESS\n");
     sleep (1);

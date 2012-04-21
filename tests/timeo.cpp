@@ -30,7 +30,7 @@ extern "C"
         void *sc = xs_socket (ctx_, XS_PUSH);
         assert (sc);
         int rc = xs_connect (sc, "inproc://timeout_test");
-        assert (rc == 0);
+        assert (rc != -1);
         sleep (1);
         rc = xs_close (sc);
         assert (rc == 0);
@@ -48,7 +48,7 @@ int XS_TEST_MAIN ()
     void *sb = xs_socket (ctx, XS_PULL);
     assert (sb);
     int rc = xs_bind (sb, "inproc://timeout_test");
-    assert (rc == 0);
+    assert (rc != -1);
 
     //  Check whether non-blocking recv returns immediately.
     char buf [] = "12345678ABCDEFGH12345678abcdefgh";
@@ -90,7 +90,7 @@ int XS_TEST_MAIN ()
     rc = xs_setsockopt(sb, XS_SNDTIMEO, &timeout, timeout_size);
     assert (rc == 0);
     rc = xs_connect (sc, "inproc://timeout_test");
-    assert (rc == 0);
+    assert (rc != -1);
     rc = xs_send (sc, buf, 32, 0);
     assert (rc == 32);
     rc = xs_recv (sb, buf, 32, 0);

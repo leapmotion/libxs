@@ -54,14 +54,14 @@ EXAMPLES
 ----
 /* Assign the pathname "/tmp/feeds/0" */
 rc = xs_bind(socket, "ipc:///tmp/feeds/0");
-assert (rc == 0);
+assert (rc != -1);
 ----
 
 .Connecting a socket
 ----
 /* Connect to the pathname "/tmp/feeds/0" */
 rc = xs_connect(socket, "ipc:///tmp/feeds/0");
-assert (rc == 0);
+assert (rc != -1);
 ----
 
 SEE ALSO

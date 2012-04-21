@@ -38,9 +38,9 @@ int XS_TEST_MAIN ()
     rc = xs_setsockopt (req_socket, XS_LINGER, &linger, sizeof (int));
     assert (rc == 0);
     rc = xs_bind (xrep_socket, "inproc://hi");
-    assert (rc == 0);
+    assert (rc != -1);
     rc = xs_connect (req_socket, "inproc://hi");
-    assert (rc == 0);
+    assert (rc != -1);
 
     //  Initial request.
     rc = xs_send (req_socket, "r", 1, 0);

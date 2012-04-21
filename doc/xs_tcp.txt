@@ -127,23 +127,23 @@ EXAMPLES
 ----
 /* TCP port 5555 on all available interfaces */
 rc = xs_bind(socket, "tcp://*:5555");
-assert (rc == 0);
+assert (rc != -1);
 /* TCP port 5555 on the local loop-back interface on all platforms */
 rc = xs_bind(socket, "tcp://127.0.0.1:5555");
-assert (rc == 0);
+assert (rc != -1);
 /* TCP port 5555 on the first Ethernet network interface on Linux */
 rc = xs_bind(socket, "tcp://eth0:5555");
-assert (rc == 0);
+assert (rc != -1);
 ----
 
 .Connecting a socket
 ----
 /* Connecting using an IP address */
 rc = xs_connect(socket, "tcp://192.168.1.1:5555");
-assert (rc == 0);
+assert (rc != -1);
 /* Connecting using a DNS name */
 rc = xs_connect(socket, "tcp://server1:5555");
-assert (rc == 0);
+assert (rc != -1);
 ----
 
 

@@ -37,7 +37,7 @@ int XS_TEST_MAIN ()
     //  Connect to non-existent endpoing.
     assert (rc == 0);
     rc = xs_connect (s, "tcp://127.0.0.1:5560");
-    assert (rc == 0);
+    assert (rc != -1);
 
     //  Send a message.
     rc = xs_send (s, "r", 1, 0);

@@ -32,23 +32,23 @@ int XS_TEST_MAIN ()
     void *xpub = xs_socket (ctx, XS_XPUB);
     assert (xpub);
     int rc = xs_bind (xpub, "tcp://127.0.0.1:5560");
-    assert (rc == 0);
+    assert (rc != -1);
     void *xsub = xs_socket (ctx, XS_XSUB);
     assert (xsub);
     rc = xs_bind (xsub, "tcp://127.0.0.1:5561");
-    assert (rc == 0);
+    assert (rc != -1);
 
     //  Create a publisher.
     void *pub = xs_socket (ctx, XS_PUB);
     assert (pub);
     rc = xs_connect (pub, "tcp://127.0.0.1:5561");
-    assert (rc == 0);
+    assert (rc != -1);
 
     //  Create a subscriber.
     void *sub = xs_socket (ctx, XS_SUB);
     assert (sub);
     rc = xs_connect (sub, "tcp://127.0.0.1:5560");
-    assert (rc == 0);
+    assert (rc != -1);
 
     //  Subscribe for all messages.
     rc = xs_setsockopt (sub, XS_SUBSCRIBE, "", 0);

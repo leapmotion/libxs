@@ -56,7 +56,7 @@ int main (int argc, char *argv [])
     }
 
     rc = xs_bind (s, bind_to);
-    if (rc != 0) {
+    if (rc == -1) {
         printf ("error in xs_bind: %s\n", xs_strerror (errno));
         return -1;
     }

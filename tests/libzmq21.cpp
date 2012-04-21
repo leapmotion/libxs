@@ -57,7 +57,7 @@ int XS_TEST_MAIN ()
     int rc = xs_setsockopt (pub, XS_PROTOCOL, &protocol, sizeof (protocol));
     assert (rc == 0);
     rc = xs_bind (pub, "tcp://127.0.0.1:5560");
-    assert (rc == 0);
+    assert (rc != -1);
 
     int oldsub = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
     struct sockaddr_in address;
@@ -105,7 +105,7 @@ int XS_TEST_MAIN ()
     rc = xs_setsockopt (sub, XS_SUBSCRIBE, "", 0);
     assert (rc == 0);
     rc = xs_bind (sub, "tcp://127.0.0.1:5560");
-    assert (rc == 0);
+    assert (rc != -1);
 
     int oldpub = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
     address.sin_family = AF_INET;

@@ -67,6 +67,12 @@ namespace xs
 
     protected:
 
+        //  Handlers for incoming commands.
+        void process_own (own_t *object_);
+        void process_term_req (own_t *object_);
+        void process_term_ack ();
+        void process_seqnum ();
+
         //  Launch the supplied object and become its owner.
         void launch_child (own_t *object_);
 
@@ -100,12 +106,6 @@ namespace xs
 
         //  Set owner of the object
         void set_owner (own_t *owner_);
-
-        //  Handlers for incoming commands.
-        void process_own (own_t *object_);
-        void process_term_req (own_t *object_);
-        void process_term_ack ();
-        void process_seqnum ();
 
         //  Check whether all the peding term acks were delivered.
         //  If so, deallocate this object.

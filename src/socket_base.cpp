@@ -347,7 +347,12 @@ int xs::socket_base_t::bind (const char *addr_)
     if (protocol == "inproc") {
         endpoint_t endpoint = {this, options};
         rc = register_endpoint (addr_, endpoint);
-        return rc;
+        if (rc != 0)
+            return -1;
+
+        //  Endpoint IDs for inproc transport are not implemented at the
+        //  moment. Thus we return 0 to the user.
+        return 0;
     }
 
     if (protocol == "pgm" || protocol == "epgm") {
@@ -373,7 +378,7 @@ int xs::socket_base_t::bind (const char *addr_)
             return -1;
         }
         launch_child (listener);
-        return 0;
+        return add_endpoint (listener);
     }
 
 #if !defined XS_HAVE_WINDOWS && !defined XS_HAVE_OPENVMS
@@ -387,7 +392,7 @@ int xs::socket_base_t::bind (const char *addr_)
             return -1;
         }
         launch_child (listener);
-        return 0;
+        return add_endpoint (listener);
     }
 #endif
 
@@ -478,6 +483,7 @@ int xs::socket_base_t::connect (const char *addr_)
         //  increased here.
         send_bind (peer.socket, ppair [1], false);
 
+        //  Inproc endpoints are not yet implemented thus we return 0.
         return 0;
     }
 
@@ -512,7 +518,32 @@ int xs::socket_base_t::connect (const char *addr_)
 
     //  Activate the session. Make it a child of this socket.
     launch_child (session);
+    return add_endpoint (session);
+}
 
+int xs::socket_base_t::shutdown (int how_)
+{
+    //  Check whether the library haven't been shut down yet.
+    if (unlikely (ctx_terminated)) {
+        errno = ETERM;
+        return -1;
+    }
+
+    //  Endpoint ID means 'shutdown not implemented'.
+    if (how_ <= 0) {
+        errno = ENOTSUP;
+        return -1;
+    }
+
+    //  Find the endpoint corresponding to the ID.
+    endpoints_t::iterator it = endpoints.find (how_);
+    if (it == endpoints.end ()) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    process_term_req (it->second);
+    endpoints.erase (it);
     return 0;
 }
 
@@ -937,3 +968,18 @@ uint64_t xs::socket_base_t::now_ms ()
 {
     return clock.now_ms ();
 }
+
+int xs::socket_base_t::add_endpoint (own_t *endpoint_)
+{
+    //  Get a unique endpoint ID.
+    int id = 1;
+    for (endpoints_t::iterator it = endpoints.begin (); it != endpoints.end ();
+          ++it, ++id)
+        if (it->first != id)
+            break;
+
+    //  Remember the endpoint.
+    endpoints.insert (std::make_pair (id, endpoint_));
+    return id;
+}
+

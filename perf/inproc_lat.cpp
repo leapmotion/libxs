@@ -55,7 +55,7 @@ static void *worker (void *ctx_)
     }
 
     rc = xs_connect (s, "inproc://lat_test");
-    if (rc != 0) {
+    if (rc == -1) {
         printf ("error in xs_connect: %s\n", xs_strerror (errno));
         exit (1);
     }
@@ -135,7 +135,7 @@ int main (int argc, char *argv [])
     }
 
     rc = xs_bind (s, "inproc://lat_test");
-    if (rc != 0) {
+    if (rc == -1) {
         printf ("error in xs_bind: %s\n", xs_strerror (errno));
         return -1;
     }

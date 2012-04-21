@@ -30,7 +30,7 @@ extern "C"
         int rc;
 
         rc = xs_connect (s_, "tcp://127.0.0.1:5560");
-        assert (rc == 0);
+        assert (rc != -1);
 
         //  Start closing the socket while the connecting process is underway.
         rc = xs_close (s_);
@@ -65,7 +65,7 @@ int XS_TEST_MAIN ()
         assert (s1);
 
         rc = xs_bind (s1, "tcp://127.0.0.1:5560");
-        assert (rc == 0);
+        assert (rc != -1);
 
         for (i = 0; i != THREAD_COUNT; i++) {
             s2 = xs_socket (ctx, XS_SUB);

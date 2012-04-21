@@ -32,23 +32,23 @@ int XS_TEST_MAIN ()
     void *xreq = xs_socket (ctx, XS_XREQ);
     assert (xreq);
     int rc = xs_bind (xreq, "tcp://127.0.0.1:5560");
-    assert (rc == 0);
+    assert (rc != -1);
     void *xrep = xs_socket (ctx, XS_XREP);
     assert (xrep);
     rc = xs_bind (xrep, "tcp://127.0.0.1:5561");
-    assert (rc == 0);
+    assert (rc != -1);
 
     //  Create a worker.
     void *rep = xs_socket (ctx, XS_REP);
     assert (rep);
     rc = xs_connect (rep, "tcp://127.0.0.1:5560");
-    assert (rc == 0);
+    assert (rc != -1);
 
     //  Create a client.
     void *req = xs_socket (ctx, XS_REQ);
     assert (req);
     rc = xs_connect (req, "tcp://127.0.0.1:5561");
-    assert (rc == 0);
+    assert (rc != -1);
 
     //  Send a request.
     rc = xs_send (req, "ABC", 3, XS_SNDMORE);

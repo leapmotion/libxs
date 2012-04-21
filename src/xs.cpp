@@ -212,6 +212,17 @@ int xs_connect (void *s_, const char *addr_)
     return rc;
 }
 
+int xs_shutdown (void *s_, int how_)
+{
+    xs::socket_base_t *s = (xs::socket_base_t*) s_;
+    if (!s || !s->check_tag ()) {
+        errno = ENOTSOCK;
+        return -1;
+    }
+    int rc = s->shutdown (how_);
+    return rc;     
+}
+
 int xs_send (void *s_, const void *buf_, size_t len_, int flags_)
 {
     xs_msg_t msg;

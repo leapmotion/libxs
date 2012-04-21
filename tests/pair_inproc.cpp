@@ -30,12 +30,12 @@ int XS_TEST_MAIN ()
     void *sb = xs_socket (ctx, XS_PAIR);
     assert (sb);
     int rc = xs_bind (sb, "inproc://a");
-    assert (rc == 0);
+    assert (rc != -1);
 
     void *sc = xs_socket (ctx, XS_PAIR);
     assert (sc);
     rc = xs_connect (sc, "inproc://a");
-    assert (rc == 0);
+    assert (rc != -1);
     
     bounce (sb, sc);
 

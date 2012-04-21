@@ -23,6 +23,7 @@
 #ifndef __XS_SOCKET_BASE_HPP_INCLUDED__
 #define __XS_SOCKET_BASE_HPP_INCLUDED__
 
+#include <map>
 #include <string>
 
 #include "own.hpp"
@@ -71,6 +72,7 @@ namespace xs
         int getsockopt (int option_, void *optval_, size_t *optvallen_);
         int bind (const char *addr_);
         int connect (const char *addr_);
+        int shutdown (int how_);
         int send (xs::msg_t *msg_, int flags_);
         int recv (xs::msg_t *msg_, int flags_);
         int close ();
@@ -151,6 +153,9 @@ namespace xs
         //  to be later retrieved by getsockopt.
         void extract_flags (msg_t *msg_);
 
+        //  Creates new endpoint ID and adds the endpoint to the map.
+        int add_endpoint (own_t *endpoint_);
+
         //  Used to check whether the object is a socket.
         uint32_t tag;
 
@@ -208,6 +213,10 @@ namespace xs
 
         //  Improves efficiency of time measurement.
         clock_t clock;
+
+        //   Map of open endpoints.
+        typedef std::map <int, own_t*> endpoints_t;
+        endpoints_t endpoints;
 
         socket_base_t (const socket_base_t&);
         const socket_base_t &operator = (const socket_base_t&);

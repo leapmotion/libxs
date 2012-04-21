@@ -50,6 +50,7 @@ tests/wireformat
 tests/libzmq21
 tests/resubscribe
 tests/survey
+tests/shutdown
 src/platform.hpp*
 src/stamp-h1
 perf/*.exe

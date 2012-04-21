@@ -34,7 +34,7 @@ int XS_TEST_MAIN ()
 
     //  Connect before bind was done at the peer and send one message.
     int rc = xs_connect (push, "tcp://127.0.0.1:5560");
-    assert (rc == 0);
+    assert (rc != -1);
     rc = xs_send (push, "ABC", 3, 0);
     assert (rc == 3);
 
@@ -43,7 +43,7 @@ int XS_TEST_MAIN ()
 
     //  Bind the peer and get the message.
     rc = xs_bind (pull, "tcp://127.0.0.1:5560");
-    assert (rc == 0);
+    assert (rc != -1);
     unsigned char buf [3];
     rc = xs_recv (pull, buf, sizeof (buf), 0);
     assert (rc == 3);
@@ -64,7 +64,7 @@ int XS_TEST_MAIN ()
 
     //  Connect before bind was done at the peer and send one message.
     rc = xs_connect (push, "ipc:///tmp/tester");
-    assert (rc == 0);
+    assert (rc != -1);
     rc = xs_send (push, "ABC", 3, 0);
     assert (rc == 3);
 
@@ -73,7 +73,7 @@ int XS_TEST_MAIN ()
 
     //  Bind the peer and get the message.
     rc = xs_bind (pull, "ipc:///tmp/tester");
-    assert (rc == 0);
+    assert (rc != -1);
     rc = xs_recv (pull, buf, sizeof (buf), 0);
     assert (rc == 3);
 

@@ -38,8 +38,8 @@ semantics involved when connecting or binding a socket to multiple endpoints.
 
 RETURN VALUE
 ------------
-The _xs_bind()_ function shall return zero if successful. Otherwise it shall
-return `-1` and set 'errno' to one of the values defined below.
+The _xs_bind()_ function shall return endpoint ID if successful. Otherwise it
+shall return `-1` and set 'errno' to one of the values defined below.
 
 
 ERRORS
@@ -71,10 +71,10 @@ void *socket = xs_socket (context, XS_PUB);
 assert (socket);
 /* Bind it to a in-process transport with the address 'my_publisher' */
 int rc = xs_bind (socket, "inproc://my_publisher");
-assert (rc == 0);
+assert (rc != -1);
 /* Bind it to a TCP transport on port 5555 of the 'eth0' interface */
 rc = xs_bind (socket, "tcp://eth0:5555");
-assert (rc == 0);
+assert (rc != -1);
 ----
 
 

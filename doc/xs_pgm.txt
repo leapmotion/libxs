@@ -137,12 +137,12 @@ EXAMPLE
 /* using the first Ethernet network interface on Linux */
 /* and the Encapsulated PGM protocol */
 rc = xs_connect(socket, "epgm://eth0;239.192.1.1:5555");
-assert (rc == 0);
+assert (rc != -1);
 /* Connecting to the multicast address 239.192.1.1, port 5555, */
 /* using the network interface with the address 192.168.1.1 */
 /* and the standard PGM protocol */
 rc = xs_connect(socket, "pgm://192.168.1.1;239.192.1.1:5555");
-assert (rc == 0);
+assert (rc != -1);
 ----
 
 

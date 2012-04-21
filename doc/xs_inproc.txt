@@ -50,20 +50,20 @@ EXAMPLES
 ----
 /* Assign the in-process name "#1" */
 rc = xs_bind(socket, "inproc://#1");
-assert (rc == 0);
+assert (rc != -1);
 /* Assign the in-process name "my-endpoint" */
 rc = xs_bind(socket, "inproc://my-endpoint");
-assert (rc == 0);
+assert (rc != -1);
 ----
 
 .Connecting a socket
 ----
 /* Connect to the in-process name "#1" */
 rc = xs_connect(socket, "inproc://#1");
-assert (rc == 0);
+assert (rc != -1);
 /* Connect to the in-process name "my-endpoint" */
 rc = xs_connect(socket, "inproc://my-endpoint");
-assert (rc == 0);
+assert (rc != -1);
 ----
 
 
