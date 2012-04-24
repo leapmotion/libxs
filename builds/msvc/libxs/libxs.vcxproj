@@ -103,6 +103,7 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\src\address.cpp" />
     <ClCompile Include="..\..\..\src\clock.cpp" />
     <ClCompile Include="..\..\..\src\core.cpp" />
     <ClCompile Include="..\..\..\src\ctx.cpp" />
@@ -116,7 +117,6 @@
     <ClCompile Include="..\..\..\src\io_object.cpp" />
     <ClCompile Include="..\..\..\src\io_thread.cpp" />
     <ClCompile Include="..\..\..\src\ip.cpp" />
-    <ClCompile Include="..\..\..\src\ipc_address.cpp" />
     <ClCompile Include="..\..\..\src\ipc_connecter.cpp" />
     <ClCompile Include="..\..\..\src\ipc_listener.cpp" />
     <ClCompile Include="..\..\..\src\kqueue.cpp" />
@@ -151,7 +151,6 @@
     <ClCompile Include="..\..\..\src\stream_engine.cpp" />
     <ClCompile Include="..\..\..\src\sub.cpp" />
     <ClCompile Include="..\..\..\src\surveyor.cpp" />
-    <ClCompile Include="..\..\..\src\tcp_address.cpp" />
     <ClCompile Include="..\..\..\src\tcp_connecter.cpp" />
     <ClCompile Include="..\..\..\src\tcp_listener.cpp" />
     <ClCompile Include="..\..\..\src\thread.cpp" />
@@ -168,6 +167,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\include\xs.h" />
     <ClInclude Include="..\..\..\include\zmq.h" />
+    <ClInclude Include="..\..\..\src\address.hpp" />
     <ClInclude Include="..\..\..\src\array.hpp" />
     <ClInclude Include="..\..\..\src\atomic_counter.hpp" />
     <ClInclude Include="..\..\..\src\atomic_ptr.hpp" />
@@ -188,7 +188,6 @@
     <ClInclude Include="..\..\..\src\i_engine.hpp" />
     <ClInclude Include="..\..\..\src\io_object.hpp" />
     <ClInclude Include="..\..\..\src\ip.hpp" />
-    <ClInclude Include="..\..\..\src\ipc_address.hpp" />
     <ClInclude Include="..\..\..\src\ipc_connecter.hpp" />
     <ClInclude Include="..\..\..\src\ipc_listener.hpp" />
     <ClInclude Include="..\..\..\src\kqueue.hpp" />
@@ -225,7 +224,6 @@
     <ClInclude Include="..\..\..\src\stream_engine.hpp" />
     <ClInclude Include="..\..\..\src\sub.hpp" />
     <ClInclude Include="..\..\..\src\surveyor.hpp" />
-    <ClInclude Include="..\..\..\src\tcp_address.hpp" />
     <ClInclude Include="..\..\..\src\tcp_connecter.hpp" />
     <ClInclude Include="..\..\..\src\tcp_listener.hpp" />
     <ClInclude Include="..\..\..\src\thread.hpp" />

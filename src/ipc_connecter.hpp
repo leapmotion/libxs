@@ -29,7 +29,7 @@
 #include "own.hpp"
 #include "stdint.hpp"
 #include "io_object.hpp"
-#include "ipc_address.hpp"
+#include "address.hpp"
 
 namespace xs
 {
@@ -88,7 +88,7 @@ namespace xs
         fd_t connect ();
 
         //  Address to connect to.
-        ipc_address_t address;
+        address_t address;
 
         //  Underlying socket.
         fd_t s;

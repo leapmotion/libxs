@@ -26,7 +26,7 @@
 #include "own.hpp"
 #include "stdint.hpp"
 #include "io_object.hpp"
-#include "tcp_address.hpp"
+#include "address.hpp"
 
 namespace xs
 {
@@ -82,10 +82,10 @@ namespace xs
         fd_t connect ();
 
         //  Address to connect to.
-        tcp_address_t address;
+        address_t address;
 
         //  Source address.
-        tcp_address_t source_address;
+        address_t source_address;
 
         //  Underlying socket.
         fd_t s;

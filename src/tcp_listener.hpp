@@ -26,7 +26,7 @@
 #include "own.hpp"
 #include "stdint.hpp"
 #include "io_object.hpp"
-#include "tcp_address.hpp"
+#include "address.hpp"
 
 namespace xs
 {
@@ -63,7 +63,7 @@ namespace xs
         fd_t accept ();
 
         //  Address to listen on.
-        tcp_address_t address;
+        address_t address;
 
         //  True, if the undelying file for UNIX domain socket exists.
         bool has_file;

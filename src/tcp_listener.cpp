@@ -119,20 +119,21 @@ void xs::tcp_listener_t::close ()
 int xs::tcp_listener_t::set_address (const char *addr_)
 {
     //  Convert the textual address into address structure.
-    int rc = address.resolve (addr_, true, options.ipv4only ? true : false);
+    int rc = address_resolve_tcp (&address, addr_, true,
+        options.ipv4only ? true : false);
     if (rc != 0)
         return -1;
 
     //  Create a listening socket.
-    s = open_tcp_socket (address.family (), false);
+    s = open_tcp_socket (address.ss_family, false);
 
     //  IPv6 address family not supported, try automatic downgrade to IPv4.
-    if (address.family () == AF_INET6 && errno == EAFNOSUPPORT &&
+    if (address.ss_family == AF_INET6 && errno == EAFNOSUPPORT &&
           !options.ipv4only) {
-        rc = address.resolve (addr_, true, true);
+        rc = address_resolve_tcp (&address, addr_, true, true);
         if (rc != 0)
             return rc;
-        s = open_tcp_socket (address.family (), false);
+        s = open_tcp_socket (address.ss_family, false);
     }
 
     if (s == retired_fd)
@@ -140,7 +141,7 @@ int xs::tcp_listener_t::set_address (const char *addr_)
 
     //  On some systems, IPv4 mapping in IPv6 sockets is disabled by default.
     //  Switch it on in such cases.
-    if (address.family () == AF_INET6)
+    if (address.ss_family == AF_INET6)
         enable_ipv4_mapping (s);
 
     //  Allow reusing of the address.
@@ -155,7 +156,7 @@ int xs::tcp_listener_t::set_address (const char *addr_)
 #endif
 
     //  Bind the socket to the network interface and port.
-    rc = bind (s, address.addr (), address.addrlen ());
+    rc = bind (s, (const sockaddr*) &address, address_size (&address));
 #ifdef XS_HAVE_WINDOWS
     if (rc == SOCKET_ERROR) {
         wsa_error_to_errno ();

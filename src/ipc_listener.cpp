@@ -27,7 +27,7 @@
 #include <string.h>
 
 #include "stream_engine.hpp"
-#include "ipc_address.hpp"
+#include "address.hpp"
 #include "io_thread.hpp"
 #include "session_base.hpp"
 #include "config.hpp"
@@ -103,8 +103,8 @@ int xs::ipc_listener_t::set_address (const char *addr_)
     filename.clear ();
 
     //  Initialise the address structure.
-    ipc_address_t address;
-    int rc = address.resolve (addr_);
+    address_t address;
+    int rc = address_resolve_ipc (&address, addr_);
     if (rc != 0)
         return -1;
 
@@ -114,7 +114,7 @@ int xs::ipc_listener_t::set_address (const char *addr_)
         return -1;
 
     //  Bind the socket to the file path.
-    rc = bind (s, address.addr (), address.addrlen ());
+    rc = bind (s, (const sockaddr*) &address, address_size (&address));
     if (rc != 0)
         return -1;
 

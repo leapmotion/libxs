@@ -16,6 +16,7 @@ include_HEADERS = ../include/xs.h
 endif
 
 libxs_la_SOURCES = \
+    address.hpp \
     array.hpp \
     atomic_counter.hpp \
     atomic_ptr.hpp \
@@ -36,7 +37,6 @@ libxs_la_SOURCES = \
     io_object.hpp \
     io_thread.hpp \
     ip.hpp \
-    ipc_address.hpp \
     ipc_connecter.hpp \
     ipc_listener.hpp \
     i_engine.hpp \
@@ -74,7 +74,6 @@ libxs_la_SOURCES = \
     stream_engine.hpp \
     sub.hpp \
     surveyor.hpp \
-    tcp_address.hpp \
     tcp_connecter.hpp \
     tcp_listener.hpp \
     thread.hpp \
@@ -89,6 +88,7 @@ libxs_la_SOURCES = \
     xsurveyor.hpp \
     ypipe.hpp \
     yqueue.hpp \
+    address.cpp \
     clock.cpp \
     core.cpp \
     ctx.cpp \
@@ -102,7 +102,6 @@ libxs_la_SOURCES = \
     io_object.cpp \
     io_thread.cpp \
     ip.cpp \
-    ipc_address.cpp \
     ipc_connecter.cpp \
     ipc_listener.cpp \
     kqueue.cpp \
@@ -134,7 +133,6 @@ libxs_la_SOURCES = \
     stream_engine.cpp \
     sub.cpp \
     surveyor.cpp \
-    tcp_address.cpp \
     tcp_connecter.cpp \
     tcp_listener.cpp \
     thread.cpp \

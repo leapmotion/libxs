@@ -22,7 +22,7 @@
 #include <string.h>
 #include <string>
 
-#include "tcp_address.hpp"
+#include "address.hpp"
 #include "platform.hpp"
 #include "stdint.hpp"
 #include "err.hpp"
@@ -52,7 +52,8 @@
 #include <stdlib.h>
 
 //  On Solaris platform, network interface name can be queried by ioctl.
-int xs::tcp_address_t::resolve_nic_name (const char *nic_, bool ipv4only_)
+static int resolve_nic_name (xs::address_t *self_, const char *nic_,
+    bool ipv4only_)
 {
     //  TODO: Unused parameter, IPv6 support not implemented for Solaris.
     (void) ipv4only_;
@@ -72,7 +73,7 @@ int xs::tcp_address_t::resolve_nic_name (const char *nic_, bool ipv4only_)
     size_t ifr_size = sizeof (struct lifreq) * ifn.lifn_count;
     char *ifr = (char*) malloc (ifr_size);
     alloc_assert (ifr);
-    
+
     //  Retrieve interface names.
     lifconf ifc;
     ifc.lifc_family = AF_INET;
@@ -91,7 +92,7 @@ int xs::tcp_address_t::resolve_nic_name (const char *nic_, bool ipv4only_)
             rc = ioctl (fd, SIOCGLIFADDR, (char*) ifrp);
             xs_assert (rc != -1);
             if (ifrp->lifr_addr.ss_family == AF_INET) {
-                address.ipv4 = *(sockaddr_in*) &ifrp->lifr_addr;
+                *(sockaddr_in*) self_ = *(sockaddr_in*) &ifrp->lifr_addr;
                 found = true;
                 break;
             }
@@ -117,7 +118,8 @@ int xs::tcp_address_t::resolve_nic_name (const char *nic_, bool ipv4only_)
 #include <sys/ioctl.h>
 #include <net/if.h>
 
-int xs::tcp_address_t::resolve_nic_name (const char *nic_, bool ipv4only_)
+static int resolve_nic_name (xs::address_t *self_, const char *nic_,
+    bool ipv4only_)
 {
     //  TODO: Unused parameter, IPv6 support not implemented for AIX or HP/UX.
     (void) ipv4only_;
@@ -126,7 +128,7 @@ int xs::tcp_address_t::resolve_nic_name (const char *nic_, bool ipv4only_)
     int sd = open_socket (AF_INET, SOCK_DGRAM, 0);
     xs_assert (sd != -1);
 
-    struct ifreq ifr; 
+    struct ifreq ifr;
 
     //  Copy interface name for ioctl get.
     strncpy (ifr.ifr_name, nic_, sizeof (ifr.ifr_name));
@@ -142,10 +144,9 @@ int xs::tcp_address_t::resolve_nic_name (const char *nic_, bool ipv4only_)
         return -1;
     }
 
-    memcpy (&address.ipv4.sin_addr, &((sockaddr_in*) &ifr.ifr_addr)->sin_addr,
-        sizeof (in_addr));
+    ((sockaddr_in*) self_)->sin_addr = ((sockaddr_in*) &ifr.ifr_addr)->sin_addr;
 
-    return 0;    
+    return 0;
 }
 
 #elif ((defined XS_HAVE_LINUX || defined XS_HAVE_FREEBSD ||\
@@ -157,12 +158,13 @@ int xs::tcp_address_t::resolve_nic_name (const char *nic_, bool ipv4only_)
 
 //  On these platforms, network interface name can be queried
 //  using getifaddrs function.
-int xs::tcp_address_t::resolve_nic_name (const char *nic_, bool ipv4only_)
+static int resolve_nic_name (xs::address_t *self_, const char *nic_,
+    bool ipv4only_)
 {
     //  Get the addresses.
     ifaddrs* ifa = NULL;
     int rc = getifaddrs (&ifa);
-    errno_assert (rc == 0);    
+    errno_assert (rc == 0);
     xs_assert (ifa != NULL);
 
     //  Find the corresponding network interface.
@@ -178,7 +180,7 @@ int xs::tcp_address_t::resolve_nic_name (const char *nic_, bool ipv4only_)
              || (!ipv4only_ && family == AF_INET6))
             && !strcmp (nic_, ifp->ifa_name))
         {
-            memcpy (&address, ifp->ifa_addr,
+            memcpy (self_, ifp->ifa_addr,
                     (family == AF_INET) ? sizeof (struct sockaddr_in)
                                         : sizeof (struct sockaddr_in6));
             found = true;
@@ -201,7 +203,8 @@ int xs::tcp_address_t::resolve_nic_name (const char *nic_, bool ipv4only_)
 
 //  On other platforms we assume there are no sane interface names.
 //  This is true especially of Windows.
-int xs::tcp_address_t::resolve_nic_name (const char *nic_, bool ipv4only_)
+static int resolve_nic_name (xs::address_t *self_, const char *nic_,
+    bool ipv4only_)
 {
     //  All unused parameters.
     (void) nic_;
@@ -213,7 +216,7 @@ int xs::tcp_address_t::resolve_nic_name (const char *nic_, bool ipv4only_)
 
 #endif
 
-int xs::tcp_address_t::resolve_interface (char const *interface_,
+static int resolve_interface (xs::address_t *self_, char const *interface_,
     bool ipv4only_)
 {
     //  Initialize temporary output pointers with storage address.
@@ -241,13 +244,13 @@ int xs::tcp_address_t::resolve_interface (char const *interface_,
 
     //  * resolves to INADDR_ANY or in6addr_any.
     if (strcmp (interface_, "*") == 0) {
-        xs_assert (out_addrlen <= (socklen_t) sizeof (address));
-        memcpy (&address, out_addr, out_addrlen);
+        xs_assert (out_addrlen <= (socklen_t) sizeof (xs::address_t));
+        memcpy (self_, out_addr, out_addrlen);
         return 0;
     }
 
     //  Try to resolve the string as a NIC name.
-    int rc = resolve_nic_name (interface_, ipv4only_);
+    int rc = resolve_nic_name (self_, interface_, ipv4only_);
     if (rc != 0 && errno != ENODEV)
         return rc;
     if (rc == 0)
@@ -293,8 +296,8 @@ int xs::tcp_address_t::resolve_interface (char const *interface_,
     }
 
     //  Use the first result.
-    xs_assert ((size_t) (res->ai_addrlen) <= sizeof (address));
-    memcpy (&address, res->ai_addr, res->ai_addrlen);
+    xs_assert ((size_t) (res->ai_addrlen) <= sizeof (xs::address_t));
+    memcpy (self_, res->ai_addr, res->ai_addrlen);
 
     //  Cleanup getaddrinfo after copying the possibly referenced result.
     if (res)
@@ -303,7 +306,8 @@ int xs::tcp_address_t::resolve_interface (char const *interface_,
     return 0;
 }
 
-int xs::tcp_address_t::resolve_hostname (const char *hostname_, bool ipv4only_)
+static int resolve_hostname (xs::address_t *self_, const char *hostname_,
+    bool ipv4only_)
 {
     //  Set up the query.
 #if defined XS_HAVE_OPENVMS && defined __ia64 && __INITIAL_POINTER_SIZE == 64
@@ -351,26 +355,19 @@ int xs::tcp_address_t::resolve_hostname (const char *hostname_, bool ipv4only_)
     }
 
     //  Copy first result to output addr with hostname and service.
-    xs_assert ((size_t) (res->ai_addrlen) <= sizeof (address));
-    memcpy (&address, res->ai_addr, res->ai_addrlen);
- 
+    xs_assert ((size_t) (res->ai_addrlen) <= sizeof (xs::address_t));
+    memcpy (self_, res->ai_addr, res->ai_addrlen);
+
     freeaddrinfo (res);
     
     return 0;
 }
 
-xs::tcp_address_t::tcp_address_t ()
+int xs::address_resolve_tcp (address_t *self_, const char *name_, bool local_,
+    bool ipv4only_, bool ignore_port_)
 {
-    memset (&address, 0, sizeof (address));
-}
+    memset (self_, 0, sizeof (address_t));
 
-xs::tcp_address_t::~tcp_address_t ()
-{
-}
-
-int xs::tcp_address_t::resolve (const char *name_, bool local_, bool ipv4only_,
-    bool ignore_port_)
-{
     //  Find the ':' at end that separates address from the port number.
     const char *delimiter = strrchr (name_, ':');
     std::string addr_str;
@@ -403,40 +400,51 @@ int xs::tcp_address_t::resolve (const char *name_, bool local_, bool ipv4only_,
     //  Resolve the IP address.
     int rc;
     if (local_)
-        rc = resolve_interface (addr_str.c_str (), ipv4only_);
+        rc = resolve_interface (self_, addr_str.c_str (), ipv4only_);
     else
-        rc = resolve_hostname (addr_str.c_str (), ipv4only_);
+        rc = resolve_hostname (self_, addr_str.c_str (), ipv4only_);
     if (rc != 0)
         return -1;
 
     //  Set the port into the address structure.
-    if (address.generic.sa_family == AF_INET6)
-        address.ipv6.sin6_port = htons (port);
+    if (self_->ss_family == AF_INET6)
+        ((struct sockaddr_in6*) self_)->sin6_port = htons (port);
     else
-        address.ipv4.sin_port = htons (port);
+        ((struct sockaddr_in* ) self_)->sin_port = htons (port);
 
     return 0;
 }
 
-sockaddr *xs::tcp_address_t::addr ()
-{
-    return &address.generic;
-}
 
-socklen_t xs::tcp_address_t::addrlen ()
+int xs::address_resolve_ipc (address_t *self_, const char *name_)
 {
-    if (address.generic.sa_family == AF_INET6)
-        return (socklen_t) sizeof (address.ipv6);
-    else
-        return (socklen_t) sizeof (address.ipv4);
-}
-
-#if defined XS_HAVE_WINDOWS
-unsigned short xs::tcp_address_t::family ()
+#if defined XS_HAVE_WINDOWS || defined XS_HAVE_OPENVMS
+    errno = ENOTSUP;
+    return -1;
 #else
-sa_family_t xs::tcp_address_t::family ()
+    memset (self_, 0, sizeof (address_t));
+    struct sockaddr_un *un = (struct sockaddr_un*) self_;
+    if (strlen (name_) >= sizeof (un->sun_path)) {
+        errno = ENAMETOOLONG;
+        return -1;
+    }
+    self_->ss_family = AF_UNIX;
+    strncpy (un->sun_path, name_, sizeof (un->sun_path));
+    return 0;
 #endif
+}
+
+socklen_t xs::address_size (address_t *self_)
 {
-    return address.generic.sa_family;
+#if !defined XS_HAVE_WINDOWS && !defined XS_HAVE_OPENVMS
+    if (self_->ss_family == AF_UNIX)
+        return (socklen_t) sizeof (struct sockaddr_un);
+#endif
+    if (self_->ss_family == AF_INET6)
+        return (socklen_t) sizeof (struct sockaddr_in6);
+    if (self_->ss_family == AF_INET)
+        return (socklen_t) sizeof (struct sockaddr_in);
+    xs_assert (false);
+    return 0;
 }
 

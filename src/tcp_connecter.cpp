@@ -181,6 +181,8 @@ int xs::tcp_connecter_t::get_new_reconnect_ivl ()
 
 int xs::tcp_connecter_t::set_address (const char *addr_)
 {
+    memset (&source_address, 0, sizeof (source_address));
+
     //  Find the ';'. It separates source address address from a destination.
     const char *delimiter = strchr (addr_, ';');
 
@@ -188,7 +190,7 @@ int xs::tcp_connecter_t::set_address (const char *addr_)
     if (delimiter) {
         std::string saddr_str (addr_, delimiter - addr_);
         addr_str = delimiter + 1;
-        int rc = source_address.resolve (saddr_str.c_str(), true,
+        int rc = address_resolve_tcp (&source_address, saddr_str.c_str(), true,
             options.ipv4only ? true : false, true);
         if (rc != 0)
             return -1;
@@ -196,33 +198,39 @@ int xs::tcp_connecter_t::set_address (const char *addr_)
     else
         addr_str = addr_;
 
-    return address.resolve (addr_str.c_str(), false,
+    return address_resolve_tcp (&address, addr_str.c_str(), false,
         options.ipv4only ? true : false);
 }
 
 int xs::tcp_connecter_t::open ()
 {
+    int rc;
+
     xs_assert (s == retired_fd);
 
     //  Create the socket.
-    s = open_tcp_socket (address.family (), options.keepalive ? true : false);
+    s = open_tcp_socket (address.ss_family, options.keepalive ? true : false);
     if (s == -1)
         return -1;
 
     //  On some systems, IPv4 mapping in IPv6 sockets is disabled by default.
     //  Switch it on in such cases.
-    if (address.family () == AF_INET6)
+    if (address.ss_family == AF_INET6)
         enable_ipv4_mapping (s);
 
     //  Set the socket to non-blocking mode so that we get async connect().
     unblock_socket (s);
 
     //  Set a source address for conversations.
-    if (source_address.family ())
-        ::bind (s, source_address.addr (), source_address.addrlen ());
+    if (source_address.ss_family) {
+        rc = ::bind (s, (const sockaddr*) &source_address,
+            address_size (&source_address));
+        if (rc != 0)
+            return -1;
+    }
 
     //  Connect to the remote peer.
-    int rc = ::connect (s, address.addr (), address.addrlen ());
+    rc = ::connect (s, (const sockaddr*) &address, address_size (&address));
 
     //  Connect was successfull immediately.
     if (rc == 0)

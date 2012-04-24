@@ -174,7 +174,7 @@ int xs::ipc_connecter_t::get_new_reconnect_ivl ()
 
 int xs::ipc_connecter_t::set_address (const char *addr_)
 {
-    return address.resolve (addr_);
+    return address_resolve_ipc (&address, addr_);
 }
 
 int xs::ipc_connecter_t::open ()
@@ -190,7 +190,7 @@ int xs::ipc_connecter_t::open ()
     unblock_socket (s);
 
     //  Connect to the remote peer.
-    int rc = ::connect (s, address.addr (), address.addrlen ());
+    int rc = ::connect (s, (const sockaddr*) &address, address_size (&address));
 
     //  Connect was successfull immediately.
     if (rc == 0)
