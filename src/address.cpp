@@ -59,7 +59,7 @@ static int resolve_nic_name (xs::address_t *self_, const char *nic_,
     (void) ipv4only_;
 
     //  Create a socket.
-    int fd = open_socket (AF_INET, SOCK_DGRAM, 0);
+    int fd = xs::open_socket (AF_INET, SOCK_DGRAM, 0);
     xs_assert (fd != -1);
 
     //  Retrieve number of interfaces.
@@ -125,7 +125,7 @@ static int resolve_nic_name (xs::address_t *self_, const char *nic_,
     (void) ipv4only_;
 
     //  Create a socket.
-    int sd = open_socket (AF_INET, SOCK_DGRAM, 0);
+    int sd = xs::open_socket (AF_INET, SOCK_DGRAM, 0);
     xs_assert (sd != -1);
 
     struct ifreq ifr;
