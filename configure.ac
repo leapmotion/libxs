@@ -11,7 +11,7 @@ AC_INIT([libxs], [m4_esyscmd([./version.sh])],
 
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_MACRO_DIR([m4])
-AM_CONFIG_HEADER([src/platform.hpp])
+AC_CONFIG_HEADERS([src/platform.hpp])
 AM_INIT_AUTOMAKE([tar-ustar dist-zip foreign])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
@@ -56,8 +56,7 @@ AC_PATH_PROG([XMLTO], [xmlto])
 AC_ARG_VAR([ASCIIDOC], [Path to asciidoc command])
 AC_PATH_PROG([ASCIIDOC], [asciidoc])
 LIBXS_CONFIG_LIBTOOL
-AC_LIBTOOL_WIN32_DLL
-AC_PROG_LIBTOOL
+LT_INIT([win32-dll])
 
 # Check whether to build a with debug symbols
 LIBXS_CHECK_ENABLE_DEBUG
@@ -459,7 +458,6 @@ AM_CONDITIONAL([BUILD_PGM], [test "x$libxs_pgm_ext" = "xyes"])
 AM_CONDITIONAL([ON_MINGW], [test "x$libxs_on_mingw32" = "xyes"])
 
 # Checks for library functions.
-AC_TYPE_SIGNAL
 AC_CHECK_FUNCS([ \
     perror \
     gettimeofday \
@@ -469,7 +467,7 @@ AC_CHECK_FUNCS([ \
     getifaddrs \
     freeifaddrs
 ])
-AC_CHECK_HEADERS([alloca.h])
+
 LIBXS_CHECK_SOCK_CLOEXEC([
     AC_DEFINE([XS_HAVE_SOCK_CLOEXEC], [1],
         [Whether SOCK_CLOEXEC is defined and functioning.])

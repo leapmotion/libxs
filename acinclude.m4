@@ -581,13 +581,15 @@ AC_DEFUN([LIBXS_CHECK_LANG_VISIBILITY], [{
           [AC_MSG_RESULT(yes) ; $1], [AC_MSG_RESULT(no) ; $2])
 }])
 
-dnl ################################################################################
-dnl # LIBXS_CHECK_SOCK_CLOEXEC([action-if-found], [action-if-not-found])           #
-dnl # Check if SOCK_CLOEXEC is supported                                           #
-dnl ################################################################################
-AC_DEFUN([LIBXS_CHECK_SOCK_CLOEXEC], [{
-    AC_MSG_CHECKING(whether SOCK_CLOEXEC is supported)
-    AC_TRY_RUN([/* SOCK_CLOEXEC test */
+###############################################################################
+# LIBXS_CHECK_SOCK_CLOEXEC([action-if-found], [action-if-not-found])          #
+# Check if SOCK_CLOEXEC is supported                                          #
+###############################################################################
+
+AC_DEFUN([LIBXS_CHECK_SOCK_CLOEXEC], [
+    AC_MSG_CHECKING([whether SOCK_CLOEXEC is supported])
+    AC_RUN_IFELSE([AC_LANG_SOURCE([[
+/* SOCK_CLOEXEC test */
 #include <sys/types.h>
 #include <sys/socket.h>
 
@@ -595,13 +597,11 @@ int main (int argc, char *argv [])
 {
     int s = socket (PF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0);
     return (s == -1);
-}
-    ],
+}        ]])],
     [AC_MSG_RESULT(yes) ; libxs_cv_sock_cloexec="yes" ; $1],
     [AC_MSG_RESULT(no)  ; libxs_cv_sock_cloexec="no"  ; $2],
-    [AC_MSG_RESULT(not during cross-compile) ; libxs_cv_sock_cloexec="no"]
-    )
-}])
+    [AC_MSG_RESULT(not during cross-compile) ; libxs_cv_sock_cloexec="no"])
+])
 
 ###############################################################################
 # LIBXS_CHECK_KQUEUE                                                          #
