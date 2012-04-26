@@ -82,6 +82,15 @@ namespace xs
         {
 #if defined XS_ATOMIC_PTR_WINDOWS
             return (T*) InterlockedExchangePointer ((PVOID*) &ptr, val_);
+#elif defined __GNUC__ && !defined XS_DISABLE_GCC_SYNC_BUILTINS
+            {
+                T* ov;
+                do
+                {
+                    ov = const_cast<T*>(ptr);
+                } while (!__sync_bool_compare_and_swap (&ptr, ov, val_));
+                return ov;
+            }
 #elif defined XS_ATOMIC_PTR_ATOMIC_H
             return (T*) atomic_swap_ptr (&ptr, val_);
 #elif defined XS_ATOMIC_PTR_X86
@@ -125,6 +134,8 @@ namespace xs
 #if defined XS_ATOMIC_PTR_WINDOWS
             return (T*) InterlockedCompareExchangePointer (
                 (volatile PVOID*) &ptr, val_, cmp_);
+#elif defined __GNUC__ && !defined XS_DISABLE_GCC_SYNC_BUILTINS
+            return (T*) __sync_val_compare_and_swap (&ptr, cmp_, val_);
 #elif defined XS_ATOMIC_PTR_ATOMIC_H
             return (T*) atomic_cas_ptr (&ptr, cmp_, val_);
 #elif defined XS_ATOMIC_PTR_X86

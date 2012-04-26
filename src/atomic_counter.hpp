@@ -81,6 +81,8 @@ namespace xs
 
 #if defined XS_ATOMIC_COUNTER_WINDOWS
             old_value = InterlockedExchangeAdd ((LONG*) &value, increment_);
+#elif defined __GNUC__ && !defined XS_DISABLE_GCC_SYNC_BUILTINS
+            old_value = __sync_fetch_and_add (&value, increment_);
 #elif defined XS_ATOMIC_COUNTER_ATOMIC_H
             integer_t new_value = atomic_add_32_nv (&value, increment_);
             old_value = new_value - increment_;
@@ -121,6 +123,9 @@ namespace xs
             LONG delta = - ((LONG) decrement);
             integer_t old = InterlockedExchangeAdd ((LONG*) &value, delta);
             return old - decrement != 0;
+#elif defined __GNUC__ && !defined XS_DISABLE_GCC_SYNC_BUILTINS
+            integer_t new_value = __sync_sub_and_fetch (&value, decrement);
+            return (new_value != 0);
 #elif defined XS_ATOMIC_COUNTER_ATOMIC_H
             int32_t delta = - ((int32_t) decrement);
             integer_t nv = atomic_add_32_nv (&value, delta);
