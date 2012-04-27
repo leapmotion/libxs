@@ -21,11 +21,16 @@
 #include "xsurveyor.hpp"
 #include "err.hpp"
 #include "msg.hpp"
+#include "wire.hpp"
 
 xs::xsurveyor_t::xsurveyor_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
     socket_base_t (parent_, tid_, sid_)
 {
     options.type = XS_XSURVEYOR;
+    options.sp_pattern = SP_SURVEY;
+    options.sp_version = 1;
+    options.sp_role = SP_SURVEY_SURVEYOR;
+    options.sp_complement = SP_SURVEY_RESPONDENT;
 
     //  When the XSURVEYOR socket is close it makes no sense to send any pending
     //  surveys. The responses will be unroutable anyway.
@@ -34,6 +39,34 @@ xs::xsurveyor_t::xsurveyor_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
 
 xs::xsurveyor_t::~xsurveyor_t ()
 {
+}
+
+int xs::xsurveyor_t::xsetsockopt (int option_, const void *optval_,
+    size_t optvallen_)
+{
+    if (option_ != XS_PROTOCOL) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    if (optvallen_ != sizeof (int)) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    if (!optval_) {
+        errno = EFAULT;
+        return -1;
+    }
+
+    int version = *(int *) optval_;
+    if (version != 1) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    options.sp_version = version;
+    return 0;
 }
 
 void xs::xsurveyor_t::xattach_pipe (pipe_t *pipe_, bool icanhasall_)

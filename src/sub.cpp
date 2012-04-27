@@ -48,8 +48,7 @@ int xs::sub_t::xsetsockopt (int option_, const void *optval_,
     size_t optvallen_)
 {
     if (option_ != XS_SUBSCRIBE && option_ != XS_UNSUBSCRIBE) {
-        errno = EINVAL;
-        return -1;
+        return xsub_t::xsetsockopt (option_, optval_, optvallen_);
     }
 
     if (optvallen_ > 0 && !optval_) {
@@ -202,7 +201,7 @@ int xs::sub_t::filter_subscribed (const unsigned char *data_, size_t size_)
     int rc = msg.init_size (size_ + 4);
     errno_assert (rc == 0);
     unsigned char *data = (unsigned char*) msg.data ();
-    put_uint16 (data, XS_CMD_SUBSCRIBE);
+    put_uint16 (data, SP_PUBSUB_CMD_SUBSCRIBE);
     put_uint16 (data + 2, options.filter);
     memcpy (data + 4, data_, size_);
 
@@ -225,7 +224,7 @@ int xs::sub_t::filter_unsubscribed (const unsigned char *data_, size_t size_)
     int rc = msg.init_size (size_ + 4);
     errno_assert (rc == 0);
     unsigned char *data = (unsigned char*) msg.data ();
-    put_uint16 (data, XS_CMD_UNSUBSCRIBE);
+    put_uint16 (data, SP_PUBSUB_CMD_UNSUBSCRIBE);
     put_uint16 (data + 2, options.filter);
     memcpy (data + 4, data_, size_);
 

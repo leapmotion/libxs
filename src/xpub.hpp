@@ -49,6 +49,7 @@ namespace xs
         ~xpub_t ();
 
         //  Implementations of virtual functions from socket_base_t.
+        int xsetsockopt (int option_, const void *optval_, size_t optvallen_);
         void xattach_pipe (xs::pipe_t *pipe_, bool icanhasall_);
         int xsend (xs::msg_t *msg_, int flags_);
         bool xhas_out ();

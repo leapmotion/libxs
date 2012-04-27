@@ -92,8 +92,14 @@ namespace xs
         //  If 1, keepalives are to be sent periodically.
         int keepalive;
 
-        //  Version of wire protocol to use.
-        int protocol;
+        //  If true, the legacy non-SP wire protocol is in use.
+        bool legacy_protocol;
+
+        //  SP protocol pattern, version, role and complementary role.
+        int sp_pattern;
+        int sp_version;
+        int sp_role;
+        int sp_complement;
 
         //  Filter ID to be used with subscriptions and unsubscriptions.
         int filter;
