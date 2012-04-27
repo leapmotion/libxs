@@ -25,26 +25,16 @@
 #include "stdint.hpp"
 #include "platform.hpp"
 
-#if defined XS_FORCE_MUTEXES
-#define XS_ATOMIC_COUNTER_MUTEX
-#elif (defined __i386__ || defined __x86_64__) && defined __GNUC__
-#define XS_ATOMIC_COUNTER_X86
-#elif defined __ARM_ARCH_7A__ && defined __GNUC__
-#define XS_ATOMIC_COUNTER_ARM
-#elif defined XS_HAVE_WINDOWS
-#define XS_ATOMIC_COUNTER_WINDOWS
-#elif (defined XS_HAVE_SOLARIS || defined XS_HAVE_NETBSD)
-#define XS_ATOMIC_COUNTER_ATOMIC_H
+#if defined(XS_ATOMIC_GCC_SYNC)
+#elif (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
+#elif (defined(__GNUC__) && defined(__ARM_ARCH_7A__))
+#elif defined(XS_ATOMIC_SOLARIS)
+#   include <atomic.h>
+#elif defined(XS_HAVE_WINDOWS)
+#   include "windows.hpp"
 #else
-#define XS_ATOMIC_COUNTER_MUTEX
-#endif
-
-#if defined XS_ATOMIC_COUNTER_MUTEX
-#include "mutex.hpp"
-#elif defined XS_ATOMIC_COUNTER_WINDOWS
-#include "windows.hpp"
-#elif defined XS_ATOMIC_COUNTER_ATOMIC_H
-#include <atomic.h>
+#   define XS_ATOMIC_OVER_MUTEX 1
+#   include "mutex.hpp"
 #endif
 
 namespace xs
@@ -79,20 +69,17 @@ namespace xs
         {
             integer_t old_value;
 
-#if defined XS_ATOMIC_COUNTER_WINDOWS
-            old_value = InterlockedExchangeAdd ((LONG*) &value, increment_);
-#elif defined __GNUC__ && !defined XS_DISABLE_GCC_SYNC_BUILTINS
+#if defined(XS_ATOMIC_GCC_SYNC)
             old_value = __sync_fetch_and_add (&value, increment_);
-#elif defined XS_ATOMIC_COUNTER_ATOMIC_H
-            integer_t new_value = atomic_add_32_nv (&value, increment_);
-            old_value = new_value - increment_;
-#elif defined XS_ATOMIC_COUNTER_X86
+
+#elif (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
             __asm__ volatile (
                 "lock; xadd %0, %1 \n\t"
                 : "=r" (old_value), "=m" (value)
                 : "0" (increment_), "m" (value)
                 : "cc", "memory");
-#elif defined XS_ATOMIC_COUNTER_ARM
+
+#elif (defined(__GNUC__) && defined(__ARM_ARCH_7A__))
             integer_t flag, tmp;
             __asm__ volatile (
                 "       dmb     sy\n\t"
@@ -105,13 +92,19 @@ namespace xs
                 : "=&r"(old_value), "=&r"(flag), "=&r"(tmp), "+Qo"(value)
                 : "Ir"(increment_), "r"(&value)
                 : "cc");
-#elif defined XS_ATOMIC_COUNTER_MUTEX
+
+#elif defined(XS_ATOMIC_SOLARIS)
+            integer_t new_value = atomic_add_32_nv (&value, increment_);
+            old_value = new_value - increment_;
+
+#elif defined(XS_HAVE_WINDOWS)
+            old_value = InterlockedExchangeAdd ((LONG*) &value, increment_);
+
+#else
             sync.lock ();
             old_value = value;
             value += increment_;
             sync.unlock ();
-#else
-#error atomic_counter is not implemented for this platform
 #endif
             return old_value;
         }
@@ -119,18 +112,11 @@ namespace xs
         //  Atomic subtraction. Returns false if the counter drops to zero.
         inline bool sub (integer_t decrement)
         {
-#if defined XS_ATOMIC_COUNTER_WINDOWS
-            LONG delta = - ((LONG) decrement);
-            integer_t old = InterlockedExchangeAdd ((LONG*) &value, delta);
-            return old - decrement != 0;
-#elif defined __GNUC__ && !defined XS_DISABLE_GCC_SYNC_BUILTINS
+#if defined(XS_ATOMIC_GCC_SYNC)
             integer_t new_value = __sync_sub_and_fetch (&value, decrement);
             return (new_value != 0);
-#elif defined XS_ATOMIC_COUNTER_ATOMIC_H
-            int32_t delta = - ((int32_t) decrement);
-            integer_t nv = atomic_add_32_nv (&value, delta);
-            return nv != 0;
-#elif defined XS_ATOMIC_COUNTER_X86
+
+#elif (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
             integer_t oldval = -decrement;
             volatile integer_t *val = &value;
             __asm__ volatile ("lock; xaddl %0,%1"
@@ -138,7 +124,8 @@ namespace xs
                 : "0" (oldval), "m" (*val)
                 : "cc", "memory");
             return oldval != decrement;
-#elif defined XS_ATOMIC_COUNTER_ARM
+
+#elif (defined(__GNUC__) && defined(__ARM_ARCH_7A__))
             integer_t old_value, flag, tmp;
             __asm__ volatile (
                 "       dmb     sy\n\t"
@@ -152,14 +139,23 @@ namespace xs
                 : "Ir"(decrement), "r"(&value)
                 : "cc");
             return old_value - decrement != 0;
-#elif defined XS_ATOMIC_COUNTER_MUTEX
+
+#elif defined(XS_ATOMIC_SOLARIS)
+            int32_t delta = - ((int32_t) decrement);
+            integer_t nv = atomic_add_32_nv (&value, delta);
+            return nv != 0;
+
+#elif defined(XS_HAVE_WINDOWS)
+            LONG delta = - ((LONG) decrement);
+            integer_t old = InterlockedExchangeAdd ((LONG*) &value, delta);
+            return old - decrement != 0;
+
+#else
             sync.lock ();
             value -= decrement;
             bool result = value ? true : false;
             sync.unlock ();
             return result;
-#else
-#error atomic_counter is not implemented for this platform
 #endif
         }
 
@@ -171,7 +167,7 @@ namespace xs
     private:
 
         volatile integer_t value;
-#if defined XS_ATOMIC_COUNTER_MUTEX
+#if defined(XS_ATOMIC_OVER_MUTEX)
         mutex_t sync;
 #endif
 
@@ -182,20 +178,8 @@ namespace xs
 }
 
 //  Remove macros local to this file.
-#if defined XS_ATOMIC_COUNTER_WINDOWS
-#undef XS_ATOMIC_COUNTER_WINDOWS
-#endif
-#if defined XS_ATOMIC_COUNTER_ATOMIC_H
-#undef XS_ATOMIC_COUNTER_ATOMIC_H
-#endif
-#if defined XS_ATOMIC_COUNTER_X86
-#undef XS_ATOMIC_COUNTER_X86
-#endif
-#if defined XS_ATOMIC_COUNTER_ARM
-#undef XS_ATOMIC_COUNTER_ARM
-#endif
-#if defined XS_ATOMIC_COUNTER_MUTEX
-#undef XS_ATOMIC_COUNTER_MUTEX
+#if defined(XS_ATOMIC_OVER_MUTEX)
+#   undef XS_ATOMIC_OVER_MUTEX
 #endif
 
 #endif

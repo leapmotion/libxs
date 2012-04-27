@@ -26,26 +26,16 @@
 
 #include "platform.hpp"
 
-#if defined XS_FORCE_MUTEXES
-#define XS_ATOMIC_PTR_MUTEX
-#elif (defined __i386__ || defined __x86_64__) && defined __GNUC__
-#define XS_ATOMIC_PTR_X86
-#elif defined __ARM_ARCH_7A__ && defined __GNUC__
-#define XS_ATOMIC_PTR_ARM
-#elif defined XS_HAVE_WINDOWS
-#define XS_ATOMIC_PTR_WINDOWS
-#elif (defined XS_HAVE_SOLARIS || defined XS_HAVE_NETBSD)
-#define XS_ATOMIC_PTR_ATOMIC_H
+#if defined(XS_ATOMIC_GCC_SYNC)
+#elif (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
+#elif (defined(__GNUC__) && defined(__ARM_ARCH_7A__))
+#elif defined(XS_ATOMIC_SOLARIS)
+#   include <atomic.h>
+#elif defined(XS_HAVE_WINDOWS)
+#   include "windows.hpp"
 #else
-#define XS_ATOMIC_PTR_MUTEX
-#endif
-
-#if defined XS_ATOMIC_PTR_MUTEX
-#include "mutex.hpp"
-#elif defined XS_ATOMIC_PTR_WINDOWS
-#include "windows.hpp"
-#elif defined XS_ATOMIC_PTR_ATOMIC_H
-#include <atomic.h>
+#   define XS_ATOMIC_OVER_MUTEX 1
+#   include "mutex.hpp"
 #endif
 
 namespace xs
@@ -80,9 +70,7 @@ namespace xs
         //  to the 'val' value. Old value is returned.
         inline T *xchg (T *val_)
         {
-#if defined XS_ATOMIC_PTR_WINDOWS
-            return (T*) InterlockedExchangePointer ((PVOID*) &ptr, val_);
-#elif defined __GNUC__ && !defined XS_DISABLE_GCC_SYNC_BUILTINS
+#if defined(XS_ATOMIC_GCC_SYNC)
             {
                 T* ov;
                 do
@@ -91,16 +79,16 @@ namespace xs
                 } while (!__sync_bool_compare_and_swap (&ptr, ov, val_));
                 return ov;
             }
-#elif defined XS_ATOMIC_PTR_ATOMIC_H
-            return (T*) atomic_swap_ptr (&ptr, val_);
-#elif defined XS_ATOMIC_PTR_X86
+
+#elif (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
             T *old;
             __asm__ volatile (
                 "lock; xchg %0, %2"
                 : "=r" (old), "=m" (ptr)
                 : "m" (ptr), "0" (val_));
             return old;
-#elif defined XS_ATOMIC_PTR_ARM
+
+#elif (defined(__GNUC__) && defined(__ARM_ARCH_7A__))
             T* old;
             unsigned int flag;
             __asm__ volatile (
@@ -114,14 +102,19 @@ namespace xs
                 : "r"(&ptr), "r"(val_)
                 : "cc");
             return old;
-#elif defined XS_ATOMIC_PTR_MUTEX
+
+#elif defined(XS_ATOMIC_SOLARIS)
+            return (T*) atomic_swap_ptr (&ptr, val_);
+
+#elif defined(XS_HAVE_WINDOWS)
+            return (T*) InterlockedExchangePointer ((PVOID*) &ptr, val_);
+
+#else
             sync.lock ();
             T *old = (T*) ptr;
             ptr = val_;
             sync.unlock ();
             return old;
-#else
-#error atomic_ptr is not implemented for this platform
 #endif
         }
 
@@ -131,14 +124,10 @@ namespace xs
         //  is returned.
         inline T *cas (T *cmp_, T *val_)
         {
-#if defined XS_ATOMIC_PTR_WINDOWS
-            return (T*) InterlockedCompareExchangePointer (
-                (volatile PVOID*) &ptr, val_, cmp_);
-#elif defined __GNUC__ && !defined XS_DISABLE_GCC_SYNC_BUILTINS
+#if defined(XS_ATOMIC_GCC_SYNC)
             return (T*) __sync_val_compare_and_swap (&ptr, cmp_, val_);
-#elif defined XS_ATOMIC_PTR_ATOMIC_H
-            return (T*) atomic_cas_ptr (&ptr, cmp_, val_);
-#elif defined XS_ATOMIC_PTR_X86
+
+#elif (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
             T *old;
             __asm__ volatile (
                 "lock; cmpxchg %2, %3"
@@ -146,7 +135,8 @@ namespace xs
                 : "r" (val_), "m" (ptr), "0" (cmp_)
                 : "cc");
             return old;
-#elif defined XS_ATOMIC_PTR_ARM
+
+#elif (defined(__GNUC__) && defined(__ARM_ARCH_7A__))
             T *old;
             unsigned int flag;
             __asm__ volatile (
@@ -162,22 +152,28 @@ namespace xs
                 : "r"(&ptr), "r"(cmp_), "r"(val_)
                 : "cc");
             return old;
-#elif defined XS_ATOMIC_PTR_MUTEX
+
+#elif defined(XS_ATOMIC_SOLARIS)
+            return (T*) atomic_cas_ptr (&ptr, cmp_, val_);
+
+#elif defined(XS_HAVE_WINDOWS)
+            return (T*) InterlockedCompareExchangePointer (
+                (volatile PVOID*) &ptr, val_, cmp_);
+
+#else
             sync.lock ();
             T *old = (T*) ptr;
             if (ptr == cmp_)
                 ptr = val_;
             sync.unlock ();
             return old;
-#else
-#error atomic_ptr is not implemented for this platform
 #endif
         }
 
     private:
 
         volatile T *ptr;
-#if defined XS_ATOMIC_PTR_MUTEX
+#if defined XS_ATOMIC_OVER_MUTEX
         mutex_t sync;
 #endif
 
@@ -188,21 +184,8 @@ namespace xs
 }
 
 //  Remove macros local to this file.
-#if defined XS_ATOMIC_PTR_WINDOWS
-#undef XS_ATOMIC_PTR_WINDOWS
-#endif
-#if defined XS_ATOMIC_PTR_ATOMIC_H
-#undef XS_ATOMIC_PTR_ATOMIC_H
-#endif
-#if defined XS_ATOMIC_PTR_X86
-#undef XS_ATOMIC_PTR_X86
-#endif
-#if defined XS_ATOMIC_PTR_ARM
-#undef XS_ATOMIC_PTR_ARM
-#endif
-#if defined XS_ATOMIC_PTR_MUTEX
-#undef XS_ATOMIC_PTR_MUTEX
+#if defined(XS_ATOMIC_OVER_MUTEX)
+#   undef XS_ATOMIC_OVER_MUTEX
 #endif
 
 #endif
-

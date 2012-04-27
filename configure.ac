@@ -106,19 +106,6 @@ AS_CASE(["${host_os}"],
         AC_DEFINE([XS_HAVE_SOLARIS], [1], [Have Solaris OS])
         AC_CHECK_LIB([socket], [socket])
         AC_CHECK_LIB([nsl], [gethostbyname])
-        AC_MSG_CHECKING([whether atomic operations can be used])
-        AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
-            [[#include <atomic.h>]],
-            [[uint32_t value;
-              atomic_cas_32 (&value, 0, 0);
-              return 0;]])],
-            [solaris_has_atomic=yes],
-            [solaris_has_atomic=no])
-        AC_MSG_RESULT([$solaris_has_atomic])
-        # Solaris 8 does not have atomic operations exported to user space.
-        AS_IF([test "x$solaris_has_atomic" = "xno"], [
-            AC_DEFINE([XS_FORCE_MUTEXES], [1], [Force to use mutexes])
-        ])
     ],
     [*freebsd*], [
         AC_DEFINE([XS_HAVE_FREEBSD], [1], [Have FreeBSD OS])
@@ -133,24 +120,6 @@ AS_CASE(["${host_os}"],
      ],
     [*netbsd*], [
         AC_DEFINE([XS_HAVE_NETBSD], [1], [Have NetBSD OS])
-        # NetBSD 5.0 and newer provides atomic operations but we can
-        # only use these on systems where PR #42842 has been fixed so
-        # we must try and link a test program using C++.
-        libxs_netbsd_has_atomic=no
-        AC_MSG_CHECKING([whether atomic operations can be used])
-        AC_LANG_PUSH([C++])
-        AC_LINK_IFELSE([AC_LANG_PROGRAM(
-            [[#include <atomic.h>]],
-            [[uint32_t value;
-              atomic_cas_32 (&value, 0, 0);
-              return 0;]])],
-            [libxs_netbsd_has_atomic=yes],
-            [libxs_netbsd_has_atomic=no])
-        AC_LANG_POP([C++])
-        AC_MSG_RESULT([$libxs_netbsd_has_atomic])
-        AS_IF([test "x$libxs_netbsd_has_atomic" = "xno"], [
-            AC_DEFINE([XS_FORCE_MUTEXES], [1], [Force to use mutexes])
-        ])
     ],
     [openbsd*], [
         AC_DEFINE([XS_HAVE_OPENBSD], [1], [Have OpenBSD OS])
@@ -239,6 +208,53 @@ AC_CHECK_HEADERS([ \
 # Check if we have ifaddrs.h header file.
 AC_CHECK_HEADERS([ifaddrs.h],
     [AC_DEFINE([XS_HAVE_IFADDRS], [1], [Have ifaddrs.h header.])])
+
+###############################################################################
+# Check available atomic implementations
+#
+# We have following variants:
+#   o  gcc __sync_*() [XS_ATOMIC_GCC_SYNC]
+#   o  optional atomic.h with atomic_cas_32() on solaris and netbsd [XS_ATOMIC_SOLARIS]
+#   o  windows specific [XS_HAVE_WINDOWS]
+#   o  handwritten inline asm for x86 and arm [no specific define]
+#   o  fallback to mutexes (or force by hands) [no specific define]
+
+#
+# Check for Solaris and NetBSD style atomic.h
+#
+AC_LANG_PUSH([C++])
+AC_MSG_CHECKING([for Solaris/NetBSD-style atomic.h])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+    [[#include <atomic.h>]],
+    [[uint32_t value;
+      atomic_cas_32 (&value, 0, 0);
+      return 0;]])],
+    [solaris_style_atomic=yes],
+    [solaris_style_atomic=no])
+AC_MSG_RESULT([$solaris_style_atomic])
+AS_IF([test "x$solaris_style_atomic" = "xyes"], [
+    AC_DEFINE([XS_ATOMIC_SOLARIS], [1], [Solaris/NetBSD-style atomic.h with atomic_cas_32()])
+])
+AC_LANG_POP([C++])
+
+#
+# Check for GCC-style __sync_*() builtins
+#
+AC_LANG_PUSH([C++])
+AC_MSG_CHECKING([for GCC-style __sync_*() atomic builtins])
+AC_LINK_IFELSE([AC_LANG_PROGRAM(
+    [volatile void* p;],
+    [[  int r;
+        r = __sync_bool_compare_and_swap(&p, (void*) 0x12345, (void*) 0);
+        return r;]])],
+    [gcc_style_sync_atomic=yes],
+    [gcc_style_sync_atomic=no])
+AC_MSG_RESULT([$gcc_style_sync_atomic])
+AS_IF([test "x$gcc_style_sync_atomic" = "xyes"], [
+    AC_DEFINE([XS_ATOMIC_GCC_SYNC], [1], [GCC-style __sync_*() atomic builtins])
+])
+AC_LANG_POP([C++])
+
 
 ###############################################################################
 # Check polling system                                                        #
