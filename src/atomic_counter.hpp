@@ -69,17 +69,7 @@ namespace xs
         {
             integer_t old_value;
 
-#if defined(XS_ATOMIC_GCC_SYNC)
-            old_value = __sync_fetch_and_add (&value, increment_);
-
-#elif (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
-            __asm__ volatile (
-                "lock; xadd %0, %1 \n\t"
-                : "=r" (old_value), "=m" (value)
-                : "0" (increment_), "m" (value)
-                : "cc", "memory");
-
-#elif (defined(__GNUC__) && defined(__ARM_ARCH_7A__))
+#if (defined(__GNUC__) && defined(__ARM_ARCH_7A__))
             integer_t flag, tmp;
             __asm__ volatile (
                 "       dmb     sy\n\t"
@@ -92,6 +82,16 @@ namespace xs
                 : "=&r"(old_value), "=&r"(flag), "=&r"(tmp), "+Qo"(value)
                 : "Ir"(increment_), "r"(&value)
                 : "cc");
+
+#elif defined(XS_ATOMIC_GCC_SYNC)
+            old_value = __sync_fetch_and_add (&value, increment_);
+
+#elif (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
+            __asm__ volatile (
+                "lock; xadd %0, %1 \n\t"
+                : "=r" (old_value), "=m" (value)
+                : "0" (increment_), "m" (value)
+                : "cc", "memory");
 
 #elif defined(XS_ATOMIC_SOLARIS)
             integer_t new_value = atomic_add_32_nv (&value, increment_);
@@ -112,20 +112,7 @@ namespace xs
         //  Atomic subtraction. Returns false if the counter drops to zero.
         inline bool sub (integer_t decrement)
         {
-#if defined(XS_ATOMIC_GCC_SYNC)
-            integer_t new_value = __sync_sub_and_fetch (&value, decrement);
-            return (new_value != 0);
-
-#elif (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
-            integer_t oldval = -decrement;
-            volatile integer_t *val = &value;
-            __asm__ volatile ("lock; xaddl %0,%1"
-                : "=r" (oldval), "=m" (*val)
-                : "0" (oldval), "m" (*val)
-                : "cc", "memory");
-            return oldval != decrement;
-
-#elif (defined(__GNUC__) && defined(__ARM_ARCH_7A__))
+#if (defined(__GNUC__) && defined(__ARM_ARCH_7A__))
             integer_t old_value, flag, tmp;
             __asm__ volatile (
                 "       dmb     sy\n\t"
@@ -139,6 +126,19 @@ namespace xs
                 : "Ir"(decrement), "r"(&value)
                 : "cc");
             return old_value - decrement != 0;
+
+#elif defined(XS_ATOMIC_GCC_SYNC)
+            integer_t new_value = __sync_sub_and_fetch (&value, decrement);
+            return (new_value != 0);
+
+#elif (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
+            integer_t oldval = -decrement;
+            volatile integer_t *val = &value;
+            __asm__ volatile ("lock; xaddl %0,%1"
+                : "=r" (oldval), "=m" (*val)
+                : "0" (oldval), "m" (*val)
+                : "cc", "memory");
+            return oldval != decrement;
 
 #elif defined(XS_ATOMIC_SOLARIS)
             int32_t delta = - ((int32_t) decrement);

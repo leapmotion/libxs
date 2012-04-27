@@ -70,7 +70,22 @@ namespace xs
         //  to the 'val' value. Old value is returned.
         inline T *xchg (T *val_)
         {
-#if defined(XS_ATOMIC_GCC_SYNC)
+#if (defined(__GNUC__) && defined(__ARM_ARCH_7A__))
+            T* old;
+            unsigned int flag;
+            __asm__ volatile (
+                "       dmb     sy\n\t"
+                "1:     ldrex   %1, [%3]\n\t"
+                "       strex   %0, %4, [%3]\n\t"
+                "       teq     %0, #0\n\t"
+                "       bne     1b\n\t"
+                "       dmb     sy\n\t"
+                : "=&r"(flag), "=&r"(old), "+Qo"(ptr)
+                : "r"(&ptr), "r"(val_)
+                : "cc");
+            return old;
+
+#elif defined(XS_ATOMIC_GCC_SYNC)
             {
                 T* ov;
                 do
@@ -86,21 +101,6 @@ namespace xs
                 "lock; xchg %0, %2"
                 : "=r" (old), "=m" (ptr)
                 : "m" (ptr), "0" (val_));
-            return old;
-
-#elif (defined(__GNUC__) && defined(__ARM_ARCH_7A__))
-            T* old;
-            unsigned int flag;
-            __asm__ volatile (
-                "       dmb     sy\n\t"
-                "1:     ldrex   %1, [%3]\n\t"
-                "       strex   %0, %4, [%3]\n\t"
-                "       teq     %0, #0\n\t"
-                "       bne     1b\n\t"
-                "       dmb     sy\n\t"
-                : "=&r"(flag), "=&r"(old), "+Qo"(ptr)
-                : "r"(&ptr), "r"(val_)
-                : "cc");
             return old;
 
 #elif defined(XS_ATOMIC_SOLARIS)
@@ -124,19 +124,7 @@ namespace xs
         //  is returned.
         inline T *cas (T *cmp_, T *val_)
         {
-#if defined(XS_ATOMIC_GCC_SYNC)
-            return (T*) __sync_val_compare_and_swap (&ptr, cmp_, val_);
-
-#elif (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
-            T *old;
-            __asm__ volatile (
-                "lock; cmpxchg %2, %3"
-                : "=a" (old), "=m" (ptr)
-                : "r" (val_), "m" (ptr), "0" (cmp_)
-                : "cc");
-            return old;
-
-#elif (defined(__GNUC__) && defined(__ARM_ARCH_7A__))
+#if (defined(__GNUC__) && defined(__ARM_ARCH_7A__))
             T *old;
             unsigned int flag;
             __asm__ volatile (
@@ -150,6 +138,18 @@ namespace xs
                 "       dmb     sy\n\t"
                 : "=&r"(flag), "=&r"(old), "+Qo"(ptr)
                 : "r"(&ptr), "r"(cmp_), "r"(val_)
+                : "cc");
+            return old;
+
+#elif defined(XS_ATOMIC_GCC_SYNC)
+            return (T*) __sync_val_compare_and_swap (&ptr, cmp_, val_);
+
+#elif (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
+            T *old;
+            __asm__ volatile (
+                "lock; cmpxchg %2, %3"
+                : "=a" (old), "=m" (ptr)
+                : "r" (val_), "m" (ptr), "0" (cmp_)
                 : "cc");
             return old;
 
