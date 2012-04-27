@@ -117,24 +117,25 @@ int xs::xsub_t::xsend (msg_t *msg_, int flags_)
         ++it->second;
         if (it->second == 1)
             return dist.send_to_all (msg_, flags_);
-        else
-            return 0;
     }
     else if (cmd == XS_CMD_UNSUBSCRIBE) {
         subscriptions_t::iterator it = subscriptions.find (
             std::make_pair (filter_id, blob_t (data + 4, size - 4)));
-        if (it == subscriptions.end ())
-            return 0;
-        xs_assert (it->second);
-        --it->second;
-        if (it->second)
-            return 0;
-        subscriptions.erase (it);
-        return dist.send_to_all (msg_, flags_);
+        if (it != subscriptions.end ()) {
+            xs_assert (it->second);
+            --it->second;
+            if (!it->second) {
+                subscriptions.erase (it);
+                return dist.send_to_all (msg_, flags_);
+            }
+        }
     }
 
-    xs_assert (false);
-    return -1;
+    int rc = msg_->close ();
+    errno_assert (rc == 0);
+    rc = msg_->init ();
+    errno_assert (rc == 0);
+    return 0;
 }
 
 bool xs::xsub_t::xhas_out ()
