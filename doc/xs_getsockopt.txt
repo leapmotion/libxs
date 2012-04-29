@@ -354,10 +354,10 @@ necessarily indicate that messages are available to be read from, or can be
 written to, the underlying socket; applications must retrieve the actual event
 state with a subsequent retrieval of the 'XS_EVENTS' option.
 
-NOTE: The returned file descriptor is also used internally by the 'zmq_send'
-and 'zmq_recv' functions. As the descriptor is edge triggered, applications
-must update the state of 'ZMQ_EVENTS' after each invocation of 'zmq_send'
-or 'zmq_recv'.To be more explicit: after calling 'zmq_send' the socket may
+NOTE: The returned file descriptor is also used internally by the 'xs_send'
+and 'xs_recv' functions. As the descriptor is edge triggered, applications
+must update the state of 'XS_EVENTS' after each invocation of 'xs_send'
+or 'xs_recv'.To be more explicit: after calling 'xs_send' the socket may
 become readable (and vice versa) without triggering a read event on the
 file descriptor.
 
