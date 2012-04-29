@@ -304,7 +304,7 @@ void xs::stream_engine_t::out_event (fd_t fd_)
 
     //  If the encoder reports that there are no more data to get from it
     //  we can stop polling for POLLOUT immediately.
-    if (!more_data)
+    if (!more_data && !outsize)
         reset_pollout (handle);
 }
 
