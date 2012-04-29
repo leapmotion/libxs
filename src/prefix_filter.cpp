@@ -226,17 +226,17 @@ static void pfx_rm_all (pfx_node_t *node_, void *subscribers_,
     //  If there are multiple subnodes.
 
     //  New min non-null character in the node table after the removal.
-    unsigned char new_min = node_->min;
+    unsigned char new_min = node_->min + node_->count - 1;
 
     //  New max non-null character in the node table after the removal.
-    unsigned char new_max = node_->min + node_->count - 1;
+    unsigned char new_max = node_->min;
     for (unsigned short c = 0; c != node_->count; c++) {
         (*buff_) [buffsize_] = node_->min + c;
         if (node_->next.table [c]) {
             pfx_rm_all (node_->next.table [c], subscribers_, buff_,
                 buffsize_ + 1, maxbuffsize_, arg_);
 
-            //  Prune redudant nodes from the the trie.
+            //  Prune redundant nodes from the the trie.
             if (pfx_is_redundant (node_->next.table [c])) {
                 pfx_close (node_->next.table [c]);
                 free (node_->next.table [c]);
@@ -246,9 +246,16 @@ static void pfx_rm_all (pfx_node_t *node_, void *subscribers_,
                 --node_->live_nodes;
             }
             else {
-                if (c + node_->min > new_min)
+                //  The node is not redundant, so it's a candidate for being
+                //  the new min/max node.
+                //
+                //  We loop through the node array from left to right, so the
+                //  first non-null, non-redundant node encountered is the new
+                //  minimum index. Conversely, the last non-redundant, non-null
+                //  node encountered is the new maximum index.
+                if (c + node_->min < new_min)
                     new_min = c + node_->min;
-                if (c + node_->min < new_max)
+                if (c + node_->min > new_max)
                     new_max = c + node_->min;
             }
         }
