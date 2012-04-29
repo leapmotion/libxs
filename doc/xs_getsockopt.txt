@@ -237,7 +237,7 @@ Applicable socket types:: all, only for connection-oriented transports
 
 XS_RECONNECT_IVL_MAX: Retrieve maximum reconnection interval
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The 'XS_RECONNECT_IVL_MAX' option shall retrieve the maximum reconnection 
+The 'XS_RECONNECT_IVL_MAX' option shall retrieve the maximum reconnection
 interval for the specified 'socket'.  This is the maximum period the library
 shall wait between attempts to reconnect. On each reconnect attempt, the
 previous interval shall be doubled untill XS_RECONNECT_IVL_MAX is reached. This
@@ -353,6 +353,13 @@ NOTE: The ability to read from the returned file descriptor does not
 necessarily indicate that messages are available to be read from, or can be
 written to, the underlying socket; applications must retrieve the actual event
 state with a subsequent retrieval of the 'XS_EVENTS' option.
+
+NOTE: The returned file descriptor is also used internally by the 'zmq_send'
+and 'zmq_recv' functions. As the descriptor is edge triggered, applications
+must update the state of 'ZMQ_EVENTS' after each invocation of 'zmq_send'
+or 'zmq_recv'.To be more explicit: after calling 'zmq_send' the socket may
+become readable (and vice versa) without triggering a read event on the
+file descriptor.
 
 CAUTION: The returned file descriptor is intended for use with a 'poll' or
 similar system call only. Applications must never attempt to read or write data
