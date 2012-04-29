@@ -307,7 +307,7 @@ void xs::tcp_connecter_t::close ()
     wsa_assert (rc != SOCKET_ERROR);
 #else
     int rc = ::close (s);
-    errno_assert (rc == 0);
+    errno_assert (rc == 0 || errno == ECONNRESET);
 #endif
     s = retired_fd;
 }

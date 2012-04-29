@@ -206,16 +206,15 @@ int xs::ipc_connecter_t::open ()
     return -1;
 }
 
-int xs::ipc_connecter_t::close ()
+void xs::ipc_connecter_t::close ()
 {
     if (s == retired_fd)
-        return 0;
+        return;
 
     int rc = ::close (s);
-    if (rc != 0)
-        return -1;
+    errno_assert (rc == 0 || errno == ECONNRESET);
+    
     s = retired_fd;
-    return 0;
 }
 
 xs::fd_t xs::ipc_connecter_t::connect ()
