@@ -23,12 +23,8 @@
 
 #if defined XS_USE_ASYNC_POLL
 
-#include <sys/types.h>
-#include <sys/time.h>
-#include <poll.h>
 #include <algorithm>
 
-#include "poll.hpp"
 #include "err.hpp"
 #include "config.hpp"
 

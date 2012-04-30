@@ -26,8 +26,22 @@
 
 #if defined XS_USE_ASYNC_POLL
 
-#include <poll.h>
 #include <stddef.h>
+
+#if HAVE_SYS_TYPES
+#   include <sys/types.h>
+#endif
+
+#if HAVE_SYS_SELECT_H
+#   include <sys/select.h>
+#endif
+
+#if HAVE_POLL_H
+#   include <poll.h>
+#elif HAVE_SYS_POLL_H
+#   include <sys/poll.h>
+#endif
+
 #include <vector>
 
 #include "fd.hpp"

@@ -33,13 +33,31 @@
 //  instead of 'events' and 'revents' and defines macros to map from POSIX-y
 //  names to AIX-specific names).
 #if defined XS_USE_SYNC_POLL
-#include <poll.h>
+#   if HAVE_SYS_TYPES
+#       include <sys/types.h>
+#   endif
+#   if HAVE_SYS_SELECT_H
+#       include <sys/select.h>
+#   endif
+#   if HAVE_POLL_H
+#       include <poll.h>
+#   elif HAVE_SYS_POLL_H
+#       include <sys/poll.h>
+#   endif
 #endif
 
 #if defined XS_HAVE_WINDOWS
-#include "windows.hpp"
+#   include "windows.hpp"
 #else
-#include <unistd.h>
+#   if HAVE_SYS_TIME_H
+#       include <sys/time.h>
+#   endif
+#   if HAVE_TIME_H
+#       include <time.h>
+#   endif
+#   if HAVE_UNISTD_H
+#      include <unistd.h>
+#   endif
 #endif
 
 int xs::upoll (xs_pollitem_t *items_, int nitems_, int timeout_)
@@ -227,7 +245,7 @@ int xs::upoll (xs_pollitem_t *items_, int nitems_, int timeout_)
 
     //  Ensure we do not attempt to select () on more than FD_SETSIZE
     //  file descriptors.
-    xs_assert (nitems_ <= FD_SETSIZE);
+    xs_assert (nitems_ <= (int)FD_SETSIZE);
 
     fd_set pollset_in;
     FD_ZERO (&pollset_in);

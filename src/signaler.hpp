@@ -29,20 +29,37 @@
 //  instead of 'events' and 'revents' and defines macros to map from POSIX-y
 //  names to AIX-specific names).
 #if defined XS_USE_SYNC_POLL
-#include <poll.h>
+#   if HAVE_SYS_TYPES
+#       include <sys/types.h>
+#   endif
+#   if HAVE_SYS_SELECT_H
+#       include <sys/select.h>
+#   endif
+#   if HAVE_POLL_H
+#       include <poll.h>
+#   elif HAVE_SYS_POLL_H
+#       include <sys/poll.h>
+#   endif
 #elif defined XS_USE_SYNC_SELECT
-#if defined XS_HAVE_WINDOWS
-#include "windows.hpp"
-#elif defined XS_HAVE_HPUX
-#include <sys/param.h>
-#include <sys/types.h>
-#include <sys/time.h>
-#elif defined XS_HAVE_OPENVMS
-#include <sys/types.h>
-#include <sys/time.h>
-#else
-#include <sys/select.h>
-#endif
+#   if defined XS_HAVE_WINDOWS
+#       include "windows.hpp"
+#   else
+#       if HAVE_SYS_TYPES_H
+#           include <sys/types.h>
+#       endif
+#       if HAVE_SYS_TIME_H
+#           include <sys/time.h>
+#       endif
+#       if HAVE_TIME_H
+#           include <time.h>
+#       endif
+#       if HAVE_UNISTD_H
+#           include <unistd.h>
+#       endif
+#       if HAVE_SYS_SELECT_H
+#           include <sys/select.h>
+#       endif
+#   endif
 #endif
 
 namespace xs

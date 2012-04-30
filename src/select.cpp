@@ -24,17 +24,9 @@
 #if defined XS_USE_ASYNC_SELECT
 
 #include "platform.hpp"
+
 #if defined XS_HAVE_WINDOWS
-#include "windows.hpp"
-#elif defined XS_HAVE_HPUX
-#include <sys/param.h>
-#include <sys/types.h>
-#include <sys/time.h>
-#elif defined XS_HAVE_OPENVMS
-#include <sys/types.h>
-#include <sys/time.h>
-#else
-#include <sys/select.h>
+#   include "windows.hpp"
 #endif
 
 #include <string.h>

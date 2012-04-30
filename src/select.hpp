@@ -31,13 +31,24 @@
 #include <stddef.h>
 #include <vector>
 
-#ifdef XS_HAVE_WINDOWS
-#include "winsock2.h"
-#elif defined XS_HAVE_OPENVMS
-#include <sys/types.h>
-#include <sys/time.h>
+#if defined XS_HAVE_WINDOWS
+#   include "winsock2.h"
 #else
-#include <sys/select.h>
+#   if HAVE_SYS_TYPES_H
+#       include <sys/types.h>
+#   endif
+#   if HAVE_SYS_TIME_H
+#       include <sys/time.h>
+#   endif
+#   if HAVE_TIME_H
+#       include <time.h>
+#   endif
+#   if HAVE_UNISTD_H
+#       include <unistd.h>
+#   endif
+#   if HAVE_SYS_SELECT_H
+#       include <sys/select.h>
+#   endif
 #endif
 
 #include "fd.hpp"

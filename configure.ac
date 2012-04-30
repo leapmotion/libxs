@@ -200,6 +200,7 @@ AC_CHECK_HEADERS([ \
     string.h \
     sys/socket.h \
     sys/time.h \
+    sys/types.h \
     time.h \
     unistd.h \
     limits.h
@@ -359,7 +360,6 @@ AS_IF([test "x$libxs_cv_[]_AC_LANG_ABBREV[]_intel_compiler" = "xyes"], [
     AC_TYPE_SSIZE_T
 ])
 
-AC_HEADER_TIME
 AC_TYPE_UINT32_T
 AC_C_VOLATILE
 
