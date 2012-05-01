@@ -48,11 +48,7 @@ xs::options_t::options_t () :
     sndtimeo (-1),
     ipv4only (1),
     keepalive (0),
-    legacy_protocol (false),
-    sp_pattern (-1),
-    sp_version (-1),
-    sp_role (-1),
-    sp_complement (-1),
+    protocol (0),
     filter (XS_FILTER_PREFIX),
     survey_timeout (-1),
     delay_on_close (true),
@@ -237,6 +233,21 @@ int xs::options_t::setsockopt (int option_, const void *optval_,
                 return -1;
             }
             keepalive = val;
+            return 0;
+        }
+
+    case XS_PROTOCOL:
+        {
+            if (optvallen_ != sizeof (int)) {
+                errno = EINVAL;
+                return -1;
+            }
+            int val = *((int*) optval_);
+            if (val < 0) {
+                errno = EINVAL;
+                return -1;
+            }
+            protocol = val;
             return 0;
         }
 
@@ -446,7 +457,7 @@ int xs::options_t::getsockopt (int option_, void *optval_, size_t *optvallen_)
             errno = EINVAL;
             return -1;
         }
-        *((int*) optval_) = sp_version;
+        *((int*) optval_) = protocol;
         *optvallen_ = sizeof (int);
         return 0;
 

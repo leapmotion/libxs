@@ -447,7 +447,7 @@ int xs::socket_base_t::connect (const char *addr_)
         pipe_t *ppair [2] = {NULL, NULL};
         int hwms [2] = {sndhwm, rcvhwm};
         bool delays [2] = {options.delay_on_disconnect, options.delay_on_close};
-        rc = pipepair (parents, ppair, hwms, delays, options.sp_version);
+        rc = pipepair (parents, ppair, hwms, delays, options.protocol);
         errno_assert (rc == 0);
 
         //  Attach local end of the pipe to this socket object.
@@ -501,7 +501,7 @@ int xs::socket_base_t::connect (const char *addr_)
     pipe_t *ppair [2] = {NULL, NULL};
     int hwms [2] = {options.sndhwm, options.rcvhwm};
     bool delays [2] = {options.delay_on_disconnect, options.delay_on_close};
-    rc = pipepair (parents, ppair, hwms, delays, options.sp_version);
+    rc = pipepair (parents, ppair, hwms, delays, options.protocol);
     errno_assert (rc == 0);
 
     // PGM does not support subscription forwarding; ask for all data to be

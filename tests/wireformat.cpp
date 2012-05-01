@@ -71,10 +71,10 @@ int XS_TEST_MAIN ()
     assert (rc == 0);
 
     // Let's send some data and check if it arrived
-    rc = send (rpush, "\0\0SP\x04\x02\x01\0\x04\0abc", 13, 0);
-    assert (rc == 13);
+    rc = send (rpush, "\x04\0abc", 5, 0);
+    assert (rc == 5);
     unsigned char buf [3];
-    unsigned char buf2 [8];
+	unsigned char buf2 [3];
     rc = xs_recv (pull, buf, sizeof (buf), 0);
     assert (rc == 3);
     assert (!memcmp (buf, "abc", 3));
@@ -83,11 +83,8 @@ int XS_TEST_MAIN ()
     rc = xs_send (push, buf, sizeof (buf), 0);
     assert (rc == 3);
     rc = recv (rpull, (char*) buf2, sizeof (buf2), 0);
-    assert (rc == 8);
-    assert (!memcmp (buf2, "\0\0SP\x04\x02\x01\0", 8));
-    rc = recv (rpull, (char*) buf2, 5, 0);
-    assert (rc == 5);
-    assert (!memcmp (buf2, "\x04\0abc", 5));
+    assert (rc == 3);
+    assert (!memcmp (buf2, "\x04\0abc", 3));
 
 #if defined XS_HAVE_WINDOWS
     rc = closesocket (rpush);

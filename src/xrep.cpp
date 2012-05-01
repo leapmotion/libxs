@@ -36,10 +36,6 @@ xs::xrep_t::xrep_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
     next_peer_id (generate_random ())
 {
     options.type = XS_XREP;
-    options.sp_pattern = SP_REQREP;
-    options.sp_version = 1;
-    options.sp_role = SP_REQREP_REP;
-    options.sp_complement = SP_REQREP_REQ;
 
     //  TODO: Uncomment the following line when XREP will become true XREP
     //  rather than generic router socket.
@@ -57,34 +53,6 @@ xs::xrep_t::~xrep_t ()
 {
     xs_assert (outpipes.empty ());
     prefetched_msg.close ();
-}
-
-int xs::xrep_t::xsetsockopt (int option_, const void *optval_,
-    size_t optvallen_)
-{
-    if (option_ != XS_PROTOCOL) {
-        errno = EINVAL;
-        return -1;
-    }
-
-    if (optvallen_ != sizeof (int)) {
-        errno = EINVAL;
-        return -1;
-    }
-
-    if (!optval_) {
-        errno = EFAULT;
-        return -1;
-    }
-
-    int version = *(int *) optval_;
-    if (version != 1) {
-        errno = EINVAL;
-        return -1;
-    }
-
-    options.sp_version = version;
-    return 0;
 }
 
 void xs::xrep_t::xattach_pipe (pipe_t *pipe_, bool icanhasall_)
