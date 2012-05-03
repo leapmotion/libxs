@@ -119,6 +119,10 @@
 #include "shutdown.cpp"
 #undef XS_TEST_MAIN
 
+#define XS_TEST_MAIN backlog
+#include "backlog.cpp"
+#undef XS_TEST_MAIN
+
 int main ()
 {
     int rc;
@@ -166,6 +170,8 @@ int main ()
     rc = survey ();
     assert (rc == 0);
     rc = shutdown ();
+    assert (rc == 0);
+    rc = backlog ();
     assert (rc == 0);
     fprintf (stderr, "SUCCESS\n");
     sleep (1);
