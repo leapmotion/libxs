@@ -140,7 +140,7 @@ void xs::tcp_connecter_t::start_connecting ()
     }
 
     //  Connection establishment may be delayed. Poll for its completion.
-    else if (rc == -1 && errno == EAGAIN) {
+    else if (rc == -1 && errno == EINPROGRESS) {
         xs_assert (!handle);
         handle = add_fd (s);
         set_pollout (handle);
@@ -236,17 +236,18 @@ int xs::tcp_connecter_t::open ()
     if (rc == 0)
         return 0;
 
-    //  Asynchronous connect was launched.
+    //  Translate other error codes indicating asynchronous connect has been
+    //  launched to a uniform EINPROGRESS.
 #ifdef XS_HAVE_WINDOWS
     if (rc == SOCKET_ERROR && (WSAGetLastError () == WSAEINPROGRESS ||
           WSAGetLastError () == WSAEWOULDBLOCK)) {
-        errno = EAGAIN;
+        errno = EINPROGRESS;
         return -1;
     }    
     wsa_error_to_errno ();
 #else
-    if (rc == -1 && errno == EINPROGRESS) {
-        errno = EAGAIN;
+    if (rc == -1 && errno == EINTR) {
+        errno = EINPROGRESS;
         return -1;
     }
 #endif

@@ -133,7 +133,7 @@ void xs::ipc_connecter_t::start_connecting ()
     }
 
     //  Connection establishment may be delayed. Poll for its completion.
-    else if (rc == -1 && errno == EAGAIN) {
+    else if (rc == -1 && errno == EINPROGRESS) {
         xs_assert (!handle);
         handle = add_fd (s);
         set_pollout (handle);
@@ -196,9 +196,10 @@ int xs::ipc_connecter_t::open ()
     if (rc == 0)
         return 0;
 
-    //  Asynchronous connect was launched.
-    if (rc == -1 && errno == EINPROGRESS) {
-        errno = EAGAIN;
+    //  Translate other error codes indicating asynchronous connect has been
+    //  launched to a uniform EINPROGRESS.
+    if (rc == -1 && errno == EINTR) {
+        errno = EINPROGRESS;
         return -1;
     }
 
