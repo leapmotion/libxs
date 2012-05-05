@@ -47,8 +47,7 @@
 #endif
 
 xs::tcp_connecter_t::tcp_connecter_t (class io_thread_t *io_thread_,
-      class session_base_t *session_, const options_t &options_,
-      const char *address_, bool wait_) :
+      class session_base_t *session_, const options_t &options_, bool wait_) :
     own_t (io_thread_, options_),
     io_object_t (io_thread_),
     s (retired_fd),
@@ -58,10 +57,6 @@ xs::tcp_connecter_t::tcp_connecter_t (class io_thread_t *io_thread_,
     current_reconnect_ivl(options.reconnect_ivl),
     reconnect_timer (NULL)
 {
-    //  TODO: set_addess should be called separately, so that the error
-    //  can be propagated.
-    int rc = set_address (address_);
-    errno_assert (rc == 0);
 }
 
 xs::tcp_connecter_t::~tcp_connecter_t ()

@@ -46,6 +46,8 @@ ERRORS
 ------
 *EINVAL*::
 The endpoint supplied is invalid.
+*ENAMETOOLONG*::
+The supplied name was too long.
 *EPROTONOSUPPORT*::
 The requested 'transport' protocol is not supported.
 *ENOCOMPATPROTO*::

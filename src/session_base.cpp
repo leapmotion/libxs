@@ -422,8 +422,10 @@ void xs::session_base_t::start_connecting (bool wait_)
 
     if (protocol == "tcp") {
         tcp_connecter_t *connecter = new (std::nothrow) tcp_connecter_t (
-            thread, this, options, address.c_str (), wait_);
+            thread, this, options, wait_);
         alloc_assert (connecter);
+        int rc = connecter->set_address (address.c_str());
+        errno_assert (rc == 0);
         launch_child (connecter);
         return;
     }
@@ -431,8 +433,10 @@ void xs::session_base_t::start_connecting (bool wait_)
 #if !defined XS_HAVE_WINDOWS && !defined XS_HAVE_OPENVMS
     if (protocol == "ipc") {
         ipc_connecter_t *connecter = new (std::nothrow) ipc_connecter_t (
-            thread, this, options, address.c_str (), wait_);
+            thread, this, options, wait_);
         alloc_assert (connecter);
+        int rc = connecter->set_address (address.c_str());
+        errno_assert (rc == 0);
         launch_child (connecter);
         return;
     }

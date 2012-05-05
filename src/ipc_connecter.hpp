@@ -45,8 +45,11 @@ namespace xs
         //  connection process.
         ipc_connecter_t (xs::io_thread_t *io_thread_,
             xs::session_base_t *session_, const options_t &options_,
-            const char *address_, bool delay_);
+            bool delay_);
         ~ipc_connecter_t ();
+
+        //  Set address to connect to.
+        int set_address (const char *addr_);
 
     private:
 
@@ -71,9 +74,6 @@ namespace xs
         //  Will modify the current_reconnect_ivl used for next call
         //  Returns the currently used interval
         int get_new_reconnect_ivl ();
-
-        //  Set address to connect to.
-        int set_address (const char *addr_);
 
         //  Open IPC connecting socket. Returns -1 in case of error,
         //  0 if connect was successfull immediately. Returns -1 with

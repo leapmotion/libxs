@@ -39,6 +39,7 @@
 #include "tcp_listener.hpp"
 #include "ipc_listener.hpp"
 #include "tcp_connecter.hpp"
+#include "ipc_connecter.hpp"
 #include "io_thread.hpp"
 #include "session_base.hpp"
 #include "config.hpp"
@@ -490,6 +491,22 @@ int xs::socket_base_t::connect (const char *addr_)
     //  Choose the I/O thread to run the session in.
     io_thread_t *thread = choose_io_thread (options.affinity);
     xs_assert (thread);
+
+    if (protocol == "tcp") {
+        tcp_connecter_t connecter (thread, NULL, options, false);
+        int rc = connecter.set_address (address.c_str());
+        if (rc != 0) {
+            return -1;
+        }
+    }
+
+    if (protocol == "ipc") {
+        ipc_connecter_t connecter (thread, NULL, options, false);
+        int rc = connecter.set_address (address.c_str());
+        if (rc != 0) {
+            return -1;
+        }
+    }
 
     //  Create session.
     session_base_t *session = session_base_t::create (thread, true, this,
