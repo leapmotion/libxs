@@ -151,10 +151,10 @@ XS_EXPORT int xs_getmsgopt (xs_msg_t *msg, int option, void *optval,
 #define XS_IO_THREADS 2
 #define XS_PLUGIN 3
 
-XS_EXPORT void *xs_init ();
+XS_EXPORT void *xs_init (void);
 XS_EXPORT int xs_term (void *context);
 XS_EXPORT int xs_setctxopt (void *context, int option, const void *optval,
-    size_t optvallen); 
+    size_t optvallen);
 
 /******************************************************************************/
 /*  Crossroads socket definition.                                             */
