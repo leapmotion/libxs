@@ -194,24 +194,24 @@ int xs::pgm_socket_t::init (bool udp_encapsulation_, const char *network_)
     }
 
     {
-		const int rcvbuf = (int) options.rcvbuf;
-		if (rcvbuf) {
-		    if (!pgm_setsockopt (sock, SOL_SOCKET, SO_RCVBUF, &rcvbuf,
-		          sizeof (rcvbuf)))
-		        goto err_abort;
-		}
+        const int rcvbuf = (int) options.rcvbuf;
+        if (rcvbuf) {
+            if (!pgm_setsockopt (sock, SOL_SOCKET, SO_RCVBUF, &rcvbuf,
+                  sizeof (rcvbuf)))
+                goto err_abort;
+        }
 
-		const int sndbuf = (int) options.sndbuf;
-		if (sndbuf) {
-		    if (!pgm_setsockopt (sock, SOL_SOCKET, SO_SNDBUF, &sndbuf,
-		          sizeof (sndbuf)))
-		        goto err_abort;
-		}
+        const int sndbuf = (int) options.sndbuf;
+        if (sndbuf) {
+            if (!pgm_setsockopt (sock, SOL_SOCKET, SO_SNDBUF, &sndbuf,
+                  sizeof (sndbuf)))
+                goto err_abort;
+        }
 
-		const int max_tpdu = (int) pgm_max_tpdu;
-		if (!pgm_setsockopt (sock, IPPROTO_PGM, PGM_MTU, &max_tpdu,
-		      sizeof (max_tpdu)))
-		    goto err_abort;
+        const int max_tpdu = (int) pgm_max_tpdu;
+        if (!pgm_setsockopt (sock, IPPROTO_PGM, PGM_MTU, &max_tpdu,
+              sizeof (max_tpdu)))
+            goto err_abort;
     }
 
     if (receiver) {
@@ -332,26 +332,26 @@ int xs::pgm_socket_t::init (bool udp_encapsulation_, const char *network_)
 
     //  Set IP level parameters.
     {
-		const int multicast_loop = 0;
-		if (!pgm_setsockopt (sock, IPPROTO_PGM, PGM_MULTICAST_LOOP,
-		      &multicast_loop, sizeof (multicast_loop)))
-		    goto err_abort;
+        const int multicast_loop = 0;
+        if (!pgm_setsockopt (sock, IPPROTO_PGM, PGM_MULTICAST_LOOP,
+                             &multicast_loop, sizeof (multicast_loop)))
+            goto err_abort;
 
-		const int multicast_hops = options.multicast_hops;
-		if (!pgm_setsockopt (sock, IPPROTO_PGM, PGM_MULTICAST_HOPS,
-		        &multicast_hops, sizeof (multicast_hops)))
-		    goto err_abort;
+        const int multicast_hops = options.multicast_hops;
+        if (!pgm_setsockopt (sock, IPPROTO_PGM, PGM_MULTICAST_HOPS,
+                             &multicast_hops, sizeof (multicast_hops)))
+            goto err_abort;
 
-		//  Expedited Forwarding PHB for network elements, no ECN.
-		const int dscp = 0x2e << 2; 
-		if (AF_INET6 != sa_family && !pgm_setsockopt (sock,
-		      IPPROTO_PGM, PGM_TOS, &dscp, sizeof (dscp)))
-		    goto err_abort;
+        //  Expedited Forwarding PHB for network elements, no ECN.
+        const int dscp = 0x2e << 2;
+        if (AF_INET6 != sa_family && !pgm_setsockopt (sock,
+                          IPPROTO_PGM, PGM_TOS, &dscp, sizeof (dscp)))
+            goto err_abort;
 
-		const int nonblocking = 1;
-		if (!pgm_setsockopt (sock, IPPROTO_PGM, PGM_NOBLOCK,
-		      &nonblocking, sizeof (nonblocking)))
-		    goto err_abort;
+        const int nonblocking = 1;
+        if (!pgm_setsockopt (sock, IPPROTO_PGM, PGM_NOBLOCK,
+                             &nonblocking, sizeof (nonblocking)))
+            goto err_abort;
     }
 
     //  Connect PGM transport to start state machine.
@@ -398,13 +398,13 @@ xs::pgm_socket_t::~pgm_socket_t ()
 {
     if (pgm_msgv)
         free (pgm_msgv);
-    if (sock) 
+    if (sock)
         pgm_close (sock, TRUE);
 }
 
 //  Get receiver fds. receive_fd_ is signaled for incoming packets,
 //  waiting_pipe_fd_ is signaled for state driven events and data.
-void xs::pgm_socket_t::get_receiver_fds (fd_t *receive_fd_, 
+void xs::pgm_socket_t::get_receiver_fds (fd_t *receive_fd_,
     fd_t *waiting_pipe_fd_)
 {
     socklen_t socklen;
@@ -426,12 +426,12 @@ void xs::pgm_socket_t::get_receiver_fds (fd_t *receive_fd_,
     xs_assert (socklen == sizeof (*waiting_pipe_fd_));
 }
 
-//  Get fds and store them into user allocated memory. 
+//  Get fds and store them into user allocated memory.
 //  send_fd is for non-blocking send wire notifications.
 //  receive_fd_ is for incoming back-channel protocol packets.
 //  rdata_notify_fd_ is raised for waiting repair transmissions.
 //  pending_notify_fd_ is for state driven events.
-void xs::pgm_socket_t::get_sender_fds (fd_t *send_fd_, fd_t *receive_fd_, 
+void xs::pgm_socket_t::get_sender_fds (fd_t *send_fd_, fd_t *receive_fd_,
     fd_t *rdata_notify_fd_, fd_t *pending_notify_fd_)
 {
     socklen_t socklen;
@@ -471,7 +471,7 @@ void xs::pgm_socket_t::get_sender_fds (fd_t *send_fd_, fd_t *receive_fd_,
 size_t xs::pgm_socket_t::send (unsigned char *data_, size_t data_len_)
 {
     size_t nbytes = 0;
-   
+
     const int status = pgm_send (sock, data_, data_len_, &nbytes);
 
     //  We have to write all data as one packet.
@@ -546,7 +546,7 @@ ssize_t xs::pgm_socket_t::receive (void **raw_data_, const pgm_tsi_t **tsi_)
 {
     size_t raw_data_len = 0;
 
-    //  We just sent all data from pgm_transport_recvmsgv up 
+    //  We just sent all data from pgm_transport_recvmsgv up
     //  and have to return 0 that another engine in this thread is scheduled.
     if (nbytes_rec == nbytes_processed && nbytes_rec > 0) {
 
@@ -567,7 +567,7 @@ ssize_t xs::pgm_socket_t::receive (void **raw_data_, const pgm_tsi_t **tsi_)
         xs_assert (nbytes_processed == 0);
         xs_assert (nbytes_rec == 0);
 
-        //  Receive a vector of Application Protocol Domain Unit's (APDUs) 
+        //  Receive a vector of Application Protocol Domain Unit's (APDUs)
         //  from the transport.
         pgm_error_t *pgm_error = NULL;
 
@@ -585,7 +585,7 @@ ssize_t xs::pgm_socket_t::receive (void **raw_data_, const pgm_tsi_t **tsi_)
 
             xs_assert (nbytes_rec == 0);
 
-            //  In case if no RDATA/ODATA caused POLLIN 0 is 
+            //  In case if no RDATA/ODATA caused POLLIN 0 is
             //  returned.
             nbytes_rec = 0;
             errno = EBUSY;
@@ -641,8 +641,8 @@ ssize_t xs::pgm_socket_t::receive (void **raw_data_, const pgm_tsi_t **tsi_)
 
     // Only one APDU per pgm_msgv_t structure is allowed.
     xs_assert (pgm_msgv [pgm_msgv_processed].msgv_len == 1);
- 
-    struct pgm_sk_buff_t* skb = 
+
+    struct pgm_sk_buff_t* skb =
         pgm_msgv [pgm_msgv_processed].msgv_skb [0];
 
     //  Take pointers from pgm_msgv_t structure.
@@ -674,7 +674,7 @@ void xs::pgm_socket_t::process_upstream ()
     xs_assert (status != PGM_IO_STATUS_ERROR);
 
     //  No data should be returned.
-    xs_assert (dummy_bytes == 0 && (status == PGM_IO_STATUS_TIMER_PENDING || 
+    xs_assert (dummy_bytes == 0 && (status == PGM_IO_STATUS_TIMER_PENDING ||
         status == PGM_IO_STATUS_RATE_LIMITED ||
         status == PGM_IO_STATUS_WOULD_BLOCK));
 
@@ -692,7 +692,7 @@ int xs::pgm_socket_t::compute_sqns (int tpdu_)
 {
     //  Convert rate into B/ms.
     uint64_t rate = uint64_t (options.rate) / 8;
-        
+
     //  Compute the size of the buffer in bytes.
     uint64_t size = uint64_t (options.recovery_ivl) * rate;
 
