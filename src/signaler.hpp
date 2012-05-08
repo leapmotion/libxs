@@ -24,44 +24,6 @@
 #include "fd.hpp"
 #include "polling.hpp"
 
-//  On AIX, poll.h has to be included before xs.h to get consistent
-//  definition of pollfd structure (AIX uses 'reqevents' and 'retnevents'
-//  instead of 'events' and 'revents' and defines macros to map from POSIX-y
-//  names to AIX-specific names).
-#if defined XS_USE_SYNC_POLL
-#   if HAVE_SYS_TYPES
-#       include <sys/types.h>
-#   endif
-#   if HAVE_SYS_SELECT_H
-#       include <sys/select.h>
-#   endif
-#   if HAVE_POLL_H
-#       include <poll.h>
-#   elif HAVE_SYS_POLL_H
-#       include <sys/poll.h>
-#   endif
-#elif defined XS_USE_SYNC_SELECT
-#   if defined XS_HAVE_WINDOWS
-#       include "windows.hpp"
-#   else
-#       if HAVE_SYS_TYPES_H
-#           include <sys/types.h>
-#       endif
-#       if HAVE_SYS_TIME_H
-#           include <sys/time.h>
-#       endif
-#       if HAVE_TIME_H
-#           include <time.h>
-#       endif
-#       if HAVE_UNISTD_H
-#           include <unistd.h>
-#       endif
-#       if HAVE_SYS_SELECT_H
-#           include <sys/select.h>
-#       endif
-#   endif
-#endif
-
 namespace xs
 {
 

@@ -65,4 +65,33 @@
 #error No polling mechanism available!
 #endif
 
+//  Conditionally include header files that might be required to use the poll()
+//  or select() functions
+
+#if defined XS_HAVE_WINDOWS // Windows-specific header files
+#   include "windows.h"
+#   include "winsock2.h"
+#else // Header files for Unix-like operating systems
+#   if HAVE_SYS_TYPES
+#       include <sys/types.h>
+#   endif
+#   if HAVE_SYS_TIME_H
+#       include <sys/time.h>
+#   endif
+#   if HAVE_TIME_H
+#       include <time.h>
+#   endif
+#   if HAVE_UNISTD_H
+#       include <unistd.h>
+#   endif
+#   if HAVE_SYS_SELECT_H
+#       include <sys/select.h>
+#   endif
+#   if HAVE_POLL_H
+#       include <poll.h>
+#   elif HAVE_SYS_POLL_H
+#       include <sys/poll.h>
+#   endif
 #endif
+
+#endif // __XS_POLLING_HPP_INCLUDED__

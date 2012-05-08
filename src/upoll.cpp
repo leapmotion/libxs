@@ -28,38 +28,6 @@
 #include "platform.hpp"
 #include "polling.hpp"
 
-//  On AIX platform, poll.h has to be included first to get consistent
-//  definition of pollfd structure (AIX uses 'reqevents' and 'retnevents'
-//  instead of 'events' and 'revents' and defines macros to map from POSIX-y
-//  names to AIX-specific names).
-#if defined XS_USE_SYNC_POLL
-#   if HAVE_SYS_TYPES
-#       include <sys/types.h>
-#   endif
-#   if HAVE_SYS_SELECT_H
-#       include <sys/select.h>
-#   endif
-#   if HAVE_POLL_H
-#       include <poll.h>
-#   elif HAVE_SYS_POLL_H
-#       include <sys/poll.h>
-#   endif
-#endif
-
-#if defined XS_HAVE_WINDOWS
-#   include "windows.hpp"
-#else
-#   if HAVE_SYS_TIME_H
-#       include <sys/time.h>
-#   endif
-#   if HAVE_TIME_H
-#       include <time.h>
-#   endif
-#   if HAVE_UNISTD_H
-#      include <unistd.h>
-#   endif
-#endif
-
 int xs::upoll (xs_pollitem_t *items_, int nitems_, int timeout_)
 {
 #if defined XS_USE_SYNC_POLL
