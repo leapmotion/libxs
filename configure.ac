@@ -99,8 +99,6 @@ AS_CASE(["${host_os}"],
                 AC_DEFINE([XS_HAVE_ANDROID], [1], [Have Android OS])
             ]
         )
-
-        AC_CHECK_LIB([dl], [dlopen])
      ],
     [*solaris*], [
         AC_DEFINE([XS_HAVE_SOLARIS], [1], [Have Solaris OS])
@@ -191,7 +189,11 @@ LIBXS_CHECK_DOC_BUILD
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([ \
+    link.h \
+    dirent.h \
+    dlfcn.h \
     errno.h \
+    fcntl.h \
     arpa/inet.h \
     netinet/tcp.h \
     netinet/in.h \
@@ -199,6 +201,7 @@ AC_CHECK_HEADERS([ \
     stdlib.h \
     string.h \
     sys/socket.h \
+    sys/stat.h \
     sys/time.h \
     sys/types.h \
     time.h \
@@ -374,6 +377,34 @@ AS_IF([test "x$enable_libzmq" != "xno"], [
     libxs_libzmq="yes"
 ])
 
+# Plug-in support
+AC_ARG_ENABLE([plugins], [AS_HELP_STRING([--enable-plugins],
+    [enable plugins [default=auto]])],
+    [enable_plugins=$enableval], [enable_plugins=auto])
+
+AS_IF([test "x$enable_plugins" != "xno"], [
+    # Check if libdl is required, then check for dlopen and lstat, they are
+    # both needed to enable plug-in support
+    AC_SEARCH_LIBS([dlopen], [dl])
+    AC_CHECK_FUNCS([lstat dlopen], [], [
+        AS_IF([test "x$enable_plugins" = "xyes"], [
+            AC_MSG_ERROR([Plugins support not available])
+        ], [
+            AC_MSG_WARN([Plugins support disabled])
+            enable_plugins=no
+        ])
+    ])
+
+    # If shared library support is disabled disable plugins support
+    AS_IF([test "x$enable_shared" = "xno"], [
+        AC_MSG_WARN([Shared library support disabled, disabling plug-ins])
+        enable_plugins=no
+    ], [
+        enable_plugins=yes
+        AC_DEFINE([XS_HAVE_PLUGINS], [1], [Whether plugins support is enabled])
+    ])
+])
+
 #  PGM extension
 libxs_pgm_ext="no"
 
@@ -525,6 +556,7 @@ Configuration for $PACKAGE_STRING
     Polling system: $libxs_cv_poller
     Disable eventfd: $xs_disable_eventfd
     Build libzmq compatibility library and headers: $libxs_libzmq
+    Plugins support: $enable_plugins
     PGM extension: $with_pgm_ext
     Use system-provided PGM library: $with_system_pgm_ext
     Build documentation: $libxs_build_doc

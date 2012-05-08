@@ -23,12 +23,27 @@
 #if defined XS_HAVE_WINDOWS
 #include "windows.hpp"
 #else
-#include <unistd.h>
-#endif
-
-#if defined XS_HAVE_LINUX
-#include <dlfcn.h>
-#include <dirent.h>
+#   if HAVE_UNISTD_H
+#       include <unistd.h>
+#   endif
+#   if HAVE_SYS_TYPES_H
+#       include <sys/types.h>
+#   endif
+#   if HAVE_SYS_STAT_H
+#       include <sys/stat.h>
+#   endif
+#   if HAVE_DLFCN_H
+#       include <dlfcn.h>
+#   endif
+#   if HAVE_LINK_H
+#       include <link.h>
+#   endif
+#   if HAVE_FCNTL_H
+#       include <fcntl.h>
+#   endif
+#   if HAVE_DIRENT_H
+#       include <dirent.h>
+#   endif
 #endif
 
 #include <new>
@@ -114,7 +129,7 @@ next:
     BOOL brc = FindClose (fh);
     win_assert (brc != 0);
 
-#elif defined XS_HAVE_LINUX
+#elif XS_HAVE_PLUGINS
 
     //  Load all the installed plug-ins.
     std::string path (XS_PREFIX_PATH);
@@ -126,12 +141,17 @@ next:
     errno_assert (dp);
 
     dirent dir, *dirp;
+    struct stat stats;
+
     while (true) {
         rc = readdir_r (dp, &dir, &dirp);
         assert (rc == 0);
         if (!dirp)
             break;
-        if (dir.d_type == DT_REG) {
+
+        rc = lstat (dirp->d_name, &stats);
+
+        if ((rc == 0) && S_ISREG (stats.st_mode)) {
 
             //  Ignore the files without .xsp extension.
             std::string file = dir.d_name;
@@ -139,7 +159,7 @@ next:
                 continue;
             if (file.substr (file.size () - 4) != ".xsp")
                 continue;
-            
+
             //  Open the specified dynamic library.
             std::string filename = path + "/" + file;
             void *dl = dlopen (filename.c_str (), RTLD_LOCAL | RTLD_NOW);
@@ -260,7 +280,7 @@ int xs::ctx_t::terminate ()
           it != plugins.end (); ++it)
         FreeLibrary (*it);
     opt_sync.unlock ();
-#elif defined XS_HAVE_LINUX
+#elif XS_HAVE_PLUGINS
     opt_sync.lock ();
     for (plugins_t::iterator it = plugins.begin ();
           it != plugins.end (); ++it)
@@ -412,7 +432,7 @@ void xs::ctx_t::destroy_socket (class socket_base_t *socket_)
     //  Free the associared thread slot.
     uint32_t tid = socket_->get_tid ();
     empty_slots.push_back (tid);
-    slots [tid] = NULL;    
+    slots [tid] = NULL;
 
     //  Remove the socket from the list of sockets.
     sockets.erase (socket_);
@@ -497,7 +517,7 @@ void xs::ctx_t::unregister_endpoints (socket_base_t *socket_)
         }
         ++it;
     }
-        
+
     endpoints_sync.unlock ();
 }
 
@@ -528,4 +548,3 @@ xs::endpoint_t xs::ctx_t::find_endpoint (const char *addr_)
 //  is a global variable. Thus, even sockets created in different contexts have
 //  unique IDs.
 xs::atomic_counter_t xs::ctx_t::max_socket_id;
-

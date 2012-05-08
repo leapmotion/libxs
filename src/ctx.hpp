@@ -54,7 +54,7 @@ namespace xs
 
     //  Context object encapsulates all the global state associated with
     //  the library.
-    
+
     class ctx_t
     {
     public:
@@ -173,7 +173,7 @@ namespace xs
 #if defined XS_HAVE_WINDOWS
         typedef std::vector <HMODULE> plugins_t;
         plugins_t plugins;
-#elif defined XS_HAVE_LINUX
+#elif defined XS_HAVE_PLUGINS
         typedef std::vector <void*> plugins_t;
         plugins_t plugins;
 #endif
@@ -185,8 +185,7 @@ namespace xs
         ctx_t (const ctx_t&);
         const ctx_t &operator = (const ctx_t&);
     };
-    
+
 }
 
 #endif
-
