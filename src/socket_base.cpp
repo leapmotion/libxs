@@ -503,6 +503,7 @@ int xs::socket_base_t::connect (const char *addr_)
         }
     }
 
+#if !defined XS_HAVE_WINDOWS && !defined XS_HAVE_OPENVMS
     if (protocol == "ipc") {
         ipc_connecter_t connecter (thread, NULL, options, false);
         int rc = connecter.set_address (address.c_str());
@@ -510,6 +511,7 @@ int xs::socket_base_t::connect (const char *addr_)
             return -1;
         }
     }
+#endif
 
 #ifdef XS_HAVE_OPENPGM
     if (protocol == "pgm" || protocol == "epgm") {
