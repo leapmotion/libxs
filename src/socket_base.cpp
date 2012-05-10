@@ -786,24 +786,29 @@ int xs::socket_base_t::process_commands (int timeout_, bool throttle_)
 
         //  If we are asked not to wait, check whether we haven't processed
         //  commands recently, so that we can throttle the new commands.
+        //  This doesn't apply when the throttling is turned off.
+        if (throttle_) {
 
-        //  Get the CPU's tick counter. If 0, the counter is not available.
-        uint64_t tsc = xs::clock_t::rdtsc ();
+            //  Get the CPU's tick counter. If 0, the counter is not available.
+            uint64_t tsc = xs::clock_t::rdtsc ();
 
-        //  Optimised version of command processing - it doesn't have to check
-        //  for incoming commands each time. It does so only if certain time
-        //  elapsed since last command processing. Command delay varies
-        //  depending on CPU speed: It's ~1ms on 3GHz CPU, ~2ms on 1.5GHz CPU
-        //  etc. The optimisation makes sense only on platforms where getting
-        //  a timestamp is a very cheap operation (tens of nanoseconds).
-        if (tsc && throttle_) {
+            //  Optimised version of command processing - it doesn't have to
+            //  check for incoming commands each time. It does so only if
+            //  certain time elapsed since last command processing. Command
+            //  delay varies depending on CPU speed: With max_command_delay set
+            //  to 3000000 it's ~1ms on 3GHz CPU, ~2ms on 1.5GHz CPU etc.
+            //  The optimisation makes sense only on platforms where getting 
+            //  timestamp is a very cheap operation (tens of nanoseconds).
+            if (tsc) {
 
-            //  Check whether TSC haven't jumped backwards (in case of migration
-            //  between CPU cores) and whether certain time have elapsed since
-            //  last command processing. If it didn't do nothing.
-            if (tsc >= last_tsc && tsc - last_tsc <= max_command_delay)
-                return 0;
-            last_tsc = tsc;
+                //  Check whether TSC haven't jumped backwards (in case of
+                //  migration between CPU cores) and whether certain time have
+                //  elapsed since last command processing. If it didn't do
+                //  nothing.
+                if (tsc >= last_tsc && tsc - last_tsc <= max_command_delay)
+                    return 0;
+                last_tsc = tsc;
+            }
         }
 
         //  Check whether there are any commands pending for this thread.
