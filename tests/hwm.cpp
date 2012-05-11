@@ -77,5 +77,40 @@ int XS_TEST_MAIN ()
     rc = xs_term (ctx);
     assert (rc == 0);
 
+    //  Following part of the tests checks whether small HWMs don't interact
+    //  with command throttling in strange ways.
+
+    ctx = xs_init ();
+    assert (ctx);
+    void *s1 = xs_socket (ctx, XS_PULL);
+    assert (s1);
+    void *s2 = xs_socket (ctx, XS_PUSH);
+    assert (s2);
+
+    hwm = 5;
+    rc = xs_setsockopt (s2, XS_SNDHWM, &hwm, sizeof (hwm));
+    assert (rc == 0);
+
+    rc = xs_bind (s1, "tcp://127.0.0.1:5858");
+    assert (rc >= 0);
+    rc = xs_connect (s2, "tcp://127.0.0.1:5858");
+    assert (rc >= 0);
+
+    for (int i = 0; i < 10; i++)
+    {
+        rc = xs_send (s2, "test", 4, XS_DONTWAIT);
+        assert (rc == 4);
+        char buf [4];
+        rc = xs_recv (s1, buf, sizeof (buf), 0);
+        assert (rc == 4);
+    }
+
+    rc = xs_close (s2);
+    assert (rc == 0);
+    rc = xs_close (s1);
+    assert (rc == 0);
+    rc = xs_term (ctx);
+    assert (rc == 0);
+
 	return 0;
 }

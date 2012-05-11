@@ -614,11 +614,18 @@ int xs::socket_base_t::send (msg_t *msg_, int flags_)
     if (unlikely (errno != EAGAIN))
         return -1;
 
-    //  In case of non-blocking send we'll simply propagate
-    //  the error - including EAGAIN - up the stack.
     int timeout = sndtimeo ();
-    if (flags_ & XS_DONTWAIT || timeout == 0)
-        return -1;
+    if (flags_ & XS_DONTWAIT || timeout == 0) {
+
+        //  It looks like pipe is full. However, previous process_commands may
+        //  have done nothing because of the throttling. Thus, let's give it
+        //  last try and force commands to be processed. Then try to re-send
+        //  the message.
+        rc = process_commands (0, false);
+        if (unlikely (rc != 0))
+            return -1;
+        return xsend (msg_, flags_);
+    }
 
     //  Compute the time when the timeout should occur.
     //  If the timeout is infite, don't care. 
