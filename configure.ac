@@ -22,7 +22,7 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 # http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
 #
 # libxs -version-info current:revision:age
-LIBXS_ABI_VERSION="1:1:0"
+LIBXS_ABI_VERSION="2:0:0"
 AC_SUBST(LIBXS_ABI_VERSION)
 
 # ABI version for XS libzmq compatibility library
