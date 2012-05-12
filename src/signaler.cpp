@@ -138,7 +138,7 @@ static int make_fdpair (xs::fd_t *r_, xs::fd_t *w_)
     wsa_assert (rc != SOCKET_ERROR);
 
     //  Create the writer socket.
-    *w_ = WSASocket (AF_INET, SOCK_STREAM, 0, NULL, 0,  0);
+    *w_ = xs::open_socket (AF_INET, SOCK_STREAM, 0);
     if (*w_ == xs::retired_fd) {
         rc = closesocket (listener);
         wsa_assert (rc != SOCKET_ERROR);
