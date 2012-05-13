@@ -24,4 +24,11 @@ PROPERTIES_DIST = properties/Common.props \
 PRECOMPILED_DIST = ../../src/precompiled.hpp \
                    ../../src/precompiled.cpp
 
-EXTRA_DIST = $(LIBXS_DIST) $(PERF_DIST) $(PROPERTIES_DIST) $(PRECOMPILED_DIST)
+TESTS_DIST = tests/tests.vcxproj \
+             tests/tests.vcxproj.filters
+
+LIBZMQ_DIST = libzmq/libzmq.vcxproj \
+              libzmq/libzmq.vcxproj.filters
+
+EXTRA_DIST = $(LIBXS_DIST) $(PERF_DIST) $(PROPERTIES_DIST) $(PRECOMPILED_DIST) \
+             $(TESTS_DIST) $(LIBZMQ_DIST)

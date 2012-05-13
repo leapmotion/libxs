@@ -54,3 +54,6 @@ shutdown_SOURCES = shutdown.cpp
 backlog_SOURCES = backlog.cpp
 
 TESTS = $(noinst_PROGRAMS)
+
+EXTRA_DIST = tests.cpp
+

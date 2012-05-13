@@ -9,18 +9,18 @@ endif
 DIST_SUBDIRS = foreign/openpgm src doc perf tests builds/msvc
 
 EXTRA_DIST = \
-	autogen.sh		\
-	m4/ax_pthread.m4	\
-	version.sh		\
+	autogen.sh \
+	m4/ax_pthread.m4 \
+	version.sh \
 	foreign/openpgm/@pgm_basename@.tar.gz
 MAINTAINERCLEANFILES = \
-	$(srcdir)/aclocal.m4		\
-	$(srcdir)/m4/ltversion.m4	\
-	$(srcdir)/m4/ltoptions.m4	\
-	$(srcdir)/m4/lt~obsolete.m4	\
-	$(srcdir)/m4/libtool.m4		\
-	$(srcdir)/m4/ltsugar.m4		\
-	$(srcdir)/configure		\
+	$(srcdir)/aclocal.m4 \
+	$(srcdir)/m4/ltversion.m4 \
+	$(srcdir)/m4/ltoptions.m4 \
+	$(srcdir)/m4/lt~obsolete.m4 \
+	$(srcdir)/m4/libtool.m4 \
+	$(srcdir)/m4/ltsugar.m4 \
+	$(srcdir)/configure \
 	`find "$(srcdir)" -type f -name Makefile.in -print`
 
 dist-hook:
