@@ -10,6 +10,10 @@ Release 1.1.0 (12 May 2012)
 
 This release adds several new features as well as fixing large amount of bugs.
 
+Backward incompatible changes::
+* xs_bind() and xs_connect() return non-negative number (endpoint ID) in
+  the case of success, as opposed to zero returned in previous versions
+
 New features::
 * Survey messaging pattern added which allows to send request (survey) to
   multiple peers and get response from them; new socket types: SURVEYOR,
