@@ -38,14 +38,20 @@ xs::pair_t::~pair_t ()
 
 void xs::pair_t::xattach_pipe (pipe_t *pipe_, bool icanhasall_)
 {
-    xs_assert (!pipe);
-    pipe = pipe_;
+    xs_assert (pipe_ != NULL);
+
+    //  XS_PAIR socket can only be connected to a single peer.
+    //  The socket rejects any further connection requests.
+    if (pipe == NULL)
+        pipe = pipe_;
+    else
+        pipe_->terminate (false);
 }
 
 void xs::pair_t::xterminated (pipe_t *pipe_)
 {
-    xs_assert (pipe_ == pipe);
-    pipe = NULL;
+    if (pipe_ == pipe)
+        pipe = NULL;
 }
 
 void xs::pair_t::xread_activated (pipe_t *pipe_)
