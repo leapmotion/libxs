@@ -40,6 +40,17 @@ int XS_TEST_MAIN ()
     
     bounce (sb, sc);
 
+    //  Now let's try to open one more connection to the bound socket.
+    //  The connection should be silently rejected rather than causing error.
+    void *sc2 = xs_socket (ctx, XS_PAIR);
+    assert (sc2);
+    rc = xs_connect (sc2, "tcp://127.0.0.1:5560");
+    assert (rc != -1);
+    sleep (1);
+
+    rc = xs_close (sc2);
+    assert (rc == 0);
+
     rc = xs_close (sc);
     assert (rc == 0);
 
