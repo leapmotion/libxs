@@ -132,8 +132,8 @@ next:
 #elif XS_HAVE_PLUGINS
 
     //  Load all the installed plug-ins.
-    std::string path (XS_PREFIX_PATH);
-    path += "/lib/xs/plugins";
+    std::string path (XS_LIBDIR_PATH);
+    path += "/xs/plugins";
 
     DIR *dp = opendir (path.c_str ());
     if (!dp && (errno == ENOENT || errno == EACCES || errno == ENOTDIR))
