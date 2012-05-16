@@ -51,6 +51,7 @@ tests/libzmq21
 tests/resubscribe
 tests/survey
 tests/shutdown
+tests/backlog
 src/platform.hpp*
 src/stamp-h1
 perf/*.exe
