@@ -136,7 +136,7 @@ next:
     path += "/lib/xs/plugins";
 
     DIR *dp = opendir (path.c_str ());
-    if (!dp && errno == ENOENT)
+    if (!dp && (errno == ENOENT || errno == EACCES || errno == ENOTDIR))
         return;
     errno_assert (dp);
 
