@@ -136,9 +136,10 @@ Manipulating socket options::
     linkxs:xs_getsockopt[3]
     linkxs:xs_setsockopt[3]
 
-Establishing a message flow::
+Creating and modifiying topologies::
     linkxs:xs_bind[3]
     linkxs:xs_connect[3]
+    linkxs:xs_shutdown[3]
 
 Sending and receiving messages::
     linkxs:xs_send[3]
