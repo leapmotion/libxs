@@ -126,7 +126,7 @@ int XS_TEST_MAIN ()
     assert (rc == 3);
     void *watch = xs_stopwatch_start ();
     rc = xs_recv (surveyor, buf, sizeof (buf), 0);
-    assert (rc == - 1 && errno == EAGAIN);
+    assert (rc == - 1 && errno == ETIMEDOUT);
     unsigned long elapsed = xs_stopwatch_stop (watch) / 1000;
     time_assert (elapsed, (unsigned long) timeout);
 

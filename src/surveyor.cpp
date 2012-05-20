@@ -92,8 +92,16 @@ int xs::surveyor_t::xrecv (msg_t *msg_, int flags_)
 
     //  Get the first part of the response -- the survey ID.
     rc = xsurveyor_t::xrecv (msg_, flags_);
-    if (rc != 0)
-        return rc;
+    if (rc != 0) {
+        if (errno != EAGAIN)
+            return -1;
+
+        //  In case of AGAIN we should check whether the survey timeout expired.
+        //  If so, we should return ETIMEDOUT so that user is able to
+        //  distinguish survey timeout from RCVTIMEO-caused timeout.
+        errno = now_ms () >= timeout ? ETIMEDOUT : EAGAIN;
+        return -1;
+    }
 
     //  Check whether this is response for the onging survey. If not, we can
     //  drop the response.

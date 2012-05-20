@@ -157,7 +157,7 @@ const char *xs::wsa_error_no (int no_)
         (no_ == WSAETOOMANYREFS) ?
             "Too many references can't splice" : 
         (no_ == WSAETIMEDOUT) ?
-            "Connection timed out" : 
+            "Operation timed out" : 
         (no_ == WSAECONNREFUSED) ?
             "Connection refused" : 
         (no_ == WSAELOOP) ?
