@@ -33,6 +33,7 @@ tests/pair_tcp
 tests/reqrep_inproc
 tests/reqrep_ipc
 tests/reqrep_tcp
+tests/pubsub_udp
 tests/shutdown_stress
 tests/hwm
 tests/timeo

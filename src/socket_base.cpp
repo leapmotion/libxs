@@ -208,7 +208,7 @@ int xs::socket_base_t::check_protocol (const std::string &protocol_)
 {
     //  First check out whether the protcol is something we are aware of.
     if (protocol_ != "inproc" && protocol_ != "ipc" && protocol_ != "tcp" &&
-          protocol_ != "pgm" && protocol_ != "epgm") {
+          protocol_ != "pgm" && protocol_ != "epgm" && protocol_ != "udp") {
         errno = EPROTONOSUPPORT;
         return -1;
     }
@@ -234,7 +234,7 @@ int xs::socket_base_t::check_protocol (const std::string &protocol_)
     //  Check whether socket type and transport protocol match.
     //  Specifically, multicast protocols can't be combined with
     //  bi-directional messaging patterns (socket types).
-    if ((protocol_ == "pgm" || protocol_ == "epgm") &&
+    if ((protocol_ == "pgm" || protocol_ == "epgm" || protocol_ == "udp") &&
           options.type != XS_PUB && options.type != XS_SUB &&
           options.type != XS_XPUB && options.type != XS_XSUB) {
         errno = ENOCOMPATPROTO;
@@ -359,7 +359,7 @@ int xs::socket_base_t::bind (const char *addr_)
         return 0;
     }
 
-    if (protocol == "pgm" || protocol == "epgm") {
+    if (protocol == "pgm" || protocol == "epgm" || protocol == "udp") {
 
         //  For convenience's sake, bind can be used interchageable with
         //  connect for PGM and EPGM transports.

@@ -7,6 +7,7 @@ noinst_PROGRAMS = pair_inproc \
                   pair_tcp \
                   reqrep_inproc \
                   reqrep_tcp \
+                  pubsub_udp \
                   hwm \
                   reqrep_device \
                   sub_forward \
@@ -32,6 +33,7 @@ pair_inproc_SOURCES = pair_inproc.cpp testutil.hpp
 pair_tcp_SOURCES = pair_tcp.cpp testutil.hpp
 reqrep_inproc_SOURCES = reqrep_inproc.cpp testutil.hpp
 reqrep_tcp_SOURCES = reqrep_tcp.cpp testutil.hpp
+pubsub_udp_SOURCES = pubsub_udp.cpp testutil.hpp
 hwm_SOURCES = hwm.cpp
 reqrep_device_SOURCES = reqrep_device.cpp
 sub_forward_SOURCES = sub_forward.cpp
