@@ -246,6 +246,33 @@ void xs::wsa_error_to_errno ()
     case WSAEACCES:
         errno = EACCES;
         return;
+    case WSAENETRESET:
+        errno = ENETRESET;
+        return;
+    case WSAENETUNREACH:
+        errno = ENETUNREACH;
+        return;
+    case WSAEHOSTUNREACH:
+        errno = EHOSTUNREACH;
+        return;
+    case WSAENOTCONN:
+        errno = ENOTCONN;
+        return;
+    case WSAEMSGSIZE:
+        errno = EMSGSIZE;
+        return;
+    case WSAETIMEDOUT:
+        errno = ETIMEDOUT;
+        return;
+    case WSAECONNREFUSED:
+        errno = ECONNREFUSED;
+        return;
+    case WSAECONNABORTED:
+        errno = ECONNABORTED;
+        return;
+    case WSAECONNRESET:
+        errno = ECONNRESET;
+        return;
     default:
         wsa_assert (false);
     }
