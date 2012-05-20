@@ -60,6 +60,25 @@ int xs::pgm_sender_t::init (bool udp_encapsulation_, const char *network_)
     out_buffer_size = pgm_socket.get_max_tsdu_size ();
     out_buffer = (unsigned char*) malloc (out_buffer_size);
     alloc_assert (out_buffer);
+    encode_buffer = out_buffer;
+    encode_buffer_size = out_buffer_size;
+    header_size = 0;
+
+    //  If not using a legacy protocol, fill in our datagram header and reserve
+    //  space for it in the datagram.
+    if (!options.legacy_protocol) {
+        sp_get_header (out_buffer, options.sp_service, options.sp_pattern,
+            options.sp_version, options.sp_role);
+        encode_buffer += SP_HEADER_LENGTH;
+        encode_buffer_size -= SP_HEADER_LENGTH;
+        header_size += SP_HEADER_LENGTH;
+    }
+
+    //  Reserve space in the datagram for the offset of the first message.
+    offset_p = encode_buffer;
+    encode_buffer += sizeof (uint16_t);
+    encode_buffer_size -= sizeof (uint16_t);
+    header_size += sizeof (uint16_t);
 
     return rc;
 }
@@ -156,27 +175,25 @@ void xs::pgm_sender_t::in_event (fd_t fd_)
 
 void xs::pgm_sender_t::out_event (fd_t fd_)
 {
-    //  POLLOUT event from send socket. If write buffer is empty, 
-    //  try to read new data from the encoder.
+    //  POLLOUT event from send socket. If write buffer is empty (which means
+    //  that the last write succeeded), try to read new data from the encoder.
     if (write_size == 0) {
 
-        //  First two bytes (sizeof uint16_t) are used to store message 
-        //  offset in following steps. Note that by passing our buffer to
-        //  the get data function we prevent it from returning its own buffer.
-        unsigned char *bf = out_buffer + sizeof (uint16_t);
-        size_t bfsz = out_buffer_size - sizeof (uint16_t);
+        //  Pass our own buffer to the get_data () function to prevent it from
+        //  returning its own buffer.
         int offset = -1;
-        encoder.get_data (&bf, &bfsz, &offset);
+        size_t data_size = encode_buffer_size;
+        encoder.get_data (&encode_buffer, &data_size, &offset);
 
         //  If there are no data to write stop polling for output.
-        if (!bfsz) {
+        if (!data_size) {
             reset_pollout (handle);
             return;
         }
 
         //  Put offset information in the buffer.
-        write_size = bfsz + sizeof (uint16_t);
-        put_uint16 (out_buffer, offset == -1 ? 0xffff : (uint16_t) offset);
+        write_size = header_size + data_size;
+        put_uint16 (offset_p, offset == -1 ? 0xffff : (uint16_t) offset);
     }
 
     if (tx_timer) {

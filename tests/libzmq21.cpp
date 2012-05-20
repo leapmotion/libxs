@@ -53,8 +53,9 @@ int XS_TEST_MAIN ()
     errno_assert (ctx);
     void *pub = xs_socket (ctx, XS_PUB);
     errno_assert (pub);
-    int protocol = 1;
-    int rc = xs_setsockopt (pub, XS_PROTOCOL, &protocol, sizeof (protocol));
+    int pattern_version = 1;
+    int rc = xs_setsockopt (pub, XS_PATTERN_VERSION, &pattern_version,
+        sizeof (pattern_version));
     errno_assert (rc == 0);
     rc = xs_bind (pub, "tcp://127.0.0.1:5560");
     errno_assert (rc != -1);
@@ -99,8 +100,9 @@ int XS_TEST_MAIN ()
     errno_assert (ctx);
     void *sub = xs_socket (ctx, XS_SUB);
     errno_assert (sub);
-    protocol = 1;
-    rc = xs_setsockopt (sub, XS_PROTOCOL, &protocol, sizeof (protocol));
+    pattern_version = 1;
+    rc = xs_setsockopt (sub, XS_PATTERN_VERSION, &pattern_version,
+        sizeof (pattern_version));
     errno_assert (rc == 0);
     rc = xs_setsockopt (sub, XS_SUBSCRIBE, "", 0);
     errno_assert (rc == 0);

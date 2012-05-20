@@ -298,7 +298,7 @@ void xs::session_base_t::process_attach (i_engine *engine_)
         pipe_t *pipes [2] = {NULL, NULL};
         int hwms [2] = {options.rcvhwm, options.sndhwm};
         bool delays [2] = {options.delay_on_close, options.delay_on_disconnect};
-        int rc = pipepair (parents, pipes, hwms, delays, options.protocol);
+        int rc = pipepair (parents, pipes, hwms, delays, options.sp_version);
         errno_assert (rc == 0);
 
         //  Plug the local end of the pipe.
