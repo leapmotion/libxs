@@ -95,8 +95,8 @@ static int make_fdpair (xs::fd_t *r_, xs::fd_t *w_)
     //  This function has to be in a system-wide critical section so that
     //  two instances of the library don't accidentally create signaler
     //  crossing the process boundary.
-    //  We'll use named event object to implement the critical section.
-    HANDLE sync = CreateEvent (&sa, FALSE, TRUE, "xs-signaler-port-sync");
+    HANDLE sync = CreateEvent (&sa, FALSE, TRUE,
+        "Global\\xs-signaler-port-sync");
     win_assert (sync != NULL);
 
     //  Enter the critical section.
