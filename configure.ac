@@ -162,7 +162,7 @@ AS_CASE(["${host_os}"],
             AC_MSG_ERROR([Building static libraries is not supported under Cygwin])
         ])
     ],
-    [AC_MSG_ERROR([unsupported system: ${host_os}.])]
+    [AC_MSG_WARN([unsupported system: ${host_os}.])]
 )
 
 #
