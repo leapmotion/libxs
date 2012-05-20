@@ -187,9 +187,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\include\xs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\address.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -407,6 +404,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\xsurveyor.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\xs\xs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
