@@ -48,7 +48,12 @@ xs::options_t::options_t () :
     sndtimeo (-1),
     ipv4only (1),
     keepalive (0),
-    protocol (0),
+    legacy_protocol (false),
+    sp_service (0),
+    sp_pattern (-1),
+    sp_version (-1),
+    sp_role (-1),
+    sp_complement (-1),
     filter (XS_FILTER_PREFIX),
     survey_timeout (-1),
     delay_on_close (true),
@@ -236,21 +241,6 @@ int xs::options_t::setsockopt (int option_, const void *optval_,
             return 0;
         }
 
-    case XS_PROTOCOL:
-        {
-            if (optvallen_ != sizeof (int)) {
-                errno = EINVAL;
-                return -1;
-            }
-            int val = *((int*) optval_);
-            if (val < 0) {
-                errno = EINVAL;
-                return -1;
-            }
-            protocol = val;
-            return 0;
-        }
-
     case XS_FILTER:
         if (optvallen_ != sizeof (int)) {
             errno = EINVAL;
@@ -258,6 +248,21 @@ int xs::options_t::setsockopt (int option_, const void *optval_,
         }
         filter = *((int*) optval_);
         return 0;
+
+    case XS_SERVICE_ID:
+        {
+            if (optvallen_ != sizeof (int)) {
+                errno = EINVAL;
+                return -1;
+            }
+            int val = *((int*) optval_);
+            if (val < 0 || val > 0xffff) {
+                errno = EINVAL;
+                return -1;
+            }
+            sp_service = val;
+            return 0;
+        }
 
     case XS_SURVEY_TIMEOUT:
         if (type != XS_SURVEYOR) {
@@ -452,12 +457,21 @@ int xs::options_t::getsockopt (int option_, void *optval_, size_t *optvallen_)
         *optvallen_ = sizeof (int);
         return 0;
 
-    case XS_PROTOCOL:
+    case XS_PATTERN_VERSION:
         if (*optvallen_ < sizeof (int)) {
             errno = EINVAL;
             return -1;
         }
-        *((int*) optval_) = protocol;
+        *((int*) optval_) = sp_version;
+        *optvallen_ = sizeof (int);
+        return 0;
+
+    case XS_SERVICE_ID:
+        if (*optvallen_ < sizeof (int)) {
+            errno = EINVAL;
+            return -1;
+        }
+        *((int*) optval_) = sp_service;
         *optvallen_ = sizeof (int);
         return 0;
 

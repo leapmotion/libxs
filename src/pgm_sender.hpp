@@ -84,11 +84,20 @@ namespace xs
         handle_t rdata_notify_handle;
         handle_t pending_notify_handle;
 
-        //  Output buffer from pgm_socket.
+        //  Output buffer and size for pgm_socket.
         unsigned char *out_buffer;
-        
-        //  Output buffer size.
         size_t out_buffer_size;
+
+        //  Size of header in each datagram.
+        size_t header_size;
+
+        //  Encoder buffer and size, adjusted from output buffer by size of
+        //  datagram header(s).
+        unsigned char *encode_buffer;
+        size_t encode_buffer_size;
+
+        //  Position of offset to first message in output buffer.
+        unsigned char *offset_p;
 
         //  Number of bytes in the buffer to be written to the socket.
         //  If zero, there are no data to be sent.

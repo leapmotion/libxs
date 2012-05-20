@@ -35,6 +35,10 @@ xs::xrespondent_t::xrespondent_t (class ctx_t *parent_, uint32_t tid_,
     next_peer_id (generate_random ())
 {
     options.type = XS_XRESPONDENT;
+    options.sp_pattern = SP_SURVEY;
+    options.sp_version = 2;
+    options.sp_role = SP_SURVEY_RESPONDENT;
+    options.sp_complement = SP_SURVEY_SURVEYOR;
 
     //  If the connection disappears it makes no sense to read any more surveys
     //  from it. The responses will be unroutable anyway.
@@ -47,6 +51,34 @@ xs::xrespondent_t::~xrespondent_t ()
 {
     xs_assert (outpipes.empty ());
     prefetched_msg.close ();
+}
+
+int xs::xrespondent_t::xsetsockopt (int option_, const void *optval_,
+    size_t optvallen_)
+{
+    if (option_ != XS_PATTERN_VERSION) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    if (optvallen_ != sizeof (int)) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    if (!optval_) {
+        errno = EFAULT;
+        return -1;
+    }
+
+    int version = *(int *) optval_;
+    if (version != 1) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    options.sp_version = version;
+    return 0;
 }
 
 void xs::xrespondent_t::xattach_pipe (pipe_t *pipe_, bool icanhasall_)

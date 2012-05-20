@@ -23,15 +23,48 @@
 #include "pipe.hpp"
 #include "err.hpp"
 #include "msg.hpp"
+#include "wire.hpp"
 
 xs::push_t::push_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
     socket_base_t (parent_, tid_, sid_)
 {
     options.type = XS_PUSH;
+    options.sp_pattern = SP_PIPELINE;
+    options.sp_version = 3;
+    options.sp_role = SP_PIPELINE_PUSH;
+    options.sp_complement = SP_PIPELINE_PULL;
 }
 
 xs::push_t::~push_t ()
 {
+}
+
+int xs::push_t::xsetsockopt (int option_, const void *optval_,
+    size_t optvallen_)
+{
+    if (option_ != XS_PATTERN_VERSION) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    if (optvallen_ != sizeof (int)) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    if (!optval_) {
+        errno = EFAULT;
+        return -1;
+    }
+
+    int version = *(int *) optval_;
+    if (version != 2) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    options.sp_version = version;
+    return 0;
 }
 
 void xs::push_t::xattach_pipe (pipe_t *pipe_, bool icanhasall_)
