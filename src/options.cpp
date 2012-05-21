@@ -23,7 +23,7 @@
 #include <string.h>
 #include <limits>
 
-#include "../include/xs.h"
+#include "../include/xs/xs.h"
 
 #include "options.hpp"
 #include "err.hpp"

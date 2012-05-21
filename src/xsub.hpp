@@ -23,7 +23,7 @@
 
 #include <map>
 
-#include "../include/xs.h"
+#include "../include/xs/xs.h"
 
 #include "socket_base.hpp"
 #include "session_base.hpp"

@@ -28,7 +28,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-#include "../include/xs.h"
+#include "../include/xs/xs.h"
 #include "../src/platform.hpp"
 
 #if !defined XS_HAVE_WINDOWS

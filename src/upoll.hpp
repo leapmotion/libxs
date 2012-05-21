@@ -21,7 +21,7 @@
 #ifndef __XS_UPOLL_HPP_INCLUDED__
 #define __XS_UPOLL_HPP_INCLUDED__
 
-#include "../include/xs.h"
+#include "../include/xs/xs.h"
 
 namespace xs
 {

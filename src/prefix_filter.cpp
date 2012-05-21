@@ -24,7 +24,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-#include "../include/xs.h"
+#include "../include/xs/xs.h"
 
 #include "prefix_filter.hpp"
 #include "err.hpp"

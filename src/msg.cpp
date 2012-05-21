@@ -20,7 +20,7 @@
 */
 
 #include "msg.hpp"
-#include "../include/xs.h"
+#include "../include/xs/xs.h"
 
 #include <string.h>
 #include <errno.h>

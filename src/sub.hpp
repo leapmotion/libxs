@@ -24,7 +24,7 @@
 
 #include <vector>
 
-#include "../include/xs.h"
+#include "../include/xs/xs.h"
 
 #include "xsub.hpp"
 #include "core.hpp"

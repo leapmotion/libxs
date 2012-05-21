@@ -26,7 +26,7 @@
 #include <vector>
 #include <string>
 
-#include "../include/xs.h"
+#include "../include/xs/xs.h"
 
 #include "mailbox.hpp"
 #include "array.hpp"

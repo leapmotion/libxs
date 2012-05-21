@@ -40,7 +40,7 @@
 #include <vector>
 
 // Crossroads definitions and exported functions
-#include "../include/xs.h"
+#include "../include/xs/xs.h"
 
 #endif // _MSC_VER
 

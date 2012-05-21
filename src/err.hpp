@@ -23,7 +23,7 @@
 #define __XS_ERR_HPP_INCLUDED__
 
 //  Crossroads-specific error codes are defined in xs.h
-#include "../include/xs.h"
+#include "../include/xs/xs.h"
 
 #include <assert.h>
 #include <errno.h>

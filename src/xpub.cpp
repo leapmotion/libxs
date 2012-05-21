@@ -21,7 +21,7 @@
 
 #include <string.h>
 
-#include "../include/xs.h"
+#include "../include/xs/xs.h"
 
 #include "xpub.hpp"
 #include "pipe.hpp"

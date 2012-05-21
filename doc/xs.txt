@@ -9,7 +9,7 @@ xs - Crossroads I/O, a lightweight messaging layer
 
 SYNOPSIS
 --------
-*#include <xs.h>*
+*#include <xs/xs.h>*
 
 *cc* ['flags'] 'files' *-lxs* ['libraries']
 

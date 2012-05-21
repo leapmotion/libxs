@@ -5,15 +5,15 @@ lib_LTLIBRARIES = libxs.la libzmq.la
 
 pkgconfig_DATA = libxs.pc libzmq.pc
 
-include_HEADERS = ../include/xs.h \
-    ../include/zmq.h ../include/zmq_utils.h
+include_HEADERS = ../include/zmq.h ../include/zmq_utils.h
 else
 lib_LTLIBRARIES = libxs.la
 
 pkgconfig_DATA = libxs.pc
-
-include_HEADERS = ../include/xs.h
 endif
+
+xsincludedir = $(includedir)/xs
+xsinclude_HEADERS = ../include/xs/xs.h
 
 libxs_la_SOURCES = \
     address.hpp \
