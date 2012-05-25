@@ -23,6 +23,8 @@
 #define BACKLOG 10
 #define PARALLEL_CONNECTS 50
 
+#if 0
+
 extern "C"
 {
 
@@ -42,8 +44,6 @@ extern "C"
         assert (rc == 0);
     }
 #endif
-
-#if 0
     static void tcp_worker (void *ctx_)
     {
         int rc;
@@ -59,14 +59,14 @@ extern "C"
         rc = xs_close (push);
         assert (rc == 0);
     }
-#endif
-
 }
+#endif
 
 int XS_TEST_MAIN ()
 {
     fprintf (stderr, "backlog test running...\n");
 
+#if 0
     int rc;
     void *ctx;
     void *pull;
@@ -105,7 +105,6 @@ int XS_TEST_MAIN ()
         thread_join (threads [i]);
 #endif
 
-#if 0
     //  Test the exhaustion on TCP backlog.
 
     ctx = xs_init ();
