@@ -43,6 +43,7 @@ extern "C"
     }
 #endif
 
+#if 0
     static void tcp_worker (void *ctx_)
     {
         int rc;
@@ -52,11 +53,14 @@ extern "C"
         assert (push);
         rc = xs_connect (push, "tcp://127.0.0.1:5560");
         assert (rc >= 0);
+
         rc = xs_send (push, NULL, 0, 0);
         assert (rc == 0);
         rc = xs_close (push);
         assert (rc == 0);
     }
+#endif
+
 }
 
 int XS_TEST_MAIN ()
@@ -101,6 +105,7 @@ int XS_TEST_MAIN ()
         thread_join (threads [i]);
 #endif
 
+#if 0
     //  Test the exhaustion on TCP backlog.
 
     ctx = xs_init ();
@@ -129,6 +134,7 @@ int XS_TEST_MAIN ()
 
     for (i = 0; i < PARALLEL_CONNECTS; i++)
         thread_join (threads [i]);
+#endif
 
     return 0;
 }
