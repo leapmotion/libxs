@@ -77,6 +77,7 @@ libxs_la_SOURCES = \
     tcp_connecter.hpp \
     tcp_listener.hpp \
     thread.hpp \
+    topic_filter.hpp \
     upoll.hpp \
     windows.hpp \
     wire.hpp \
@@ -136,6 +137,7 @@ libxs_la_SOURCES = \
     tcp_connecter.cpp \
     tcp_listener.cpp \
     thread.cpp \
+    topic_filter.cpp \
     upoll.cpp \
     xpub.cpp \
     xrep.cpp \

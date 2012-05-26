@@ -594,7 +594,7 @@ static xs_filter_t pfx_filter = {
     sf_destroy,
     sf_subscribe,
     sf_unsubscribe,
-    sf_match,
+    sf_match
 };
 
 void *xs::prefix_filter = (void*) &pfx_filter;

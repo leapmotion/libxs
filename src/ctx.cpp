@@ -56,6 +56,7 @@
 #include "err.hpp"
 #include "msg.hpp"
 #include "prefix_filter.hpp"
+#include "topic_filter.hpp"
 
 xs::ctx_t::ctx_t () :
     tag (0xbadcafe0),
@@ -73,7 +74,8 @@ xs::ctx_t::ctx_t () :
     //  Plug in the standard plugins.
     rc = plug (prefix_filter);
     errno_assert (rc == 0);
-
+    rc = plug (topic_filter);
+    errno_assert (rc == 0);
 
     //  Now plug in all the extensions found in plugin directory.
 

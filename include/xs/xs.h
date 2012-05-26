@@ -278,6 +278,7 @@ XS_EXPORT unsigned long xs_stopwatch_stop (void *watch);
 
 #define XS_FILTER_ALL 0
 #define XS_FILTER_PREFIX 1
+#define XS_FILTER_TOPIC 2
 
 typedef struct
 {
