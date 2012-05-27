@@ -23,12 +23,12 @@
 
 #include "xsurveyor.hpp"
 #include "stdint.hpp"
+#include "msg.hpp"
 
 namespace xs
 {
 
     class ctx_t;
-    class msg_t;
     class io_thread_t;
     class socket_base_t;
 
@@ -56,6 +56,10 @@ namespace xs
 
         //  The time instant when the current survey expires.
         uint64_t timeout;
+
+        //  Inbound message prefetched during polling.
+        bool has_prefetched;
+        msg_t prefetched;
 
         surveyor_t (const surveyor_t&);
         const surveyor_t &operator = (const surveyor_t&);
