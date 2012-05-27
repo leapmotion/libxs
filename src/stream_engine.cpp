@@ -347,7 +347,7 @@ int xs::stream_engine_t::write (const void *data_, size_t size_)
         return 0;
 		
     //  Signalise peer failure.
-    if (nbytes == -1 && (
+    if (nbytes == SOCKET_ERROR && (
           WSAGetLastError () == WSAENETDOWN ||
           WSAGetLastError () == WSAENETRESET ||
           WSAGetLastError () == WSAEHOSTUNREACH ||
@@ -397,7 +397,7 @@ int xs::stream_engine_t::read (void *data_, size_t size_)
         return 0;
 
     //  Connection failure.
-    if (nbytes == -1 && (
+    if (nbytes == SOCKET_ERROR && (
           WSAGetLastError () == WSAENETDOWN ||
           WSAGetLastError () == WSAENETRESET ||
           WSAGetLastError () == WSAECONNABORTED ||
