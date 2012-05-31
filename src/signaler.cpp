@@ -332,7 +332,7 @@ int xs::signaler_wait (xs::signaler_t *self_, int timeout_)
     pfd.events = POLLIN;
     int rc = poll (&pfd, 1, timeout_);
     if (unlikely (rc < 0)) {
-        xs_assert (errno == EINTR);
+        errno_assert (errno == EINTR);
         return -1;
     }
     else if (unlikely (rc == 0)) {
@@ -358,7 +358,7 @@ int xs::signaler_wait (xs::signaler_t *self_, int timeout_)
     int rc = select (self_->r + 1, &self_->fds, NULL, NULL,
         timeout_ >= 0 ? &timeout : NULL);
     if (unlikely (rc < 0)) {
-        xs_assert (errno == EINTR);
+        errno_assert (errno == EINTR);
         return -1;
     }
 #endif

@@ -268,7 +268,7 @@ int xs::ctx_t::terminate ()
         int rc = mailbox_recv (&term_mailbox, &cmd, -1);
         if (rc == -1 && errno == EINTR)
             return -1;
-        xs_assert (rc == 0);
+        errno_assert (rc == 0);
         xs_assert (cmd.type == command_t::done);
         slot_sync.lock ();
         xs_assert (sockets.empty ());

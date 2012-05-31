@@ -111,7 +111,7 @@ static bool pfx_add (pfx_node_t *node_,
                 (node_->min < c ? c - node_->min : node_->min - c) + 1;
             node_->next.table = (pfx_node_t**)
                 malloc (sizeof (pfx_node_t*) * node_->count);
-            xs_assert (node_->next.table);
+            alloc_assert (node_->next.table);
             for (unsigned short i = 0; i != node_->count; ++i)
                 node_->next.table [i] = 0;
             node_->min = std::min (node_->min, c);
@@ -293,7 +293,7 @@ static void pfx_rm_all (pfx_node_t *node_, void *subscribers_,
         node_->count = new_max - new_min + 1;
         node_->next.table =
             (pfx_node_t**) malloc (sizeof (pfx_node_t*) * node_->count);
-        xs_assert (node_->next.table);
+        alloc_assert (node_->next.table);
 
         memmove (node_->next.table, old_table + (new_min - node_->min),
                  sizeof (pfx_node_t*) * node_->count);
@@ -393,7 +393,7 @@ static bool pfx_rm (pfx_node_t *node_, const unsigned char *prefix_,
                 node_->count = node_->count - (new_min - node_->min);
                 node_->next.table = (pfx_node_t**)
                     malloc (sizeof (pfx_node_t*) * node_->count);
-                xs_assert (node_->next.table);
+                alloc_assert (node_->next.table);
 
                 memmove (node_->next.table, old_table + (new_min - node_->min),
                          sizeof (pfx_node_t*) * node_->count);
@@ -417,7 +417,7 @@ static bool pfx_rm (pfx_node_t *node_, const unsigned char *prefix_,
                 pfx_node_t **old_table = node_->next.table;
                 node_->next.table = (pfx_node_t**)
                     malloc (sizeof (pfx_node_t*) * node_->count);
-                xs_assert (node_->next.table);
+                alloc_assert (node_->next.table);
 
                 memmove (node_->next.table, old_table,
                     sizeof (pfx_node_t*) * node_->count);

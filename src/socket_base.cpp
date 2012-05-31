@@ -461,7 +461,7 @@ int xs::socket_base_t::connect (const char *addr_)
         if (options.send_identity) {
             msg_t id;
             rc = id.init_size (options.identity_size);
-            xs_assert (rc == 0);
+            errno_assert (rc == 0);
             memcpy (id.data (), options.identity, options.identity_size);
             id.set_flags (msg_t::identity);
             bool written = ppair [0]->write (&id);
@@ -473,7 +473,7 @@ int xs::socket_base_t::connect (const char *addr_)
         if (peer.options.send_identity) {
             msg_t id;
             rc = id.init_size (peer.options.identity_size);
-            xs_assert (rc == 0);
+            errno_assert (rc == 0);
             memcpy (id.data (), peer.options.identity,
                 peer.options.identity_size);
             id.set_flags (msg_t::identity);

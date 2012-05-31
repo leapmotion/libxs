@@ -461,7 +461,7 @@ void xs::session_base_t::start_connecting (bool wait_)
             alloc_assert (pgm_sender);
 
             int rc = pgm_sender->init (udp_encapsulation, address.c_str ());
-            xs_assert (rc == 0);
+            errno_assert (rc == 0);
 
             send_attach (this, pgm_sender);
         }
@@ -473,7 +473,7 @@ void xs::session_base_t::start_connecting (bool wait_)
             alloc_assert (pgm_receiver);
 
             int rc = pgm_receiver->init (udp_encapsulation, address.c_str ());
-            xs_assert (rc == 0);
+            errno_assert (rc == 0);
 
             send_attach (this, pgm_receiver);
         }

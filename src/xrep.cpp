@@ -319,7 +319,7 @@ bool xs::xrep_t::xhas_in ()
         id.close ();
         return false;
     }
-    xs_assert (rc == 0);
+    errno_assert (rc == 0);
 
     //  We have first part of the message prefetched now. We will store the
     //  prefetched identity as well.

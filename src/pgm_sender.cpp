@@ -215,7 +215,7 @@ void xs::pgm_sender_t::out_event (fd_t fd_)
             xs_assert (!tx_timer);
             tx_timer = add_timer (timeout);
         } else
-            xs_assert (errno == EBUSY);
+            errno_assert (errno == EBUSY);
     }
 }
 

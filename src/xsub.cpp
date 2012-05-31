@@ -200,7 +200,7 @@ void xs::xsub_t::send_subscription (pipe_t *pipe_, bool subscribe_,
     //  Create the subsctription message.
     msg_t msg;
     int rc = msg.init_size (size_ + 4);
-    xs_assert (rc == 0);
+    errno_assert (rc == 0);
     unsigned char *data = (unsigned char*) msg.data ();
     put_uint16 (data, subscribe_ ? SP_PUBSUB_CMD_SUBSCRIBE :
         SP_PUBSUB_CMD_UNSUBSCRIBE);
