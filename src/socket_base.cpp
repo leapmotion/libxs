@@ -541,7 +541,7 @@ int xs::socket_base_t::connect (const char *addr_)
     // PGM does not support subscription forwarding; ask for all data to be
     // sent to this pipe.
     bool icanhasall = false;
-    if (protocol == "pgm" || protocol == "epgm")
+    if (protocol == "pgm" || protocol == "epgm" || protocol == "udp")
         icanhasall = true;
 
     //  Attach local end of the pipe to the socket object.
