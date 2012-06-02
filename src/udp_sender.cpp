@@ -20,6 +20,7 @@
 #include "platform.hpp"
 
 #include <stdlib.h>
+#include <sys/uio.h>
 
 #include "io_thread.hpp"
 #include "udp_sender.hpp"
