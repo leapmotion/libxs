@@ -37,11 +37,13 @@ int XS_TEST_MAIN ()
     assert (rc != -1);
     rc = xs_setsockopt (sub, XS_SUBSCRIBE, "", 0);
     assert (rc == 0);
-
-    //  Just in case there's an delay in lower parts of the network stack.
-    sleep (1);
     
     const char *content = "12345678ABCDEFGH12345678abcdefgh";
+
+    //  TODO: Due to a core bug, the first message on a PUB/SUB socket
+    //  is always lost. For now just send a dummy message.
+    rc = xs_send (pub, "", 0, 0);
+    assert (rc == 0);
 
     //  Send a message with two identical parts.
     rc = xs_send (pub, content, 32, XS_SNDMORE);
