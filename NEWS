@@ -5,6 +5,37 @@ This file documents the major changes in between releases of Crossroads
 I/O. For a detailed list of changes please refer to Git history, or the
 ChangeLog file included with your distribution of Crossroads.
 
+Release 1.2.0 (13 Jun 2012)
+---------------------------
+
+This release introduces the topic (wildcard) filtering mechanism.
+Aside of that it fixes several problems with 1.1.0.
+
+Backward incompatible changes::
+* xs.h header was moved to xs subdirectory to prevent clash with XenStore
+  header; use #include <xs/xs.h> from now on
+* Expired survey returns ETIMEDOUT instead of EAGAIN
+
+New features::
+* Topic filter implemented
+
+Bugfixes::
+* libzmq and tests MSVC projects added to the distribution
+* Do not crash when multiple peers connect to PAIR socket
+* Opening plug-in directory made more robust
+* Use global event to synchronise signaler creation on Windows
+* Polling on SURVEYOR socket implemented
+* Properly handle infinite timeout in zmq_poll()
+
+Build::
+* Install plugins under $(libdir) to simplify multi-arch packaging
+* Issues a warning on unsupported architectures instead of failing
+* Different minor improvements
+
+Self tests::
+* test for multiple peers on PAIR socket added
+
+
 Release 1.1.0 (12 May 2012)
 ---------------------------
 
