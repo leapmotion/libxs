@@ -53,21 +53,8 @@ xs::stream_engine_t::stream_engine_t (fd_t fd_, const options_t &options_) :
     session (NULL),
     leftover_session (NULL),
     options (options_),
-    plugged (false),
-    header_pos (in_header),
-    header_remaining (sizeof in_header),
-    header_received (false),
-    header_sent (false)
+    plugged (false)
 {
-    //  Fill in outgoing SP protocol header and the complementary (desired)
-    //  header.
-    if (!options.legacy_protocol) {
-        sp_get_header (out_header, options.sp_service, options.sp_pattern,
-            options.sp_version, options.sp_role);
-        sp_get_header (desired_header, options.sp_service, options.sp_pattern,
-            options.sp_version, options.sp_complement);
-    }
-
     //  Get the socket into non-blocking mode.
     unblock_socket (s);
 
@@ -168,35 +155,6 @@ void xs::stream_engine_t::in_event (fd_t fd_)
 {
     bool disconnection = false;
 
-    //  If we have not yet received the full protocol header...
-    if (unlikely (!options.legacy_protocol && !header_received)) {
-
-        //  Read remaining header bytes.
-        int hbytes = read (header_pos, header_remaining);
-
-        //  Check whether the peer has closed the connection.
-        if (hbytes == -1) {
-            error ();
-            return;
-        }
-
-        header_remaining -= hbytes;
-        header_pos += hbytes;
-
-        //  If we did not read the whole header, poll for more.
-        if (header_remaining)
-            return;
-
-        //  If the protocol headers do not match, close the connection.
-        if (memcmp (in_header, desired_header, sizeof in_header) != 0) {
-            error ();
-            return;
-        }
-
-        //  Done with protocol header; proceed to read data.
-        header_received = true;
-    }
-
     //  If there's no data to process in the buffer...
     if (!insize) {
 
@@ -251,20 +209,6 @@ void xs::stream_engine_t::in_event (fd_t fd_)
 void xs::stream_engine_t::out_event (fd_t fd_)
 {
     bool more_data = true;
-
-    //  If protocol header was not yet sent...
-    if (unlikely (!options.legacy_protocol && !header_sent)) {
-        int hbytes = write (out_header, sizeof out_header);
-
-        //  It should always be possible to write the full protocol header to a
-        //  freshly connected TCP socket. Therefore, if we get an error or
-        //  partial write here the peer has disconnected.
-        if (hbytes != sizeof out_header) {
-            error ();
-            return;
-        }
-        header_sent = true;
-    }
 
     //  If write buffer is empty, try to read new data from the encoder.
     if (!outsize) {

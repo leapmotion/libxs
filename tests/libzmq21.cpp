@@ -53,9 +53,8 @@ int XS_TEST_MAIN ()
     assert (ctx);
     void *pub = xs_socket (ctx, XS_PUB);
     assert (pub);
-    int pattern_version = 1;
-    int rc = xs_setsockopt (pub, XS_PATTERN_VERSION, &pattern_version,
-        sizeof (pattern_version));
+    int protocol = 1;
+    int rc = xs_setsockopt (pub, XS_PROTOCOL, &protocol, sizeof (protocol));
     assert (rc == 0);
     rc = xs_bind (pub, "tcp://127.0.0.1:5560");
     assert (rc != -1);
@@ -100,9 +99,8 @@ int XS_TEST_MAIN ()
     assert (ctx);
     void *sub = xs_socket (ctx, XS_SUB);
     assert (sub);
-    pattern_version = 1;
-    rc = xs_setsockopt (sub, XS_PATTERN_VERSION, &pattern_version,
-        sizeof (pattern_version));
+    protocol = 1;
+    rc = xs_setsockopt (sub, XS_PROTOCOL, &protocol, sizeof (protocol));
     assert (rc == 0);
     rc = xs_setsockopt (sub, XS_SUBSCRIBE, "", 0);
     assert (rc == 0);

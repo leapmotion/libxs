@@ -22,17 +22,12 @@
 #include "xreq.hpp"
 #include "err.hpp"
 #include "msg.hpp"
-#include "wire.hpp"
 
 xs::xreq_t::xreq_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
     socket_base_t (parent_, tid_, sid_),
     prefetched (false)
 {
     options.type = XS_XREQ;
-    options.sp_pattern = SP_REQREP;
-    options.sp_version = 2;
-    options.sp_role = SP_REQREP_REQ;
-    options.sp_complement = SP_REQREP_REP;
 
     //  TODO: Uncomment the following line when XREQ will become true XREQ
     //  rather than generic dealer socket.
@@ -49,34 +44,6 @@ xs::xreq_t::xreq_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
 xs::xreq_t::~xreq_t ()
 {
     prefetched_msg.close ();
-}
-
-int xs::xreq_t::xsetsockopt (int option_, const void *optval_,
-    size_t optvallen_)
-{
-    if (option_ != XS_PATTERN_VERSION) {
-        errno = EINVAL;
-        return -1;
-    }
-
-    if (optvallen_ != sizeof (int)) {
-        errno = EINVAL;
-        return -1;
-    }
-
-    if (!optval_) {
-        errno = EFAULT;
-        return -1;
-    }
-
-    int version = *(int *) optval_;
-    if (version != 1) {
-        errno = EINVAL;
-        return -1;
-    }
-
-    options.sp_version = version;
-    return 0;
 }
 
 void xs::xreq_t::xattach_pipe (pipe_t *pipe_, bool icanhasall_)

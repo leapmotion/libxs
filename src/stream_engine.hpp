@@ -30,7 +30,6 @@
 #include "encoder.hpp"
 #include "decoder.hpp"
 #include "options.hpp"
-#include "wire.hpp"
 
 namespace xs
 {
@@ -98,22 +97,6 @@ namespace xs
         options_t options;
 
         bool plugged;
-
-        //  Outgoing protocol header.
-        sp_header_t out_header;
-
-        //  Desired protocol header.
-        sp_header_t desired_header;
-
-        //  Incoming protocol header.
-        sp_header_t in_header;
-
-        unsigned char *header_pos;
-        size_t header_remaining;
-
-        //  Protocol header has been received/sent.
-        bool header_received;
-        bool header_sent;
 
         stream_engine_t (const stream_engine_t&);
         const stream_engine_t &operator = (const stream_engine_t&);

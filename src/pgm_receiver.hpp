@@ -39,7 +39,6 @@
 #include "options.hpp"
 #include "decoder.hpp"
 #include "pgm_socket.hpp"
-#include "wire.hpp"
 
 namespace xs
 {
@@ -125,9 +124,6 @@ namespace xs
 
         //  Receive timer, if active, otherwise NULL.
         handle_t rx_timer;
-
-        //  Desired protocol header.
-        sp_header_t desired_header;
 
         pgm_receiver_t (const pgm_receiver_t&);
         const pgm_receiver_t &operator = (const pgm_receiver_t&);

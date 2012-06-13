@@ -47,11 +47,6 @@ xs::pgm_receiver_t::pgm_receiver_t (class io_thread_t *parent_,
     pending_bytes (0),
     rx_timer (NULL)
 {
-    //  If not using a legacy protocol, fill in desired protocol header.
-    if (!options.legacy_protocol) {
-        sp_get_header (desired_header, options.sp_service, options.sp_pattern,
-            options.sp_version, options.sp_complement);
-    }
 }
 
 xs::pgm_receiver_t::~pgm_receiver_t ()
@@ -178,7 +173,7 @@ void xs::pgm_receiver_t::in_event (fd_t fd_)
         data = (unsigned char*) tmp;
 
         //  No data to process. This may happen if the packet received is
-        //  neither RDATA nor ODATA.
+        //  neither ODATA nor ODATA.
         if (received == 0) {
             if (errno == ENOMEM || errno == EBUSY) {
                 const long timeout = pgm_socket.get_rx_timeout ();
@@ -205,31 +200,17 @@ void xs::pgm_receiver_t::in_event (fd_t fd_)
             break;
         }
 
-        //  Check protocol header.
-        if (unlikely (!options.legacy_protocol)) {
-            if (received < (ssize_t) sizeof desired_header)
-                //  Ignore malformed datagram.
-                continue;
-            if (memcmp (data, desired_header, sizeof desired_header) != 0)
-                //  Ignore datagram with incorrect protocol header.
-                continue;
-            data += sizeof desired_header;
-            received -= sizeof desired_header;
-        }
-
-        //  Read the offset of the fist message in the current packet.
-        if (received < (ssize_t) sizeof (uint16_t))
-            //  Ignore malformed datagram.
-            continue;
-        uint16_t offset = get_uint16 (data);
-        data += sizeof (uint16_t);
-        received -= sizeof (uint16_t);
-
-        //  New peer. Add it to the list of known but disjoint peers.
+        //  New peer. Add it to the list of know but unjoint peers.
         if (it == peers.end ()) {
             peer_info_t peer_info = {false, NULL};
             it = peers.insert (peers_t::value_type (*tsi, peer_info)).first;
         }
+
+        //  Read the offset of the fist message in the current packet.
+        xs_assert ((size_t) received >= sizeof (uint16_t));
+        uint16_t offset = get_uint16 (data);
+        data += sizeof (uint16_t);
+        received -= sizeof (uint16_t);
 
         //  Join the stream if needed.
         if (!it->second.joined) {

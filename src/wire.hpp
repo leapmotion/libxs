@@ -24,52 +24,11 @@
 #include "stdint.hpp"
 
 //  Protocol-related constants.
-
-//  Protocol header.
-#define SP_HEADER_LENGTH 8
-
-//  Patterns.
-#define SP_PAIR 1
-#define SP_PUBSUB 2
-#define SP_REQREP 3
-#define SP_PIPELINE 4
-#define SP_SURVEY 5
-
-//  Roles.
-#define SP_PAIR_PAIR 1
-#define SP_PUBSUB_PUB 1
-#define SP_PUBSUB_SUB 2
-#define SP_REQREP_REQ 1
-#define SP_REQREP_REP 2
-#define SP_PIPELINE_PUSH 1
-#define SP_PIPELINE_PULL 2
-#define SP_SURVEY_SURVEYOR 1
-#define SP_SURVEY_RESPONDENT 2
-
-//  PUBSUB pattern commands.
-#define SP_PUBSUB_CMD_SUBSCRIBE 1
-#define SP_PUBSUB_CMD_UNSUBSCRIBE 2
+#define XS_CMD_SUBSCRIBE 1
+#define XS_CMD_UNSUBSCRIBE 2
 
 namespace xs
 {
-    //  Protocol header type.
-    typedef unsigned char sp_header_t [SP_HEADER_LENGTH];
-
-    //  Get the SP protocol header for the specified service, pattern, version
-    //  and role.
-    inline void sp_get_header (sp_header_t header_, int service_, int pattern_,
-        int version_, int role_)
-    {
-        header_ [0] = 0;                      //  Protocol identifier
-        header_ [1] = 'S';                    //  "
-        header_ [2] = 'P';                    //  "
-        header_ [3] = 0;                      //  Reserved, must be zero.
-        header_ [4] = (service_ >> 8) & 0xff; //  Service id high byte
-        header_ [5] = service_ & 0xff;        //  Service id low byte
-        header_ [6] = pattern_ & 0xff;        //  Pattern
-        header_ [7] = (version_ & 0xf) << 4;  //  Pattern version
-        header_ [7] |= role_ & 0xf;           //  Pattern role
-    }
 
     //  Helper functions to convert different integer types to/from network
     //  byte order.
