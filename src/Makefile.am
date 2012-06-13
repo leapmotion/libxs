@@ -78,8 +78,6 @@ libxs_la_SOURCES = \
     tcp_listener.hpp \
     thread.hpp \
     topic_filter.hpp \
-    udp_receiver.hpp \
-    udp_sender.hpp \
     upoll.hpp \
     windows.hpp \
     wire.hpp \
@@ -140,8 +138,6 @@ libxs_la_SOURCES = \
     tcp_listener.cpp \
     thread.cpp \
     topic_filter.cpp \
-    udp_receiver.cpp \
-    udp_sender.cpp \
     upoll.cpp \
     xpub.cpp \
     xrep.cpp \
