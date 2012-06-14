@@ -132,6 +132,7 @@ namespace xs
                 "1:     ldrex   %1, [%3]\n\t"
                 "       mov     %0, #0\n\t"
                 "       teq     %1, %4\n\t"
+                "       it      eq\n"
                 "       strexeq %0, %5, [%3]\n\t"
                 "       teq     %0, #0\n\t"
                 "       bne     1b\n\t"
