@@ -35,13 +35,13 @@ extern "C"
         void *push;
 
         push = xs_socket (ctx_, XS_PUSH);
-        assert (push);
+        errno_assert (push);
         rc = xs_connect (push, "ipc:///tmp/test-backlog");
-        assert (rc >= 0);
+        errno_assert (rc >= 0);
         rc = xs_send (push, NULL, 0, 0);
-        assert (rc == 0);
+        errno_assert (rc == 0);
         rc = xs_close (push);
-        assert (rc == 0);
+        errno_assert (rc == 0);
     }
 #endif
     static void tcp_worker (void *ctx_)
@@ -50,14 +50,14 @@ extern "C"
         void *push;
 
         push = xs_socket (ctx_, XS_PUSH);
-        assert (push);
+        errno_assert (push);
         rc = xs_connect (push, "tcp://127.0.0.1:5560");
-        assert (rc >= 0);
+        errno_assert (rc >= 0);
 
         rc = xs_send (push, NULL, 0, 0);
-        assert (rc == 0);
+        errno_assert (rc == 0);
         rc = xs_close (push);
-        assert (rc == 0);
+        errno_assert (rc == 0);
     }
 }
 #endif
@@ -77,29 +77,28 @@ int XS_TEST_MAIN ()
     //  Test the exhaustion on IPC backlog.
 #if !defined XS_HAVE_WINDOWS && !defined XS_HAVE_OPENVMS
     ctx = xs_init ();
-    assert (ctx);
+    errno_assert (ctx);
 
     pull = xs_socket (ctx, XS_PULL);
-    assert (pull);
+    errno_assert (pull);
     backlog = BACKLOG;
     rc = xs_setsockopt (pull, XS_BACKLOG, &backlog, sizeof (backlog));
-    assert (rc == 0);
+    errno_assert (rc == 0);
     rc = xs_bind (pull, "ipc:///tmp/test-backlog");
-    assert (rc >= 0);
+    errno_assert (rc >= 0);
 
-    
     for (i = 0; i < PARALLEL_CONNECTS; i++)
         threads [i] = thread_create (ipc_worker, ctx);
 
     for (i = 0; i < PARALLEL_CONNECTS; i++) {
         rc = xs_recv (pull, NULL, 0, 0);
-        assert (rc == 0);
+        errno_assert (rc == 0);
     }
     
     rc = xs_close (pull);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     rc = xs_term (ctx);
-    assert (rc == 0);
+    errno_assert (rc == 0);
 
     for (i = 0; i < PARALLEL_CONNECTS; i++)
         thread_join (threads [i]);
@@ -108,28 +107,28 @@ int XS_TEST_MAIN ()
     //  Test the exhaustion on TCP backlog.
 
     ctx = xs_init ();
-    assert (ctx);
+    errno_assert (ctx);
 
     pull = xs_socket (ctx, XS_PULL);
-    assert (pull);
+    errno_assert (pull);
     backlog = BACKLOG;
     rc = xs_setsockopt (pull, XS_BACKLOG, &backlog, sizeof (backlog));
-    assert (rc == 0);
+    errno_assert (rc == 0);
     rc = xs_bind (pull, "tcp://127.0.0.1:5560");
-    assert (rc >= 0);
+    errno_assert (rc >= 0);
 
     for (i = 0; i < PARALLEL_CONNECTS; i++)
         threads [i] = thread_create (tcp_worker, ctx);
 
     for (i = 0; i < PARALLEL_CONNECTS; i++) {
         rc = xs_recv (pull, NULL, 0, 0);
-        assert (rc == 0);
+        errno_assert (rc == 0);
     }
     
     rc = xs_close (pull);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     rc = xs_term (ctx);
-    assert (rc == 0);
+    errno_assert (rc == 0);
 
     for (i = 0; i < PARALLEL_CONNECTS; i++)
         thread_join (threads [i]);

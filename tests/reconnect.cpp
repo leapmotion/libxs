@@ -26,67 +26,67 @@ int XS_TEST_MAIN ()
 
     //  Create the basic infrastructure.
     void *ctx = xs_init ();
-    assert (ctx);
+    errno_assert (ctx);
     void *push = xs_socket (ctx, XS_PUSH);
-    assert (push);
+    errno_assert (push);
     void *pull = xs_socket (ctx, XS_PULL);
-    assert (push);
+    errno_assert (push);
 
     //  Connect before bind was done at the peer and send one message.
     int rc = xs_connect (push, "tcp://127.0.0.1:5560");
-    assert (rc != -1);
+    errno_assert (rc != -1);
     rc = xs_send (push, "ABC", 3, 0);
-    assert (rc == 3);
+    errno_assert (rc == 3);
 
     //  Wait a while for few attempts to reconnect to happen.
     sleep (1);
 
     //  Bind the peer and get the message.
     rc = xs_bind (pull, "tcp://127.0.0.1:5560");
-    assert (rc != -1);
+    errno_assert (rc != -1);
     unsigned char buf [3];
     rc = xs_recv (pull, buf, sizeof (buf), 0);
-    assert (rc == 3);
+    errno_assert (rc == 3);
 
     //  Clean up.
     rc = xs_close (push);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     rc = xs_close (pull);
-    assert (rc == 0);
+    errno_assert (rc == 0);
 
 #if !defined XS_HAVE_WINDOWS && !defined XS_HAVE_OPENVMS
 
     //  Now, let's test the same scenario with IPC.
     push = xs_socket (ctx, XS_PUSH);
-    assert (push);
+    errno_assert (push);
     pull = xs_socket (ctx, XS_PULL);
-    assert (push);
+    errno_assert (push);
 
     //  Connect before bind was done at the peer and send one message.
     rc = xs_connect (push, "ipc:///tmp/tester");
-    assert (rc != -1);
+    errno_assert (rc != -1);
     rc = xs_send (push, "ABC", 3, 0);
-    assert (rc == 3);
+    errno_assert (rc == 3);
 
     //  Wait a while for few attempts to reconnect to happen.
     sleep (1);
 
     //  Bind the peer and get the message.
     rc = xs_bind (pull, "ipc:///tmp/tester");
-    assert (rc != -1);
+    errno_assert (rc != -1);
     rc = xs_recv (pull, buf, sizeof (buf), 0);
-    assert (rc == 3);
+    errno_assert (rc == 3);
 
     //  Clean up.
     rc = xs_close (push);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     rc = xs_close (pull);
-    assert (rc == 0);
+    errno_assert (rc == 0);
 
 #endif
 
     rc = xs_term (ctx);
-    assert (rc == 0);
+    errno_assert (rc == 0);
 
     return 0 ;
 }

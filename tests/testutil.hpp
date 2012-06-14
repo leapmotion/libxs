@@ -42,9 +42,24 @@
 #define XS_TEST_MAIN main
 #endif
 
+#define errno_assert(x) \
+    do {\
+        if (!(x)) {\
+            const char *errstr = xs_strerror (errno);\
+            fprintf (stderr, "%s (%s:%d)\n", errstr, __FILE__, __LINE__);\
+            abort ();\
+        }\
+    } while (false)
+
 #if defined XS_HAVE_WINDOWS
 #define sleep(s) Sleep ((s) * 1000)
 #endif
+
+//  Check whether measured time is the expected time (in milliseconds).
+//  The upper tolerance is 1/2 sec so that the test doesn't fail even on
+//  very slow or very loaded systems.
+#define time_assert(actual,expected) \
+   assert (actual > ((expected) - 50) && actual < ((expected) + 500)); 
 
 #if defined XS_HAVE_WINDOWS
 
@@ -113,7 +128,10 @@ void *thread_create (void (*fn_) (void *arg_), void *arg_)
     arg->fn = fn_;
     arg->arg = arg_;
     int rc = pthread_create (&arg->handle, NULL, thread_routine, (void*) arg);
-    assert (rc == 0);
+    if (rc != 0) {
+        errno = rc;
+        errno_assert (0);
+    }
     return (void*) arg;
 }
 
@@ -121,7 +139,10 @@ void thread_join (void *thread_)
 {
     arg_t *arg = (arg_t*) thread_;
     int rc = pthread_join (arg->handle, NULL);
-    assert (rc == 0);
+    if (rc != 0) {
+        errno = rc;
+        errno_assert (0);
+    }
     free (arg);
 }
 
@@ -133,50 +154,52 @@ inline void bounce (void *sb, void *sc)
 
     //  Send the message.
     int rc = xs_send (sc, content, 32, XS_SNDMORE);
+    errno_assert (rc != -1);
     assert (rc == 32);
     rc = xs_send (sc, content, 32, 0);
+    errno_assert (rc != -1);
     assert (rc == 32);
 
     //  Bounce the message back.
     char buf1 [32];
     rc = xs_recv (sb, buf1, 32, 0);
+    errno_assert (rc != -1);
     assert (rc == 32);
     int rcvmore;
     size_t sz = sizeof (rcvmore);
     rc = xs_getsockopt (sb, XS_RCVMORE, &rcvmore, &sz);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     assert (rcvmore);
     rc = xs_recv (sb, buf1, 32, 0);
+    errno_assert (rc != -1);
     assert (rc == 32);
     rc = xs_getsockopt (sb, XS_RCVMORE, &rcvmore, &sz);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     assert (!rcvmore);
     rc = xs_send (sb, buf1, 32, XS_SNDMORE);
+    errno_assert (rc != -1);
     assert (rc == 32);
     rc = xs_send (sb, buf1, 32, 0);
+    errno_assert (rc != -1);
     assert (rc == 32);
 
     //  Receive the bounced message.
     char buf2 [32];
     rc = xs_recv (sc, buf2, 32, 0);
+    errno_assert (rc != -1);
     assert (rc == 32);
     rc = xs_getsockopt (sc, XS_RCVMORE, &rcvmore, &sz);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     assert (rcvmore);
     rc = xs_recv (sc, buf2, 32, 0);
+    errno_assert (rc != -1);
     assert (rc == 32);
     rc = xs_getsockopt (sc, XS_RCVMORE, &rcvmore, &sz);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     assert (!rcvmore);
 
     //  Check whether the message is still the same.
     assert (memcmp (buf2, content, 32) == 0);
 }
-
-//  Check whether measured time is the expected time (in milliseconds).
-//  The upper tolerance is 1/2 sec so that the test doesn't fail even on
-//  very slow or very loaded systems.
-#define time_assert(actual,expected) \
-   assert (actual > ((expected) - 50) && actual < ((expected) + 500)); 
 
 #endif

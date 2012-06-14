@@ -25,28 +25,28 @@ int XS_TEST_MAIN ()
     fprintf (stderr, "pair_inproc test running...\n");
 
     void *ctx = xs_init ();
-    assert (ctx);
+    errno_assert (ctx);
 
     void *sb = xs_socket (ctx, XS_PAIR);
-    assert (sb);
+    errno_assert (sb);
     int rc = xs_bind (sb, "inproc://a");
-    assert (rc != -1);
+    errno_assert (rc != -1);
 
     void *sc = xs_socket (ctx, XS_PAIR);
-    assert (sc);
+    errno_assert (sc);
     rc = xs_connect (sc, "inproc://a");
-    assert (rc != -1);
+    errno_assert (rc != -1);
     
     bounce (sb, sc);
 
     rc = xs_close (sc);
-    assert (rc == 0);
+    errno_assert (rc == 0);
 
     rc = xs_close (sb);
-    assert (rc == 0);
+    errno_assert (rc == 0);
 
     rc = xs_term (ctx);
-    assert (rc == 0);
+    errno_assert (rc == 0);
 
     return 0 ;
 }

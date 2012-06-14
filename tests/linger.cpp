@@ -26,31 +26,31 @@ int XS_TEST_MAIN ()
 
     //  Create socket.
     void *ctx = xs_init ();
-    assert (ctx);
+    errno_assert (ctx);
     void *s = xs_socket (ctx, XS_PUSH);
-    assert (s);
+    errno_assert (s);
 
     //  Set linger to 0.1 second.
     int linger = 100;
     int rc = xs_setsockopt (s, XS_LINGER, &linger, sizeof (int));
+    errno_assert (rc == 0);
 
     //  Connect to non-existent endpoing.
-    assert (rc == 0);
     rc = xs_connect (s, "tcp://127.0.0.1:5560");
-    assert (rc != -1);
+    errno_assert (rc != -1);
 
     //  Send a message.
     rc = xs_send (s, "r", 1, 0);
-    assert (rc == 1);
+    errno_assert (rc == 1);
 
     //  Close the socket.
     rc = xs_close (s);
-    assert (rc == 0);
+    errno_assert (rc == 0);
 
     //  Terminate the context. This should take 0.1 second.
     void *watch = xs_stopwatch_start ();
     rc = xs_term (ctx);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     int ms = (int) xs_stopwatch_stop (watch) / 1000;
     time_assert (ms, linger);
 

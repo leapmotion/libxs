@@ -32,28 +32,28 @@ int XS_TEST_MAIN ()
     fprintf (stderr, "reqrep_ipc test running...\n");
 
     void *ctx = xs_init ();
-    assert (ctx);
+    errno_assert (ctx);
 
     void *sb = xs_socket (ctx, XS_REP);
-    assert (sb);
+    errno_assert (sb);
     int rc = xs_bind (sb, "ipc:///tmp/tester");
-    assert (rc != -1);
+    errno_assert (rc != -1);
 
     void *sc = xs_socket (ctx, XS_REQ);
-    assert (sc);
+    errno_assert (sc);
     rc = xs_connect (sc, "ipc:///tmp/tester");
-    assert (rc != -1);
+    errno_assert (rc != -1);
     
     bounce (sb, sc);
 
     rc = xs_close (sc);
-    assert (rc == 0);
+    errno_assert (rc == 0);
 
     rc = xs_close (sb);
-    assert (rc == 0);
+    errno_assert (rc == 0);
 
     rc = xs_term (ctx);
-    assert (rc == 0);
+    errno_assert (rc == 0);
 
     return 0 ;
 }

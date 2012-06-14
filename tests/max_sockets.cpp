@@ -26,25 +26,25 @@ int XS_TEST_MAIN ()
 
     //  Create context and set MAX_SOCKETS to 1.
     void *ctx = xs_init ();
-    assert (ctx);
+    errno_assert (ctx);
     int max_sockets = 1;
     int rc = xs_setctxopt (ctx, XS_MAX_SOCKETS, &max_sockets,
         sizeof (max_sockets));
-    assert (rc == 0);
+    errno_assert (rc == 0);
 
     //  First socket should be created OK.
     void *s1 = xs_socket (ctx, XS_PUSH);
-    assert (s1);
+    errno_assert (s1);
 
     //  Creation of second socket should fail.
     void *s2 = xs_socket (ctx, XS_PUSH);
-    assert (!s2 && errno == EMFILE);
+    errno_assert (!s2 && errno == EMFILE);
 
     //  Clean up.
     rc = xs_close (s1);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     rc = xs_term (ctx);
-    assert (rc == 0);
+    errno_assert (rc == 0);
 
     return 0;
 }

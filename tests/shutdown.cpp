@@ -29,25 +29,25 @@ int XS_TEST_MAIN ()
 
     //  Create infrastructure.
     void *ctx = xs_init ();
-    assert (ctx);
+    errno_assert (ctx);
     void *push = xs_socket (ctx, XS_PUSH);
-    assert (push);
+    errno_assert (push);
     int push_id = xs_bind (push, "tcp://127.0.0.1:5560");
-    assert (push_id != -1);
+    errno_assert (push_id != -1);
     void *pull = xs_socket (ctx, XS_PULL);
-    assert (pull);
+    errno_assert (pull);
     rc = xs_connect (pull, "tcp://127.0.0.1:5560");
-    assert (rc != -1);
+    errno_assert (rc != -1);
 
     //  Pass one message through to ensure the connection is established.
     rc = xs_send (push, "ABC", 3, 0);
-    assert (rc == 3);
+    errno_assert (rc == 3);
     rc = xs_recv (pull, buf, sizeof (buf), 0);
-    assert (rc == 3);
+    errno_assert (rc == 3);
 
     //  Shut down the bound endpoint.
     rc = xs_shutdown (push, push_id);
-    assert (rc == 0); 
+    errno_assert (rc == 0); 
     sleep (1);
 
     //  Check that sending would block (there's no outbound connection).
@@ -56,35 +56,35 @@ int XS_TEST_MAIN ()
 
     //  Clean up.
     rc = xs_close (pull);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     rc = xs_close (push);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     rc = xs_term (ctx);
-    assert (rc == 0);
+    errno_assert (rc == 0);
 
     //  Now the other way round.
 
     //  Create infrastructure.
     ctx = xs_init ();
-    assert (ctx);
+    errno_assert (ctx);
     pull = xs_socket (ctx, XS_PULL);
-    assert (pull);
+    errno_assert (pull);
     rc = xs_bind (pull, "tcp://127.0.0.1:5560");
-    assert (rc != -1);
+    errno_assert (rc != -1);
     push = xs_socket (ctx, XS_PUSH);
-    assert (push);
+    errno_assert (push);
     push_id = xs_connect (push, "tcp://127.0.0.1:5560");
-    assert (push_id != -1);
+    errno_assert (push_id != -1);
 
     //  Pass one message through to ensure the connection is established.
     rc = xs_send (push, "ABC", 3, 0);
-    assert (rc == 3);
+    errno_assert (rc == 3);
     rc = xs_recv (pull, buf, sizeof (buf), 0);
-    assert (rc == 3);
+    errno_assert (rc == 3);
 
     //  Shut down the bound endpoint.
     rc = xs_shutdown (push, push_id);
-    assert (rc == 0); 
+    errno_assert (rc == 0); 
     sleep (1);
 
     //  Check that sending would block (there's no outbound connection).
@@ -93,11 +93,11 @@ int XS_TEST_MAIN ()
 
     //  Clean up.
     rc = xs_close (pull);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     rc = xs_close (push);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     rc = xs_term (ctx);
-    assert (rc == 0);
+    errno_assert (rc == 0);
 
     return 0;
 }

@@ -28,12 +28,12 @@ extern "C"
         //  for 1 more second, so that async connect has time to succeed.
         sleep (1);
         void *sc = xs_socket (ctx_, XS_PUSH);
-        assert (sc);
+        errno_assert (sc);
         int rc = xs_connect (sc, "inproc://timeout_test");
-        assert (rc != -1);
+        errno_assert (rc != -1);
         sleep (1);
         rc = xs_close (sc);
-        assert (rc == 0);
+        errno_assert (rc == 0);
     }
 }
 
@@ -42,13 +42,13 @@ int XS_TEST_MAIN ()
     fprintf (stderr, "polltimeo test running...\n");
 
     void *ctx = xs_init ();
-    assert (ctx);
+    errno_assert (ctx);
 
     //  Create a disconnected socket.
     void *sb = xs_socket (ctx, XS_PULL);
-    assert (sb);
+    errno_assert (sb);
     int rc = xs_bind (sb, "inproc://timeout_test");
-    assert (rc != -1);
+    errno_assert (rc != -1);
 
     //  Check whether timeout is honoured.
     xs_pollitem_t pi;
@@ -56,7 +56,7 @@ int XS_TEST_MAIN ()
     pi.events = XS_POLLIN;
     void *watch = xs_stopwatch_start ();
     rc = xs_poll (&pi, 1, 500);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     unsigned long elapsed = xs_stopwatch_stop (watch) / 1000;
     time_assert (elapsed, 500);
 
@@ -65,16 +65,16 @@ int XS_TEST_MAIN ()
     assert (thread);
     watch = xs_stopwatch_start ();
     rc = xs_poll (&pi, 1, 2000);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     elapsed = xs_stopwatch_stop (watch) / 1000;
     time_assert (elapsed, 2000);
     thread_join (thread);
 
     //  Clean-up.
     rc = xs_close (sb);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     rc = xs_term (ctx);
-    assert (rc == 0);
+    errno_assert (rc == 0);
 
     return 0 ;
 }

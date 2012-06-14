@@ -26,112 +26,112 @@ int XS_TEST_MAIN ()
     fprintf (stderr, "reqrep_device test running...\n");
 
     void *ctx = xs_init ();
-    assert (ctx);
+    errno_assert (ctx);
 
     //  Create a req/rep device.
     void *xreq = xs_socket (ctx, XS_XREQ);
-    assert (xreq);
+    errno_assert (xreq);
     int rc = xs_bind (xreq, "tcp://127.0.0.1:5560");
-    assert (rc != -1);
+    errno_assert (rc != -1);
     void *xrep = xs_socket (ctx, XS_XREP);
-    assert (xrep);
+    errno_assert (xrep);
     rc = xs_bind (xrep, "tcp://127.0.0.1:5561");
-    assert (rc != -1);
+    errno_assert (rc != -1);
 
     //  Create a worker.
     void *rep = xs_socket (ctx, XS_REP);
-    assert (rep);
+    errno_assert (rep);
     rc = xs_connect (rep, "tcp://127.0.0.1:5560");
-    assert (rc != -1);
+    errno_assert (rc != -1);
 
     //  Create a client.
     void *req = xs_socket (ctx, XS_REQ);
-    assert (req);
+    errno_assert (req);
     rc = xs_connect (req, "tcp://127.0.0.1:5561");
-    assert (rc != -1);
+    errno_assert (rc != -1);
 
     //  Send a request.
     rc = xs_send (req, "ABC", 3, XS_SNDMORE);
-    assert (rc == 3);
+    errno_assert (rc == 3);
     rc = xs_send (req, "DEF", 3, 0);
-    assert (rc == 3);
+    errno_assert (rc == 3);
 
     //  Pass the request through the device.
     for (int i = 0; i != 4; i++) {
         xs_msg_t msg;
         rc = xs_msg_init (&msg);
-        assert (rc == 0);
+        errno_assert (rc == 0);
         rc = xs_recvmsg (xrep, &msg, 0);
-        assert (rc >= 0);
+        errno_assert (rc >= 0);
         int rcvmore;
         size_t sz = sizeof (rcvmore);
         rc = xs_getsockopt (xrep, XS_RCVMORE, &rcvmore, &sz);
-        assert (rc == 0);
+        errno_assert (rc == 0);
         rc = xs_sendmsg (xreq, &msg, rcvmore ? XS_SNDMORE : 0);
-        assert (rc >= 0);
+        errno_assert (rc >= 0);
     }
 
     //  Receive the request.
     char buff [3];
     rc = xs_recv (rep, buff, 3, 0);
-    assert (rc == 3);
+    errno_assert (rc == 3);
     assert (memcmp (buff, "ABC", 3) == 0);
     int rcvmore;
     size_t sz = sizeof (rcvmore);
     rc = xs_getsockopt (rep, XS_RCVMORE, &rcvmore, &sz);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     assert (rcvmore);
     rc = xs_recv (rep, buff, 3, 0);
-    assert (rc == 3);
+    errno_assert (rc == 3);
     assert (memcmp (buff, "DEF", 3) == 0);
     rc = xs_getsockopt (rep, XS_RCVMORE, &rcvmore, &sz);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     assert (!rcvmore);
 
     //  Send the reply.
     rc = xs_send (rep, "GHI", 3, XS_SNDMORE);
-    assert (rc == 3);
+    errno_assert (rc == 3);
     rc = xs_send (rep, "JKL", 3, 0);
-    assert (rc == 3);
+    errno_assert (rc == 3);
 
     //  Pass the reply through the device.
     for (int i = 0; i != 4; i++) {
         xs_msg_t msg;
         rc = xs_msg_init (&msg);
-        assert (rc == 0);
+        errno_assert (rc == 0);
         rc = xs_recvmsg (xreq, &msg, 0);
-        assert (rc >= 0);
+        errno_assert (rc >= 0);
         rc = xs_getsockopt (xreq, XS_RCVMORE, &rcvmore, &sz);
-        assert (rc == 0);
+        errno_assert (rc == 0);
         rc = xs_sendmsg (xrep, &msg, rcvmore ? XS_SNDMORE : 0);
-        assert (rc >= 0);
+        errno_assert (rc >= 0);
     }
 
     //  Receive the reply.
     rc = xs_recv (req, buff, 3, 0);
-    assert (rc == 3);
+    errno_assert (rc == 3);
     assert (memcmp (buff, "GHI", 3) == 0);
     rc = xs_getsockopt (req, XS_RCVMORE, &rcvmore, &sz);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     assert (rcvmore);
     rc = xs_recv (req, buff, 3, 0);
-    assert (rc == 3);
+    errno_assert (rc == 3);
     assert (memcmp (buff, "JKL", 3) == 0);
     rc = xs_getsockopt (req, XS_RCVMORE, &rcvmore, &sz);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     assert (!rcvmore);
 
     //  Clean up.
     rc = xs_close (req);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     rc = xs_close (rep);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     rc = xs_close (xrep);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     rc = xs_close (xreq);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     rc = xs_term (ctx);
-    assert (rc == 0);
+    errno_assert (rc == 0);
 
     return 0 ;
 }

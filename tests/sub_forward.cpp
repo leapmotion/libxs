@@ -26,69 +26,69 @@ int XS_TEST_MAIN ()
     fprintf (stderr, "sub_forward test running...\n");
 
     void *ctx = xs_init ();
-    assert (ctx);
+    errno_assert (ctx);
 
     //  First, create an intermediate device.
     void *xpub = xs_socket (ctx, XS_XPUB);
-    assert (xpub);
+    errno_assert (xpub);
     int rc = xs_bind (xpub, "tcp://127.0.0.1:5560");
-    assert (rc != -1);
+    errno_assert (rc != -1);
     void *xsub = xs_socket (ctx, XS_XSUB);
-    assert (xsub);
+    errno_assert (xsub);
     rc = xs_bind (xsub, "tcp://127.0.0.1:5561");
-    assert (rc != -1);
+    errno_assert (rc != -1);
 
     //  Create a publisher.
     void *pub = xs_socket (ctx, XS_PUB);
-    assert (pub);
+    errno_assert (pub);
     rc = xs_connect (pub, "tcp://127.0.0.1:5561");
-    assert (rc != -1);
+    errno_assert (rc != -1);
 
     //  Create a subscriber.
     void *sub = xs_socket (ctx, XS_SUB);
-    assert (sub);
+    errno_assert (sub);
     rc = xs_connect (sub, "tcp://127.0.0.1:5560");
-    assert (rc != -1);
+    errno_assert (rc != -1);
 
     //  Subscribe for all messages.
     rc = xs_setsockopt (sub, XS_SUBSCRIBE, "", 0);
-    assert (rc == 0);
+    errno_assert (rc == 0);
 
     //  Pass the subscription upstream through the device.
     char buff [32];
     rc = xs_recv (xpub, buff, sizeof (buff), 0);
-    assert (rc >= 0);
+    errno_assert (rc >= 0);
     rc = xs_send (xsub, buff, rc, 0);
-    assert (rc >= 0);
+    errno_assert (rc >= 0);
 
     //  Wait a bit till the subscription gets to the publisher.
     sleep (1);
 
     //  Send an empty message.
     rc = xs_send (pub, NULL, 0, 0);
-    assert (rc == 0);
+    errno_assert (rc == 0);
 
     //  Pass the message downstream through the device.
     rc = xs_recv (xsub, buff, sizeof (buff), 0);
-    assert (rc >= 0);
+    errno_assert (rc >= 0);
     rc = xs_send (xpub, buff, rc, 0);
-    assert (rc >= 0);
+    errno_assert (rc >= 0);
 
     //  Receive the message in the subscriber.
     rc = xs_recv (sub, buff, sizeof (buff), 0);
-    assert (rc == 0);
+    errno_assert (rc == 0);
 
     //  Clean up.
     rc = xs_close (xpub);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     rc = xs_close (xsub);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     rc = xs_close (pub);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     rc = xs_close (sub);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     rc = xs_term (ctx);
-    assert (rc == 0);
+    errno_assert (rc == 0);
 
     return 0 ;
 }

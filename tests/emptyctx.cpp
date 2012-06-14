@@ -27,9 +27,9 @@ int XS_TEST_MAIN ()
     //  This is a very simple test to check whether everything works OK when
     //  context is terminated even before I/O threads were launched.
     void *ctx = xs_init ();
-    assert (ctx);
+    errno_assert (ctx);
     int rc = xs_term (ctx);
-    assert (rc == 0);
+    errno_assert (rc == 0);
 
     return 0 ;
 }

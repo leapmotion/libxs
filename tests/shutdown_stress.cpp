@@ -30,11 +30,11 @@ extern "C"
         int rc;
 
         rc = xs_connect (s_, "tcp://127.0.0.1:5560");
-        assert (rc != -1);
+        errno_assert (rc != -1);
 
         //  Start closing the socket while the connecting process is underway.
         rc = xs_close (s_);
-        assert (rc == 0);
+        errno_assert (rc == 0);
     }
 }
 
@@ -55,24 +55,24 @@ int XS_TEST_MAIN ()
 
         //  Check the shutdown with many parallel I/O threads.
         ctx = xs_init ();
-        assert (ctx);
+        errno_assert (ctx);
         io_threads = 7;
         rc = xs_setctxopt (ctx, XS_IO_THREADS, &io_threads,
             sizeof (io_threads));
-        assert (rc == 0);
+        errno_assert (rc == 0);
 
         s1 = xs_socket (ctx, XS_PUB);
-        assert (s1);
+        errno_assert (s1);
 
         rc = xs_bind (s1, "tcp://127.0.0.1:5560");
-        assert (rc != -1);
+        errno_assert (rc != -1);
 
         for (i = 0; i != THREAD_COUNT; i++) {
             s2 = xs_socket (ctx, XS_SUB);
             if (!s2 && (errno == EMFILE || errno == ENFILE))
                 threads [i] = NULL;
             else {
-                assert (s2);
+                errno_assert (s2);
                 threads [i] = thread_create (shutdown_stress_worker, s2);
                 assert (threads [i]);
             }
@@ -83,10 +83,10 @@ int XS_TEST_MAIN ()
                 thread_join (threads [i]);
 
         rc = xs_close (s1);
-        assert (rc == 0);
+        errno_assert (rc == 0);
 
         rc = xs_term (ctx);
-        assert (rc == 0);
+        errno_assert (rc == 0);
     }
 
     return 0;

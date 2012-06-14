@@ -26,33 +26,33 @@ int XS_TEST_MAIN ()
 
     //  Create the basic infrastructure.
     void *ctx = xs_init ();
-    assert (ctx);
+    errno_assert (ctx);
     void *xpub = xs_socket (ctx, XS_XPUB);
-    assert (xpub);
+    errno_assert (xpub);
     void *sub = xs_socket (ctx, XS_SUB);
-    assert (sub);
+    errno_assert (sub);
 
     //  Send two subscriptions upstream.
     int rc = xs_bind (xpub, "tcp://127.0.0.1:5560");
-    assert (rc != -1);
+    errno_assert (rc != -1);
     rc = xs_setsockopt (sub, XS_SUBSCRIBE, "a", 1);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     rc = xs_setsockopt (sub, XS_SUBSCRIBE, "b", 1);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     rc = xs_connect (sub, "tcp://127.0.0.1:5560");
-    assert (rc != -1);
+    errno_assert (rc != -1);
 
     //  Check whether subscriptions are correctly received.
     char buf [5];
     rc = xs_recv (xpub, buf, sizeof (buf), 0);
-    assert (rc == 5);
+    errno_assert (rc == 5);
     assert (buf [0] == 0);
     assert (buf [1] == 1);
     assert (buf [2] == 0);
     assert (buf [3] == 1);
     assert (buf [4] == 'a');
     rc = xs_recv (xpub, buf, sizeof (buf), 0);
-    assert (rc == 5);
+    errno_assert (rc == 5);
     assert (buf [0] == 0);
     assert (buf [1] == 1);
     assert (buf [2] == 0);
@@ -61,14 +61,14 @@ int XS_TEST_MAIN ()
 
     //  Tear down the connection.
     rc = xs_close (xpub);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     sleep (1);
 
     //  Re-establish the connection.
     xpub = xs_socket (ctx, XS_XPUB);
-    assert (xpub);
+    errno_assert (xpub);
     rc = xs_bind (xpub, "tcp://127.0.0.1:5560");
-    assert (rc != -1);
+    errno_assert (rc != -1);
 
     //  We have to give control to the SUB socket here so that it has
     //  chance to resend the subscriptions.
@@ -77,14 +77,14 @@ int XS_TEST_MAIN ()
 
     //  Check whether subscriptions are correctly generated.
     rc = xs_recv (xpub, buf, sizeof (buf), 0);
-    assert (rc == 5);
+    errno_assert (rc == 5);
     assert (buf [0] == 0);
     assert (buf [1] == 1);
     assert (buf [2] == 0);
     assert (buf [3] == 1);
     assert (buf [4] == 'a');
     rc = xs_recv (xpub, buf, sizeof (buf), 0);
-    assert (rc == 5);
+    errno_assert (rc == 5);
     assert (buf [0] == 0);
     assert (buf [1] == 1);
     assert (buf [2] == 0);
@@ -93,11 +93,11 @@ int XS_TEST_MAIN ()
 
     //  Clean up.
     rc = xs_close (sub);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     rc = xs_close (xpub);
-    assert (rc == 0);
+    errno_assert (rc == 0);
     rc = xs_term (ctx);
-    assert (rc == 0);
+    errno_assert (rc == 0);
 
     return 0 ;
 }
