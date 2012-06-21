@@ -42,6 +42,14 @@ const char *xs::errno_to_string (int errno_)
         return "Connection refused";
     case EINPROGRESS:
         return "Operation in progress";
+    case ETIMEDOUT:
+        return "Operation timed out";
+    case ENOTSOCK:
+        return "Not a valid socket";
+    case EAFNOSUPPORT:
+        return "No support for AF"; // ???
+    case EMTHREAD:
+        return "Threading error";
 #endif
     case EFSM:
         return "Operation cannot be accomplished in current state";
