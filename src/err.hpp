@@ -50,9 +50,7 @@ namespace xs
 
 namespace xs
 {
-    const char *wsa_error ();
-    const char *wsa_error_no (int no_);
-    void win_error (char *buffer_, size_t buffer_size_);
+    void win_error (int err, char *buffer_, size_t buffer_size_);
     void wsa_error_to_errno ();
 }
 
@@ -60,7 +58,8 @@ namespace xs
 #define wsa_assert(x) \
     do {\
         if (unlikely (!(x))) {\
-            const char *errstr = xs::wsa_error ();\
+            char errstr [256];\
+            xs::win_error (WSAGetLastError (), errstr, 256);\
             if (errstr != NULL) {\
                 fprintf (stderr, "Assertion failed: %s (%s:%d)\n", errstr, \
                     __FILE__, __LINE__);\
@@ -72,9 +71,10 @@ namespace xs
 //  Provides convenient way to assert on WSA-style errors on Windows.
 #define wsa_assert_no(no) \
     do {\
-        const char *errstr = xs::wsa_error_no (no);\
+        char errstr [256];\
+        xs::win_error ((no), errstr, 256);\
         if (errstr != NULL) {\
-            fprintf (stderr, "Assertion failed: %s (%s:%d)\n", errstr, \
+            fprintf (stderr, "Assertion failed: %s (%s:%d)\n", errstr,\
                 __FILE__, __LINE__);\
             xs::xs_abort (errstr);\
         }\
@@ -85,7 +85,7 @@ namespace xs
     do {\
         if (unlikely (!(x))) {\
             char errstr [256];\
-            xs::win_error (errstr, 256);\
+            xs::win_error ((int) GetLastError (), errstr, 256);\
             fprintf (stderr, "Assertion failed: %s (%s:%d)\n", errstr, \
                 __FILE__, __LINE__);\
             xs::xs_abort (errstr);\
