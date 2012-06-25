@@ -45,11 +45,9 @@ const char *xs::errno_to_string (int errno_)
     case ETIMEDOUT:
         return "Operation timed out";
     case ENOTSOCK:
-        return "Not a valid socket";
+        return "Not a socket";
     case EAFNOSUPPORT:
-        return "No support for AF"; // ???
-    case EMTHREAD:
-        return "Threading error";
+        return "Address family not supported";
 #endif
     case EFSM:
         return "Operation cannot be accomplished in current state";
