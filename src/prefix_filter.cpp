@@ -264,7 +264,14 @@ static void pfx_rm_all (pfx_node_t *node_, void *subscribers_,
     xs_assert (node_->count > 1);
 
     //  Compact the node table if possible.
-    if (node_->live_nodes == 1) {
+    if (node_->live_nodes == 0) {
+
+        //  Free the node table if it's no longer used.
+        free (node_->next.table);
+        node_->next.table = NULL;
+        node_->count = 0;
+    }
+    else if (node_->live_nodes == 1) {
 
         //  If there's only one live node in the table we can
         //  switch to using the more compact single-node
@@ -279,8 +286,8 @@ static void pfx_rm_all (pfx_node_t *node_, void *subscribers_,
         node_->count = 1;
         node_->min = new_min;
     }
-    else if (node_->live_nodes > 1 &&
-          (new_min > node_->min || new_max < node_->min + node_->count - 1)) {
+    else if (new_min > node_->min ||
+          new_max < node_->min + node_->count - 1) {
         xs_assert (new_max - new_min + 1 > 1);
 
         pfx_node_t **old_table = node_->next.table;
@@ -356,7 +363,15 @@ static bool pfx_rm (pfx_node_t *node_, const unsigned char *prefix_,
             --node_->live_nodes;
 
             //  Compact the table if possible.
-            if (node_->live_nodes == 1) {
+            if (node_->live_nodes == 0) {
+
+                //  Free the node table if it's no longer used.
+                free (node_->next.table);
+                node_->next.table = NULL;
+                node_->count = 0;
+            }
+            else if (node_->live_nodes == 1) {
+
                 //  If there's only one live node in the table we can
                 //  switch to using the more compact single-node
                 //  representation
