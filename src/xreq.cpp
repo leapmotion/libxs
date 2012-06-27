@@ -30,7 +30,7 @@ xs::xreq_t::xreq_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
 {
     options.type = XS_XREQ;
     options.sp_pattern = SP_REQREP;
-    options.sp_version = 2;
+    options.sp_version = 3;
     options.sp_role = SP_REQREP_REQ;
     options.sp_complement = SP_REQREP_REP;
 

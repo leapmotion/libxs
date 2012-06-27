@@ -30,7 +30,8 @@
 xs::req_t::req_t (class ctx_t *parent_, uint32_t tid_, int sid_) :
     xreq_t (parent_, tid_, sid_),
     receiving_reply (false),
-    message_begins (true)
+    message_begins (true),
+    request_id (generate_random ())
 {
     options.type = XS_REQ;
 }
@@ -41,6 +42,8 @@ xs::req_t::~req_t ()
 
 int xs::req_t::xsend (msg_t *msg_, int flags_)
 {
+    int rc;
+
     //  If we've sent a request and we still haven't got the reply,
     //  we can't send another request.
     if (receiving_reply) {
@@ -48,10 +51,23 @@ int xs::req_t::xsend (msg_t *msg_, int flags_)
         return -1;
     }
 
-    //  First part of the request is the request identity.
+    //  Request starts with request ID and delimiter.
     if (message_begins) {
+        if (options.sp_version >= 3) {
+            msg_t id;
+            rc = id.init_size (4);
+            errno_assert (rc == 0);
+            put_uint32 ((unsigned char*) id.data (), request_id);
+            id.set_flags (msg_t::more);
+            rc = xreq_t::xsend (&id, 0);
+            if (rc != 0) {
+                id.close ();
+                return -1;
+            }
+            id.close ();
+        }
         msg_t bottom;
-        int rc = bottom.init ();
+        rc = bottom.init ();
         errno_assert (rc == 0);
         bottom.set_flags (msg_t::more);
         rc = xreq_t::xsend (&bottom, 0);
@@ -59,13 +75,13 @@ int xs::req_t::xsend (msg_t *msg_, int flags_)
             bottom.close ();
             return -1;
         }
-        message_begins = false;
         bottom.close ();
+        message_begins = false;
     }
 
     bool more = msg_->flags () & msg_t::more ? true : false;
 
-    int rc = xreq_t::xsend (msg_, flags_);
+    rc = xreq_t::xsend (msg_, flags_);
     if (rc != 0)
         return rc;
 
@@ -88,13 +104,33 @@ int xs::req_t::xrecv (msg_t *msg_, int flags_)
         return -1;
     }
 
-    //  First part of the reply should be the original request ID.
+    //  First part of the reply should be the original request ID,
+    //  then delimiter.
     if (message_begins) {
+retry:
         rc = xreq_t::xrecv (msg_, flags_);
         if (rc != 0)
             return rc;
 
-        // TODO: This should also close the connection with the peer!
+        if (options.sp_version >= 3) {
+            if (unlikely (!(msg_->flags () & msg_t::more) ||
+                  msg_->size () != 4 ||
+                  get_uint32 ((unsigned char*) msg_->data ()) != request_id)) {
+                while (true) {
+                    rc = xreq_t::xrecv (msg_, flags_);
+                    errno_assert (rc == 0);
+                    if (!(msg_->flags () & msg_t::more))
+                        break;
+                }
+                msg_->close ();
+                msg_->init ();
+                goto retry;
+            }
+            ++request_id;
+            rc = xreq_t::xrecv (msg_, flags_);
+            errno_assert (rc == 0);
+        }
+
         if (unlikely (!(msg_->flags () & msg_t::more) || msg_->size () != 0)) {
             while (true) {
                 rc = xreq_t::xrecv (msg_, flags_);
@@ -104,8 +140,7 @@ int xs::req_t::xrecv (msg_t *msg_, int flags_)
             }
             msg_->close ();
             msg_->init ();
-            errno = EAGAIN;
-            return -1;
+            goto retry;
         }
 
         message_begins = false;
@@ -159,6 +194,12 @@ xs::req_session_t::~req_session_t ()
 int xs::req_session_t::write (msg_t *msg_)
 {
     switch (state) {
+    case reqid:
+        if (msg_->flags () == msg_t::more && msg_->size () == 4) {
+            state = bottom;
+            return xreq_session_t::write (msg_);
+        }
+        break;
     case bottom:
         if (msg_->flags () == msg_t::more && msg_->size () == 0) {
             state = body;
@@ -175,7 +216,10 @@ int xs::req_session_t::write (msg_t *msg_)
         break;
     case identity:
         if (msg_->flags () == 0) {
-            state = bottom;
+            if (options.sp_version >= 3)
+                state = reqid;
+            else
+                state = bottom;
             return xreq_session_t::write (msg_);
         }
         break;

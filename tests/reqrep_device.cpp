@@ -57,7 +57,7 @@ int XS_TEST_MAIN ()
     errno_assert (rc == 3);
 
     //  Pass the request through the device.
-    for (int i = 0; i != 4; i++) {
+    for (int i = 0; i != 5; i++) {
         xs_msg_t msg;
         rc = xs_msg_init (&msg);
         errno_assert (rc == 0);
@@ -95,7 +95,7 @@ int XS_TEST_MAIN ()
     errno_assert (rc == 3);
 
     //  Pass the reply through the device.
-    for (int i = 0; i != 4; i++) {
+    for (int i = 0; i != 5; i++) {
         xs_msg_t msg;
         rc = xs_msg_init (&msg);
         errno_assert (rc == 0);

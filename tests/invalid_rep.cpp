@@ -49,22 +49,39 @@ int XS_TEST_MAIN ()
     //  Receive the request.
     char addr [32];
     int addr_size;
+    char reqid [4];
     char bottom [1];
     char body [1];
     addr_size = xs_recv (xrep_socket, addr, sizeof (addr), 0);
     errno_assert (addr_size >= 0);
+    rc = xs_recv (xrep_socket, reqid, sizeof (reqid), 0);
+    errno_assert (rc == 4);
     rc = xs_recv (xrep_socket, bottom, sizeof (bottom), 0);
     errno_assert (rc == 0);
     rc = xs_recv (xrep_socket, body, sizeof (body), 0);
     errno_assert (rc == 1);
 
-    //  Send invalid reply.
+    //  Send invalid reply (missing backtrace stack).
     rc = xs_send (xrep_socket, addr, addr_size, 0);
     errno_assert (rc == addr_size);
+
+    //  Send invalid reply (the request ID doesn't match).
+    rc = xs_send (xrep_socket, addr, addr_size, XS_SNDMORE);
+    errno_assert (rc == addr_size);
+    reqid [0]++;
+    rc = xs_send (xrep_socket, reqid, 4, XS_SNDMORE);
+    errno_assert (rc == 4);
+    reqid [0]--;
+    rc = xs_send (xrep_socket, bottom, 0, XS_SNDMORE);
+    errno_assert (rc == 0);
+    rc = xs_send (xrep_socket, "x", 1, 0);
+    errno_assert (rc == 1);
 
     //  Send valid reply.
     rc = xs_send (xrep_socket, addr, addr_size, XS_SNDMORE);
     errno_assert (rc == addr_size);
+    rc = xs_send (xrep_socket, reqid, 4, XS_SNDMORE);
+    errno_assert (rc == 4);
     rc = xs_send (xrep_socket, bottom, 0, XS_SNDMORE);
     errno_assert (rc == 0);
     rc = xs_send (xrep_socket, "b", 1, 0);

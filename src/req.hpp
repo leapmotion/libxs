@@ -57,6 +57,9 @@ namespace xs
         //  of the message must be empty message part (backtrace stack bottom).
         bool message_begins;
 
+        //  ID of the ongoing request.
+        uint32_t request_id;
+
         req_t (const req_t&);
         const req_t &operator = (const req_t&);
     };
@@ -78,6 +81,7 @@ namespace xs
 
         enum {
             identity,
+            reqid,
             bottom,
             body
         } state;
