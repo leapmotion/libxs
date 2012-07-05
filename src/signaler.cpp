@@ -111,18 +111,29 @@ static int make_fdpair (xs::fd_t *r_, xs::fd_t *w_)
     //  Create listening socket.
     SOCKET listener;
     listener = xs::open_socket (AF_INET, SOCK_STREAM, 0);
-    if (listener == xs::retired_fd)
+    if (listener == xs::retired_fd) {
+        BOOL brc = SetEvent (sync);
+        win_assert (brc != 0);
         return -1;
+    }
 
     //  Set SO_REUSEADDR and TCP_NODELAY on listening socket.
     BOOL so_reuseaddr = 1;
     int rc = setsockopt (listener, SOL_SOCKET, SO_REUSEADDR,
         (char *)&so_reuseaddr, sizeof (so_reuseaddr));
-    wsa_assert (rc != SOCKET_ERROR);
+    if (rc == SOCKET_ERROR) {
+        BOOL brc = SetEvent (sync);
+        win_assert (brc != 0);
+        xs_assert (false);
+    }
     BOOL tcp_nodelay = 1;
     rc = setsockopt (listener, IPPROTO_TCP, TCP_NODELAY,
         (char *)&tcp_nodelay, sizeof (tcp_nodelay));
-    wsa_assert (rc != SOCKET_ERROR);
+    if (rc == SOCKET_ERROR) {
+        BOOL brc = SetEvent (sync);
+        win_assert (brc != 0);
+        xs_assert (false);
+    }
 
     //  Bind listening socket to the local port.
     struct sockaddr_in addr;
@@ -131,42 +142,58 @@ static int make_fdpair (xs::fd_t *r_, xs::fd_t *w_)
     addr.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
     addr.sin_port = htons (xs::signaler_port);
     rc = bind (listener, (const struct sockaddr*) &addr, sizeof (addr));
-    wsa_assert (rc != SOCKET_ERROR);
+    if (rc == SOCKET_ERROR) {
+        BOOL brc = SetEvent (sync);
+        win_assert (brc != 0);
+        xs_assert (false);
+    }
 
     //  Listen for incomming connections.
     rc = listen (listener, 1);
-    wsa_assert (rc != SOCKET_ERROR);
+    if (rc == SOCKET_ERROR) {
+        BOOL brc = SetEvent (sync);
+        win_assert (brc != 0);
+        xs_assert (false);
+    }
 
     //  Create the writer socket.
     *w_ = xs::open_socket (AF_INET, SOCK_STREAM, 0);
     if (*w_ == xs::retired_fd) {
-        rc = closesocket (listener);
-        wsa_assert (rc != SOCKET_ERROR);
+        closesocket (listener);
+        BOOL brc = SetEvent (sync);
+        win_assert (brc != 0);
         return -1;
     }
 
     //  Set TCP_NODELAY on writer socket.
     rc = setsockopt (*w_, IPPROTO_TCP, TCP_NODELAY,
         (char *)&tcp_nodelay, sizeof (tcp_nodelay));
-    wsa_assert (rc != SOCKET_ERROR);
+    if (rc == SOCKET_ERROR) {
+        BOOL brc = SetEvent (sync);
+        win_assert (brc != 0);
+        xs_assert (false);
+    }
 
     //  Connect writer to the listener.
     rc = connect (*w_, (sockaddr *) &addr, sizeof (addr));
-    wsa_assert (rc != SOCKET_ERROR);
+    if (rc == SOCKET_ERROR) {
+        BOOL brc = SetEvent (sync);
+        win_assert (brc != 0);
+        xs_assert (false);
+    }
 
     //  Accept connection from writer.
     *r_ = accept (listener, NULL, NULL);
     if (*r_ == xs::retired_fd) {
-        rc = closesocket (listener);
-        wsa_assert (rc != SOCKET_ERROR);
-        rc = closesocket (*w_);
-        wsa_assert (rc != SOCKET_ERROR);
+        closesocket (listener);
+        closesocket (*w_);
+        BOOL brc = SetEvent (sync);
+        win_assert (brc != 0);
         return -1;
     }
 
     //  We don't need the listening socket anymore. Close it.
-    rc = closesocket (listener);
-    wsa_assert (rc != SOCKET_ERROR);
+    closesocket (listener);
 
     //  Exit the critical section.
     BOOL brc = SetEvent (sync);
