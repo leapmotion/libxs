@@ -12,7 +12,7 @@ AC_INIT([libxs], [m4_esyscmd([./version.sh])],
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([src/platform.hpp])
-AM_INIT_AUTOMAKE([tar-ustar dist-zip foreign])
+AM_INIT_AUTOMAKE([tar-ustar dist-zip foreign subdir-objects])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # ABI version for libxs (Libtool -version-info)
@@ -527,18 +527,16 @@ AC_SUBST([LIBXS_EXTRA_LDFLAGS])
 
 AC_CONFIG_FILES([
     Makefile
-    src/Makefile
-    doc/Makefile
-    perf/Makefile
     src/libxs.pc
-    builds/msvc/Makefile
-    tests/Makefile
     foreign/openpgm/Makefile
 ])
 
 AS_IF([test "x$libxs_libzmq" == "xyes"], [
     AC_CONFIG_FILES([src/libzmq.pc])
 ])
+
+# Create output directories
+AS_MKDIR_P([doc])
 
 AC_OUTPUT
 
