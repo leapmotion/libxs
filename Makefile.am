@@ -233,50 +233,49 @@ endif
 ###############################################################################
 
 MAN3 = \
-    doc/xs_bind.3 \
-    doc/xs_close.3 \
-    doc/xs_connect.3 \
-    doc/xs_init.3 \
-    doc/xs_msg_close.3 \
-    doc/xs_msg_copy.3 \
-    doc/xs_msg_data.3 \
-    doc/xs_msg_init.3 \
-    doc/xs_msg_init_data.3 \
-    doc/xs_msg_init_size.3 \
-    doc/xs_msg_move.3 \
-    doc/xs_msg_size.3 \
-    doc/xs_poll.3 \
-    doc/xs_recv.3 \
-    doc/xs_send.3 \
-    doc/xs_setsockopt.3 \
-    doc/xs_socket.3 \
-    doc/xs_strerror.3 \
-    doc/xs_term.3 \
-    doc/xs_version.3 \
-    doc/xs_getsockopt.3 \
-    doc/xs_errno.3 \
-    doc/xs_sendmsg.3 \
-    doc/xs_recvmsg.3 \
-    doc/xs_getmsgopt.3 \
-    doc/xs_setctxopt.3 \
-    doc/xs_shutdown.3
+    doc/xs_bind.txt \
+    doc/xs_close.txt \
+    doc/xs_connect.txt \
+    doc/xs_init.txt \
+    doc/xs_msg_close.txt \
+    doc/xs_msg_copy.txt \
+    doc/xs_msg_data.txt \
+    doc/xs_msg_init.txt \
+    doc/xs_msg_init_data.txt \
+    doc/xs_msg_init_size.txt \
+    doc/xs_msg_move.txt \
+    doc/xs_msg_size.txt \
+    doc/xs_poll.txt \
+    doc/xs_recv.txt \
+    doc/xs_send.txt \
+    doc/xs_setsockopt.txt \
+    doc/xs_socket.txt \
+    doc/xs_strerror.txt \
+    doc/xs_term.txt \
+    doc/xs_version.txt \
+    doc/xs_getsockopt.txt \
+    doc/xs_errno.txt \
+    doc/xs_sendmsg.txt \
+    doc/xs_recvmsg.txt \
+    doc/xs_getmsgopt.txt \
+    doc/xs_setctxopt.txt \
+    doc/xs_shutdown.txt
 
 MAN7 = \
-    doc/xs.7 \
-    doc/xs_tcp.7 \
-    doc/xs_pgm.7 \
-    doc/xs_inproc.7 \
-    doc/xs_ipc.7 \
-    doc/xs_zmq.7
+    doc/xs.txt \
+    doc/xs_tcp.txt \
+    doc/xs_pgm.txt \
+    doc/xs_inproc.txt \
+    doc/xs_ipc.txt \
+    doc/xs_zmq.txt
 
-MAN_DOC = $(MAN1) $(MAN3) $(MAN7)
-
-MAN_TXT = $(MAN3:%.3=%.txt)
-MAN_TXT += $(MAN7:%.7=%.txt)
+MAN_TXT = $(MAN3) $(MAN7)
 MAN_HTML = $(MAN_TXT:%.txt=%.html)
+MAN_XML = $(MAN_TXT:%.txt=%.xml)
 
 if INSTALL_MAN
-dist_man_MANS = $(MAN_DOC)
+dist_man3_MANS = $(MAN3)
+dist_man7_MANS = $(MAN7)
 endif
 
 EXTRA_DIST += doc/asciidoc.conf $(MAN_TXT)
@@ -285,23 +284,23 @@ if BUILD_DOC
 EXTRA_DIST += $(MAN_HTML)
 endif
 
-MAINTAINERCLEANFILES += $(MAN_DOC) $(MAN_HTML)
+MAINTAINERCLEANFILES += $(MAN_HTML) $(MAN_XML)
 
 if BUILD_DOC
-SUFFIXES=.html .txt .xml .3 .7
+
+# Silent rules for asciidoc
+asciidoc_verbose = $(asciidoc_verbose_$(V))
+asciidoc_verbose_ = $(asciidoc_verbose_$(AM_DEFAULT_VERBOSITY))
+asciidoc_verbose_0 = @echo ASCIIDOC $@;
+
+SUFFIXES= .html .xml .txt
 
 .txt.html:
-	asciidoc -d manpage -b xhtml11 -f $(top_srcdir)/doc/asciidoc.conf \
-		-axs_version=@PACKAGE_VERSION@ -o$@ $<
+	$(asciidoc_verbose)asciidoc -d manpage -b xhtml11 -f $(top_srcdir)/doc/asciidoc.conf -axs_version=@PACKAGE_VERSION@ -o$@ $<
+
 .txt.xml:
-	asciidoc -d manpage -b docbook -f $(top_srcdir)/doc/asciidoc.conf \
-		-axs_version=@PACKAGE_VERSION@ -o$@ $<
-.xml.1:
-	xmlto -o doc man $<
-.xml.3:
-	xmlto -o doc man $<
-.xml.7:
-	xmlto -o doc man $<
+	$(asciidoc_verbose)asciidoc -d manpage -b docbook -f $(top_srcdir)/doc/asciidoc.conf -axs_version=@PACKAGE_VERSION@ -o$@ $<
+
 endif
 
 ###############################################################################
