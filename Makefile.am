@@ -205,8 +205,8 @@ src_libxs_la_CPPFLAGS = -DXS_LIBDIR_PATH='"$(libdir)"'
 src_libxs_la_CXXFLAGS = @LIBXS_EXTRA_CXXFLAGS@
 
 if BUILD_PGM
-src_libxs_la_CPPFLAGS += -I$(top_srcdir)/@pgm_srcdir@/include/
-src_libxs_la_LIBADD = @pgm_srcdir@/libpgm_noinst.la
+src_libxs_la_CPPFLAGS += -I$(srcdir)/@pgm_srcdir@/include/
+src_libxs_la_LIBADD = $(builddir)/@pgm_srcdir@/libpgm_noinst.la
 endif
 
 ##################

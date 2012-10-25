@@ -435,23 +435,23 @@ AS_IF([test "x$with_pgm_ext" != "xno"], [
     # Unpack libpgm
     AC_MSG_NOTICE([Unpacking ${pgm_basename}.tar.gz])
     libxs_pwd=`pwd`
-    cd foreign/openpgm
+    cd "${srcdir}/foreign/openpgm"
 
     AS_IF([! (gzip -dc "${pgm_basename}.tar.gz" || echo "failed") | ${am__untar}], [
-        AC_MSG_ERROR([cannot unpack the foreign/openpgm/${pgm_basename}.tar.gz file])
+        AC_MSG_ERROR([${pgm_basename}.tar.gz file])
     ])
 
     cd "${libxs_pwd}"
 
-    AS_IF([test -d foreign/openpgm/build-staging], [
-        rm -rf foreign/openpgm/build-staging
+    AS_IF([test -d "${srcdir}/foreign/openpgm/build-staging"], [
+        rm -rf "${srcdir}/foreign/openpgm/build-staging"
     ])
 
-    mv foreign/openpgm/${pgm_basename} foreign/openpgm/build-staging
+    mv "${srcdir}/foreign/openpgm/${pgm_basename}" "${srcdir}/foreign/openpgm/build-staging"
     pgm_srcdir=foreign/openpgm/build-staging/openpgm/pgm
 
-    AS_IF([! test -d foreign/openpgm/build-staging/openpgm/pgm/config], [
-        mkdir foreign/openpgm/build-staging/openpgm/pgm/config
+    AS_IF([! test -d "${srcdir}/foreign/openpgm/build-staging/openpgm/pgm/config"], [
+        mkdir "${srcdir}/foreign/openpgm/build-staging/openpgm/pgm/config"
     ])
 
     # DSO symbol visibility for openpgm
@@ -463,7 +463,7 @@ AS_IF([test "x$with_pgm_ext" != "xno"], [
     AC_SUBST([pgm_subdir])
 
     AC_SUBST([pgm_srcdir])
-    AC_CONFIG_SUBDIRS([foreign/openpgm/build-staging/openpgm/pgm/])
+    AC_CONFIG_SUBDIRS([foreign/openpgm/build-staging/openpgm/pgm])
 
     # Success!
     AC_DEFINE([XS_HAVE_OPENPGM], [1], [Have OpenPGM extension])
