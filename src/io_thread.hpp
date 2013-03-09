@@ -116,10 +116,23 @@ namespace xs
         struct timer_info_t
         {
             xs::i_poll_events *sink;
+#if LIBCXX_WORKAROUND
+            void* self;
+#else
             std::multimap <uint64_t, timer_info_t>::iterator self;
+#endif
         };
         typedef std::multimap <uint64_t, timer_info_t> timers_t;
         timers_t timers;
+
+#if LIBCXX_WORKAROUND
+        union union_timers_t_iterator {
+          union_timers_t_iterator(void* _self = 0) : iter(timers_t::iterator()) { self = _self; }
+          union_timers_t_iterator(timers_t::iterator _iter) : iter(_iter) {}
+          void* self;
+          timers_t::iterator iter;
+        };
+#endif
 
         //  Load of the I/O thread. Currently the number of file descriptors
         //  registered.

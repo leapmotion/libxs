@@ -98,17 +98,31 @@ void xs::io_thread_t::adjust_load (int amount_)
 xs::handle_t xs::io_thread_t::add_timer (int timeout_, i_poll_events *sink_)
 {
     uint64_t expiration = clock.now_ms () + timeout_;
+#if LIBCXX_WORKAROUND
+    timer_info_t info = {sink_, 0};
+#else
     timer_info_t info = {sink_, timers_t::iterator ()};
+#endif
     timers_t::iterator it = timers.insert (
         timers_t::value_type (expiration, info));
+#if LIBCXX_WORKAROUND
+    union_timers_t_iterator utti(it);
+    it->second.self = utti.self;
+#else
     it->second.self = it;
+#endif
     return (handle_t) &(it->second);
 }
 
 void xs::io_thread_t::rm_timer (handle_t handle_)
 {
     timer_info_t *info = (timer_info_t*) handle_;
+#if LIBCXX_WORKAROUND
+    union_timers_t_iterator utti(info->self);
+    timers.erase (utti.iter);
+#else
     timers.erase (info->self);
+#endif
 }
 
 uint64_t xs::io_thread_t::execute_timers ()
