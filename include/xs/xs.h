@@ -35,10 +35,16 @@ extern "C" {
 
 /*  Handle DSO symbol visibility                                             */
 #if defined _WIN32
-#   if defined DLL_EXPORT
-#       define XS_EXPORT __declspec(dllexport)
+// XS_STATIC. Suggested here: http://stackoverflow.com/questions/6259022/how-can-i-handle-dll-export-when-compiling-dll-to-a-static-library
+// toggle the XS_STATIC or DLL_EXPORT macros in builds/msvc/properties/Crossroads.props
+#   if defined XS_STATIC
+#       define XS_EXPORT
 #   else
-#       define XS_EXPORT __declspec(dllimport)
+#       if defined DLL_EXPORT
+#           define XS_EXPORT __declspec(dllexport)
+#       else
+#           define XS_EXPORT __declspec(dllimport)
+#       endif
 #   endif
 #else
 #   if defined __SUNPRO_C  || defined __SUNPRO_CC
