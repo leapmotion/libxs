@@ -205,7 +205,7 @@ int xs::tcp_connecter_t::open ()
 
     //  Create the socket.
     s = open_tcp_socket (address.ss_family, options.keepalive ? true : false);
-    if (s == -1)
+    if (static_cast<int>(s) == -1)
         return -1;
 
     //  On some systems, IPv4 mapping in IPv6 sockets is disabled by default.

@@ -76,7 +76,7 @@
 #ifndef NODRAWTEXT
 #define NODRAWTEXT        // DrawText() and DT_*
 #endif
-#ifndef NOGDI
+#if !defined(NOGDI) && !defined(__MINGW32__)
 #define NOGDI             // All GDI defines and routines
 #endif
 #ifndef NOKERNEL
@@ -142,7 +142,9 @@
 #define _WIN32_WINNT 0x0501
 #endif
 
+#ifndef __MINGW32__
 #include <windows.h>
+#endif
 
 #ifdef __MINGW32__
 //  Require Windows XP or higher with MinGW for getaddrinfo().
@@ -165,6 +167,9 @@
 #define AI_NUMERICSERV 0x0400
 #endif
 
+#if defined(__MINGW32__) && !defined(WIN32_IE)
+#define _WIN32_IE 0x0500
+#endif
 #include <Shlobj.h>
 
 #endif

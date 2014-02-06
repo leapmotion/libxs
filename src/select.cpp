@@ -77,7 +77,11 @@ xs::handle_t xs::select_t::add_fd (fd_t fd_, i_poll_events *events_)
 
 void xs::select_t::rm_fd (handle_t handle_)
 {
+#ifdef __MINGW32__
+    unsigned fd = ptrtofd (handle_);
+#else
     int fd = ptrtofd (handle_);
+#endif
 
     //  Mark the descriptor as retired.
     fd_set_t::iterator it;

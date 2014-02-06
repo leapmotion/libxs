@@ -69,7 +69,9 @@
 //  or select() functions
 
 #if defined XS_HAVE_WINDOWS // Windows-specific header files
+#ifndef __MINGW32__
 #   include "windows.h"
+#endif
 #   include "winsock2.h"
 #else // Header files for Unix-like operating systems
 #   if HAVE_SYS_TYPES

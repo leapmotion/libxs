@@ -48,6 +48,17 @@ namespace xs
 
 #ifdef XS_HAVE_WINDOWS
 
+#ifdef __MINGW32__
+#define EMSGSIZE        40
+#define ENETUNREACH     51
+#define ENETRESET       52
+#define ECONNABORTED    53
+#define ECONNRESET      54
+#define ENOTCONN        57
+#define ETIMEDOUT       60
+#define EHOSTUNREACH    65
+#endif
+
 namespace xs
 {
     const char *wsa_error ();

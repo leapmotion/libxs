@@ -19,6 +19,9 @@
 */
 
 #include "testutil.hpp"
+#ifdef __MINGW32__
+#include "err.hpp"
+#endif
 
 int XS_TEST_MAIN ()
 {

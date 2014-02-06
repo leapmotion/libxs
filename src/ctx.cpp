@@ -101,13 +101,22 @@ xs::ctx_t::ctx_t () :
             goto next;
 
         //  Load the library and locate the extension point.
+#ifdef __MINGW32__
+        HMODULE dl;
+        dl = LoadLibrary ((path + "\\xs\\" + ffd.cFileName).c_str ());
+#else
         HMODULE dl = LoadLibrary ((path + "\\xs\\" + ffd.cFileName).c_str ());
+#endif
         if (!dl)
             goto next;
         file = std::string ("xsp_") + file.substr (0, file.size () - 4) +
             "_init";
         void *(*initfn) ();
+#ifdef __MINGW32__
+        *(void**)(&initfn) = (void *)(int)GetProcAddress (dl, file.c_str ());
+#else
         *(void**)(&initfn) = GetProcAddress (dl, file.c_str ());
+#endif
         if (!initfn)
             goto next;
 

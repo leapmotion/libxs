@@ -151,10 +151,6 @@ AS_CASE(["${host_os}"],
         AC_LANG_POP([C++])
         libxs_on_mingw32="yes"
         libxs_dso_visibility="no"
-
-        AS_IF([test "x$enable_static" = "xyes"], [
-            AC_MSG_ERROR([Building static libraries is not supported under MinGW32])
-        ])
     ],
     [*cygwin*], [
         AC_DEFINE([XS_HAVE_CYGWIN], [1], [Have Cygwin])
